@@ -1,0 +1,19 @@
+{
+  "name": "driversclubhessen",
+  "version": "1.0.0",
+  "private": true,
+  "description": "DriversClub Hessen monorepo",
+  "workspaces": ["apps/*", "packages/*"],
+  "scripts": {
+    "dev": "npm run dev --workspace web",
+    "dev:web": "npm run dev --workspace web",
+    "dev:cms": "npm run develop --workspace cms",
+    "build": "npm run build --workspaces --if-present",
+    "typecheck": "npm run typecheck --workspace @driversclub/shared",
+    "lint": "biome check apps/web/src apps/web/next.config.ts packages/shared/src",
+    "format": "biome format --write apps/web/src apps/web/next.config.ts packages/shared/src"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "^1.9.4"
+  }
+}

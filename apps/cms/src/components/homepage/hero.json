@@ -1,0 +1,25 @@
+{
+  "collectionName": "components_homepage_heroes",
+  "info": {
+    "displayName": "Hero",
+    "description": "Homepage hero content"
+  },
+  "attributes": {
+    "eyebrow": {
+      "type": "string",
+      "required": true
+    },
+    "titleLine1": {
+      "type": "string",
+      "required": true
+    },
+    "titleLine2": {
+      "type": "string",
+      "required": true
+    },
+    "dateLabel": {
+      "type": "string",
+      "required": true
+    }
+  }
+}

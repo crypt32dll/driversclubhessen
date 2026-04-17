@@ -1,0 +1,12 @@
+.env
+node_modules/
+**/node_modules/
+**/.next/
+**/dist/
+**/build/
+**/.strapi/
+apps/web/.env.local
+apps/web/.env
+apps/cms/.tmp/
+apps/cms/.cache/
+apps/cms/build/

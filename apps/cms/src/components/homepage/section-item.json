@@ -1,0 +1,20 @@
+{
+  "collectionName": "components_homepage_section_items",
+  "info": {
+    "displayName": "Section Item",
+    "description": "Flexible homepage content section item"
+  },
+  "attributes": {
+    "title": {
+      "type": "string",
+      "required": true
+    },
+    "description": {
+      "type": "text"
+    },
+    "order": {
+      "type": "integer",
+      "default": 0
+    }
+  }
+}
