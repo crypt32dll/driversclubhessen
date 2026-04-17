@@ -7,11 +7,24 @@ import { buildStrapiImageRemotePatterns } from "./src/lib/strapi/build-remote-pa
 /** Default ISR window (seconds); align with `STRAPI_ISR_REVALIDATE_SECONDS` in production env. */
 const STRAPI_CACHE_REVALIDATE_SEC = 3600;
 
+const isVercelBuild = process.env.VERCEL === "1";
+
 const nextConfig: NextConfig = {
   typescript: {
     // Node 23 in this environment can hang TS build checks.
     // Keep CI on Node LTS and run `npm run typecheck` in CI.
     ignoreBuildErrors: true,
+  },
+  /** On Vercel, log full fetch URLs in server/runtime logs (helps trace Strapi calls). */
+  logging: isVercelBuild ? { fetches: { fullUrl: true } } : undefined,
+  compiler: {
+    runAfterProductionCompile: async ({ projectDir, distDir }) => {
+      if (process.env.VERCEL !== "1" && process.env.CI !== "true") return;
+      console.log(
+        "[web:build] production compile finished — next: typecheck + static generation",
+        JSON.stringify({ projectDir, distDir }),
+      );
+    },
   },
   // Monorepo: trace files from repo root (avoids wrong root when multiple lockfiles exist).
   // Assumes Next commands run with cwd = `apps/web` (default for npm workspace scripts).

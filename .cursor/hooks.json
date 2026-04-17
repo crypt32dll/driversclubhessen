@@ -1,0 +1,17 @@
+{
+  "version": 1,
+  "hooks": {
+    "postToolUse": [
+      {
+        "command": "node .cursor/hooks/scan-shell-output.mjs",
+        "matcher": "Shell"
+      }
+    ],
+    "afterShellExecution": [
+      {
+        "command": "node .cursor/hooks/scan-shell-output.mjs",
+        "matcher": "npm|turbo|next|strapi|npx|node |pnpm|yarn "
+      }
+    ]
+  }
+}

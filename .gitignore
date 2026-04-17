@@ -1,7 +1,10 @@
+# Turbo (local cache — do not commit)
+.turbo/
+
 .env
 .env.local
 .env.production
-
+*.tar
 node_modules/
 **/node_modules/
 **/.next/
