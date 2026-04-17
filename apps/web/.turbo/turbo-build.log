@@ -1,0 +1,58 @@
+
+> web@0.1.0 prebuild
+> node ./scripts/check-build-env.cjs
+
+[web:build-env] INFO check (strict=false, VERCEL=0)
+[web:build-env] WARN NEXT_PUBLIC_STRAPI_URL unset or empty (allowed locally; production deploys must set a public Strapi base URL).
+[web:build-env] INFO env check finished
+
+> web@0.1.0 build
+> next build --webpack
+
+▲ Next.js 16.2.4 (webpack)
+- Environments: .env.local
+
+  Creating an optimized production build ...
+✓ Compiled successfully in 1327ms
+  Skipping validation of types
+  Finished TypeScript config validation in 4ms ...
+  Collecting page data using 1 worker ...
+  Generating static pages using 1 worker (0/10) ...
+  Generating static pages using 1 worker (2/10) 
+  Generating static pages using 1 worker (4/10) 
+[37m2026-04-17 22:52:45.003[39m[0m[0m	[31m[1mERROR[22m[39m[0m[0m	[37m[39m[0m[0m[1m[37m	web[39m[22m[0m[0m	API GET request failed {
+  path: [32m'/api/events'[39m,
+  status: [33m404[39m 
+}
+[37m2026-04-17 22:52:45.007[39m[0m[0m	[31m[1mERROR[22m[39m[0m[0m	[37m[39m[0m[0m[1m[37m	web[39m[22m[0m[0m	API GET request failed {
+  path: [32m'/api/homepage'[39m,
+  status: [33m404[39m 
+}
+[37m2026-04-17 22:52:45.027[39m[0m[0m	[31m[1mERROR[22m[39m[0m[0m	[37m[39m[0m[0m[1m[37m	web[39m[22m[0m[0m	API GET request failed {
+  path: [32m'/api/galleries'[39m,
+  status: [33m404[39m 
+}
+[37m2026-04-17 22:52:45.040[39m[0m[0m	[31m[1mERROR[22m[39m[0m[0m	[37m[39m[0m[0m[1m[37m	web[39m[22m[0m[0m	API GET request failed {
+  path: [32m'/api/events'[39m,
+  status: [33m404[39m 
+}
+  Generating static pages using 1 worker (7/10) 
+✓ Generating static pages using 1 worker (10/10) in 325ms
+  Finalizing page optimization ...
+  Collecting build traces ...
+
+Route (app)             Revalidate  Expire
+┌ ○ /                           1h      1y
+├ ○ /_not-found
+├ ƒ /api/revalidate
+├ ○ /events                     1h      1y
+├ ƒ /events/[slug]
+├ ○ /gallery                    1h      1y
+├ ○ /legal/datenschutz
+├ ○ /legal/impressum
+└ ○ /robots.txt
+
+
+○  (Static)   prerendered as static content
+ƒ  (Dynamic)  server-rendered on demand
+

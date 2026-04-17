@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "private": true,
   "description": "DriversClub Hessen monorepo",
+  "packageManager": "npm@10.9.2",
   "workspaces": [
     "apps/*",
     "packages/*"
@@ -11,7 +12,9 @@
     "dev": "npm run dev --workspace web",
     "dev:web": "npm run dev --workspace web",
     "dev:cms": "npm run develop --workspace cms",
-    "build": "turbo run build",
+    "build": "turbo run build --filter=web",
+    "build:web": "turbo run build --filter=web",
+    "build:all": "turbo run build",
     "typecheck": "turbo run typecheck",
     "lint": "biome check apps/web/src apps/web/next.config.ts packages/shared/src packages/logger/src",
     "format": "biome format --write apps/web/src apps/web/next.config.ts packages/shared/src packages/logger/src"
