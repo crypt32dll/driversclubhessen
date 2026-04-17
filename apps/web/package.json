@@ -4,6 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev --webpack",
+    "prebuild": "node ./scripts/check-build-env.cjs",
     "build": "next build --webpack",
     "start": "next start",
     "typecheck": "tsc --noEmit"

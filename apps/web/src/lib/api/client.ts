@@ -44,6 +44,8 @@ export const apiClient = {
     const url = `${STRAPI_URL}${path}${toQueryString(query)}`;
     const revalidateSec = cache?.revalidate ?? STRAPI_ISR_SECONDS;
     const response = await fetch(url, {
+      // Next.js 16 Data Cache: ISR window + tag-based on-demand revalidation (webhooks).
+      cache: "force-cache",
       next: {
         revalidate: revalidateSec,
         ...(cache?.tags?.length ? { tags: cache.tags } : {}),

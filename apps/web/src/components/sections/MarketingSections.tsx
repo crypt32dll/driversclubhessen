@@ -2,11 +2,29 @@ import { ButtonLink } from "@/components/ui/ButtonLink";
 import { Container } from "@/components/ui/Container";
 import { Reveal } from "@/components/ui/Reveal";
 import type { HomepageSection } from "@driversclub/shared";
+
+const DEFAULT_HIGHLIGHT_ICONS = ["🚗", "⛽", "🍔", "👥", "📸", "🔥"] as const;
+
+function sortByOrder(a: HomepageSection, b: HomepageSection) {
+  return (a.order ?? 0) - (b.order ?? 0);
+}
+
+function highlightsFromCms(cms: HomepageSection[] | undefined) {
+  if (!cms?.length) return [];
+  return cms
+    .filter((s) => !s.variant || s.variant === "highlight")
+    .sort(sortByOrder);
+}
+
+function blocksForVariant(
+  cms: HomepageSection[] | undefined,
+  variant: NonNullable<HomepageSection["variant"]>,
+) {
+  if (!cms?.length) return [];
+  return cms.filter((s) => s.variant === variant).sort(sortByOrder);
+}
 import Link from "next/link";
 import {
-  cmsSection,
-  cmsSectionBody,
-  cmsSectionTitle,
   collabDesc,
   collabLogoBox,
   collabLogos,
@@ -97,32 +115,38 @@ const rules = [
 const MAP_URL = "https://maps.google.com/?q=Industriestraße+6+63633+Birstein";
 
 type Props = {
-  /** Dynamic zone blocks from Strapi (`homepage.section-item`). */
+  /** Dynamic zone blocks from Strapi (`homepage.section-item`), ordered by `order`, filtered by `variant`. */
   cmsSections?: HomepageSection[];
 };
 
 export const MarketingSections = ({ cmsSections }: Props) => {
-  const hasCmsSections = Boolean(cmsSections?.length);
+  const highlightBlocks = highlightsFromCms(cmsSections);
+  const ruleBlocks = blocksForVariant(cmsSections, "rule");
+  const aboutBlocks = blocksForVariant(cmsSections, "about");
+  const locationBlocks = blocksForVariant(cmsSections, "location");
+  const socialBlocks = blocksForVariant(cmsSections, "social");
+
+  const featureItems =
+    highlightBlocks.length > 0
+      ? highlightBlocks.map((s, index) => ({
+          icon:
+            s.icon ??
+            DEFAULT_HIGHLIGHT_ICONS[index % DEFAULT_HIGHLIGHT_ICONS.length],
+          title: s.title,
+          text: s.description ?? "",
+        }))
+      : features.map((item) => ({ ...item }));
+
+  const ruleItems =
+    ruleBlocks.length > 0
+      ? ruleBlocks.map((s) => ({
+          icon: s.icon ?? "✅",
+          text: [s.title, s.description].filter(Boolean).join(" — "),
+        }))
+      : rules.map((item) => ({ ...item }));
 
   return (
     <>
-      {hasCmsSections ? (
-        <section className={featuresSection} id="cms-sections">
-          <Container>
-            {cmsSections?.map((block, index) => (
-              <Reveal key={`${block.title}-${index}`} className={cmsSection}>
-                <h2 className={cmsSectionTitle}>{block.title}</h2>
-                {block.description ? (
-                  <div className={cmsSectionBody}>{block.description}</div>
-                ) : null}
-              </Reveal>
-            ))}
-          </Container>
-        </section>
-      ) : null}
-
-      {hasCmsSections ? <div className={divider} aria-hidden /> : null}
-
       <section className={featuresSection} id="features">
         <Container>
           <Reveal>
@@ -132,8 +156,8 @@ export const MarketingSections = ({ cmsSections }: Props) => {
             </h2>
           </Reveal>
           <div className={featuresGrid}>
-            {features.map((item) => (
-              <Reveal key={item.title} className={feature}>
+            {featureItems.map((item, index) => (
+              <Reveal key={`${item.title}-${index}`} className={feature}>
                 <div className={featureIcon}>{item.icon}</div>
                 <div className={featureTitle}>{item.title}</div>
                 <div className={featureText}>{item.text}</div>
@@ -154,8 +178,8 @@ export const MarketingSections = ({ cmsSections }: Props) => {
             </h2>
           </Reveal>
           <div className={rulesGrid}>
-            {rules.map((item) => (
-              <Reveal key={item.text} className={rule}>
+            {ruleItems.map((item, index) => (
+              <Reveal key={`${item.text}-${index}`} className={rule}>
                 <div className={ruleIcon}>{item.icon}</div>
                 <div className={ruleText}>{item.text}</div>
               </Reveal>
@@ -187,12 +211,20 @@ export const MarketingSections = ({ cmsSections }: Props) => {
               <span className={logoName}>DCH Est. 2024</span>
             </div>
           </Reveal>
-          <Reveal className={collabDesc}>
-            Zwei Communities. Eine Leidenschaft. Der DriversClub Hessen wurde
-            2024 gegründet und steht für die Leidenschaft für Autos in Hessen.
-            Gemeinsam mit Mi Familia & Friends bringen wir die Szene zusammen –
-            für ein Treffen, das Erinnerungen hinterlässt.
-          </Reveal>
+          {aboutBlocks.length > 0 ? (
+            aboutBlocks.map((b, index) => (
+              <Reveal key={`${b.title}-${index}`} className={collabDesc}>
+                {b.description ?? b.title}
+              </Reveal>
+            ))
+          ) : (
+            <Reveal className={collabDesc}>
+              Zwei Communities. Eine Leidenschaft. Der DriversClub Hessen wurde
+              2024 gegründet und steht für die Leidenschaft für Autos in Hessen.
+              Gemeinsam mit Mi Familia & Friends bringen wir die Szene zusammen –
+              für ein Treffen, das Erinnerungen hinterlässt.
+            </Reveal>
+          )}
         </Container>
       </section>
 
@@ -208,49 +240,80 @@ export const MarketingSections = ({ cmsSections }: Props) => {
           </Reveal>
           <div className={locationContent}>
             <div className={locationInfo}>
-              <Reveal className={locationDetail}>
-                <div className={locIcon}>📍</div>
-                <div>
-                  <div className={locLabel}>Adresse</div>
-                  <div className={locValue}>
-                    Industriestraße 6
-                    <br />
-                    63633 Birstein, Hessen
-                  </div>
-                </div>
-              </Reveal>
-              <Reveal className={locationDetail}>
-                <div className={locIcon}>🕐</div>
-                <div>
-                  <div className={locLabel}>Öffnungszeiten</div>
-                  <div className={locValue}>
-                    12:00 Uhr – 20:00 Uhr
-                    <br />
-                    Sonntag, 19. April 2026
-                  </div>
-                </div>
-              </Reveal>
-              <Reveal className={locationDetail}>
-                <div className={locIcon}>🎟️</div>
-                <div>
-                  <div className={locLabel}>Eintritt</div>
-                  <div className={locValue}>
-                    Komplett kostenlos
-                    <br />
-                    Jeder ist willkommen
-                  </div>
-                </div>
-              </Reveal>
-              <Reveal>
-                <ButtonLink
-                  href={MAP_URL}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className={mapCtaInline}
-                >
-                  In Google Maps öffnen
-                </ButtonLink>
-              </Reveal>
+              {locationBlocks.length > 0 ? (
+                <>
+                  {locationBlocks.map((b, index) => (
+                    <Reveal key={`${b.title}-${index}`} className={locationDetail}>
+                      <div className={locIcon}>{b.icon ?? "📍"}</div>
+                      <div>
+                        <div className={locLabel}>{b.title}</div>
+                        <div
+                          className={locValue}
+                          style={{ whiteSpace: "pre-line" }}
+                        >
+                          {b.description ?? ""}
+                        </div>
+                      </div>
+                    </Reveal>
+                  ))}
+                  <Reveal>
+                    <ButtonLink
+                      href={MAP_URL}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className={mapCtaInline}
+                    >
+                      In Google Maps öffnen
+                    </ButtonLink>
+                  </Reveal>
+                </>
+              ) : (
+                <>
+                  <Reveal className={locationDetail}>
+                    <div className={locIcon}>📍</div>
+                    <div>
+                      <div className={locLabel}>Adresse</div>
+                      <div className={locValue}>
+                        Industriestraße 6
+                        <br />
+                        63633 Birstein, Hessen
+                      </div>
+                    </div>
+                  </Reveal>
+                  <Reveal className={locationDetail}>
+                    <div className={locIcon}>🕐</div>
+                    <div>
+                      <div className={locLabel}>Öffnungszeiten</div>
+                      <div className={locValue}>
+                        12:00 Uhr – 20:00 Uhr
+                        <br />
+                        Sonntag, 19. April 2026
+                      </div>
+                    </div>
+                  </Reveal>
+                  <Reveal className={locationDetail}>
+                    <div className={locIcon}>🎟️</div>
+                    <div>
+                      <div className={locLabel}>Eintritt</div>
+                      <div className={locValue}>
+                        Komplett kostenlos
+                        <br />
+                        Jeder ist willkommen
+                      </div>
+                    </div>
+                  </Reveal>
+                  <Reveal>
+                    <ButtonLink
+                      href={MAP_URL}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className={mapCtaInline}
+                    >
+                      In Google Maps öffnen
+                    </ButtonLink>
+                  </Reveal>
+                </>
+              )}
             </div>
             <Reveal>
               <Link
@@ -282,10 +345,18 @@ export const MarketingSections = ({ cmsSections }: Props) => {
               Bleib <span className={sectionTitleAccent}>connected</span>
             </h2>
           </Reveal>
-          <Reveal className={socialIntro}>
-            Kein Event verpassen, aktuelle Updates und Content direkt aus der
-            Szene.
-          </Reveal>
+          {socialBlocks.length > 0 ? (
+            socialBlocks.map((b, index) => (
+              <Reveal key={`${b.title}-${index}`} className={socialIntro}>
+                {b.description ?? b.title}
+              </Reveal>
+            ))
+          ) : (
+            <Reveal className={socialIntro}>
+              Kein Event verpassen, aktuelle Updates und Content direkt aus der
+              Szene.
+            </Reveal>
+          )}
           <div className={socialLinks}>
             <Reveal>
               <a

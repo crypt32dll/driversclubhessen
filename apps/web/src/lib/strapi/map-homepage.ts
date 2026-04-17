@@ -1,5 +1,25 @@
 import type { Homepage, HomepageSection } from "@driversclub/shared";
 
+const SECTION_VARIANTS = [
+  "highlight",
+  "rule",
+  "about",
+  "location",
+  "social",
+] as const;
+
+function parseSectionVariant(
+  raw: unknown,
+): NonNullable<HomepageSection["variant"]> {
+  if (
+    typeof raw === "string" &&
+    (SECTION_VARIANTS as readonly string[]).includes(raw)
+  ) {
+    return raw as NonNullable<HomepageSection["variant"]>;
+  }
+  return "highlight";
+}
+
 import { mapStrapiEventFromRest } from "@/lib/strapi/map-event";
 
 function flattenStrapiEntry(raw: unknown): Record<string, unknown> {
@@ -37,21 +57,31 @@ function normalizeSections(raw: unknown): HomepageSection[] {
     if (Array.isArray(d)) list = d;
   }
   if (list.length === 0) return [];
-  return list
-    .map((item) => {
-      const x = flattenStrapiEntry(item);
-      if (!x.title && !x.description) return null;
-      return {
-        title: String(x.title ?? ""),
-        description:
-          x.description !== null && x.description !== undefined
-            ? String(x.description)
-            : undefined,
-        order: typeof x.order === "number" ? x.order : 0,
-      };
-    })
-    .filter((x): x is HomepageSection => x !== null)
-    .sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
+  const rows: HomepageSection[] = [];
+  for (const item of list) {
+    const x = flattenStrapiEntry(item);
+    if (!x.title && !x.description) continue;
+    const iconRaw = x.icon;
+    const icon =
+      iconRaw !== null && iconRaw !== undefined && String(iconRaw).trim()
+        ? String(iconRaw).trim()
+        : undefined;
+    const section: HomepageSection = {
+      title: String(x.title ?? ""),
+      order: typeof x.order === "number" ? x.order : 0,
+      variant: parseSectionVariant(x.variant),
+    };
+    if (
+      x.description !== null &&
+      x.description !== undefined &&
+      String(x.description).length > 0
+    ) {
+      section.description = String(x.description);
+    }
+    if (icon) section.icon = icon;
+    rows.push(section);
+  }
+  return rows.sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
 }
 
 function formatFeaturedEventText(

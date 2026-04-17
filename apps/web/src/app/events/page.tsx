@@ -2,8 +2,8 @@ import { Container } from "@/components/ui/Container";
 import { eventService } from "@/lib/services/events";
 import Link from "next/link";
 
-/** Strapi-backed; skip SSG so `next build` never blocks on CMS/network (e.g. Vercel). */
-export const dynamic = "force-dynamic";
+/** ISR — literal required by Next.js 16 segment config; see marketing `page.tsx` comment. */
+export const revalidate = 3600;
 
 export default async function EventsPage() {
   const events = await eventService.getUpcomingEvents().catch(() => []);

@@ -23,8 +23,13 @@ export interface HomepageSectionItem extends Struct.ComponentSchema {
   };
   attributes: {
     description: Schema.Attribute.Text;
+    icon: Schema.Attribute.String;
     order: Schema.Attribute.Integer & Schema.Attribute.DefaultTo<0>;
     title: Schema.Attribute.String & Schema.Attribute.Required;
+    variant: Schema.Attribute.Enumeration<
+      ['highlight', 'rule', 'about', 'location', 'social']
+    > &
+      Schema.Attribute.DefaultTo<'highlight'>;
   };
 }
 

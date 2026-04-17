@@ -1,0 +1,51 @@
+{
+  "$schema": "https://turbo.build/schema.json",
+  "globalEnv": [
+    "CI",
+    "VERCEL",
+    "VERCEL_ENV",
+    "NODE_ENV",
+    "SKIP_ENV_CHECK",
+    "NEXT_PUBLIC_STRAPI_URL",
+    "STRAPI_FETCH_TIMEOUT_MS",
+    "STRAPI_ISR_REVALIDATE_SECONDS",
+    "REVALIDATE_SECRET",
+    "STRAPI_REVALIDATE_SECRET",
+    "LOG_LEVEL",
+    "LOG_FORMAT",
+    "APP_KEYS",
+    "API_TOKEN_SALT",
+    "ADMIN_JWT_SECRET",
+    "TRANSFER_TOKEN_SALT",
+    "JWT_SECRET",
+    "ENCRYPTION_KEY",
+    "DATABASE_URL",
+    "ADMIN_PATH",
+    "STRAPI_ADMIN_BACKEND_URL"
+  ],
+  "tasks": {
+    "build": {
+      "dependsOn": ["^build"],
+      "outputs": ["dist/**", ".next/**", "!.next/cache/**", ".strapi/**", "build/**"]
+    },
+    "typecheck": {
+      "dependsOn": ["^build"],
+      "outputs": []
+    },
+    "lint": {
+      "outputs": []
+    },
+    "format": {
+      "outputs": [],
+      "cache": false
+    },
+    "dev": {
+      "cache": false,
+      "persistent": true
+    },
+    "develop": {
+      "cache": false,
+      "persistent": true
+    }
+  }
+}

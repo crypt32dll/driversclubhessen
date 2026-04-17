@@ -1,4 +1,8 @@
-import { REVALIDATE_TAGS, STRAPI_ISR_SECONDS } from "@/lib/strapi/isr-config";
+import {
+  REVALIDATE_TAG_PROFILE,
+  REVALIDATE_TAGS,
+  STRAPI_ISR_SECONDS,
+} from "@/lib/strapi/isr-config";
 import { logger } from "@/lib/logger";
 import { revalidatePath, revalidateTag } from "next/cache";
 import { NextResponse } from "next/server";
@@ -54,7 +58,7 @@ export async function POST(request: Request) {
   if (Array.isArray(tagsInput) && tagsInput.length > 0) {
     const tags = tagsInput.filter((t): t is string => typeof t === "string");
     for (const tag of tags) {
-      revalidateTag(tag);
+      revalidateTag(tag, REVALIDATE_TAG_PROFILE);
     }
     logger.info("Revalidate: tags", { tags });
     return NextResponse.json({ revalidated: true, tags });
@@ -114,7 +118,7 @@ export async function POST(request: Request) {
 
   const uniquePaths = [...new Set(paths)];
   for (const tag of tags) {
-    revalidateTag(tag);
+    revalidateTag(tag, REVALIDATE_TAG_PROFILE);
   }
   for (const path of uniquePaths) {
     revalidatePath(path);

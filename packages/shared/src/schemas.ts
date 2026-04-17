@@ -23,10 +23,20 @@ export const eventSchema = z.object({
   images: z.array(imageSchema).optional(),
 });
 
+export const homepageSectionVariantSchema = z.enum([
+  "highlight",
+  "rule",
+  "about",
+  "location",
+  "social",
+]);
+
 export const homepageSectionSchema = z.object({
   title: z.string(),
   description: z.string().optional(),
   order: z.number().optional(),
+  variant: homepageSectionVariantSchema.optional(),
+  icon: z.string().optional(),
 });
 
 export const homepageSchema = z.object({

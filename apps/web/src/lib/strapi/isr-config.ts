@@ -11,11 +11,23 @@ export const REVALIDATE_TAGS = {
 /**
  * Default time-based revalidation (seconds) when Strapi webhooks are unavailable.
  * Override with `STRAPI_ISR_REVALIDATE_SECONDS` (e.g. 3600).
+ *
+ * Route segment `export const revalidate` cannot import this — Next.js must see
+ * `process.env` in the page file. Duplicate the same logic there and keep in sync.
  */
-export const STRAPI_ISR_SECONDS = (() => {
-  const n = Number.parseInt(
-    process.env.STRAPI_ISR_REVALIDATE_SECONDS ?? "3600",
-    10,
+export function parseStrapiIsrRevalidateSeconds(): number {
+  return Math.max(
+    60,
+    Number.parseInt(process.env.STRAPI_ISR_REVALIDATE_SECONDS ?? "3600", 10) ||
+      3600,
   );
-  return Number.isFinite(n) && n >= 60 ? n : 3600;
-})();
+}
+
+export const STRAPI_ISR_SECONDS = parseStrapiIsrRevalidateSeconds();
+
+/**
+ * Next.js 16+ `revalidateTag(tag, profile)` requires a cache profile.
+ * Matches `cacheLife.strapi` in `next.config.ts`.
+ * @see https://nextjs.org/docs/app/api-reference/functions/revalidateTag
+ */
+export const REVALIDATE_TAG_PROFILE = "strapi" as const;

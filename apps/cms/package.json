@@ -4,6 +4,7 @@
   "private": true,
   "description": "A Strapi application",
   "scripts": {
+    "prebuild": "node ./scripts/check-build-env.cjs",
     "build": "strapi build",
     "console": "strapi console",
     "deploy": "strapi deploy",

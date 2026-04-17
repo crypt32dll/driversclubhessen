@@ -5,6 +5,14 @@
     "description": "Flexible homepage content section item"
   },
   "attributes": {
+    "variant": {
+      "type": "enumeration",
+      "enum": ["highlight", "rule", "about", "location", "social"],
+      "default": "highlight"
+    },
+    "icon": {
+      "type": "string"
+    },
     "title": {
       "type": "string",
       "required": true

@@ -18,8 +18,8 @@ const fallbackHomepage: Homepage = {
 };
 
 /**
- * Strapi 5 REST: `populate=*` does not reliably populate dynamic zones — use explicit `on` for
- * `homepage.section-item`. See https://docs.strapi.io/cms/api/rest/guides/understanding-populate#populate-dynamic-zones
+ * Strapi 5 REST: explicit populate for single type + dynamic zone (reliable on Vercel build).
+ * @see https://docs.strapi.io/cms/api/rest/guides/understanding-populate#populate-dynamic-zones
  */
 const HOMEPAGE_STRAPI_QUERY = {
   "populate[hero]": "*",
