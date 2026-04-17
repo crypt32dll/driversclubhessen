@@ -23,12 +23,22 @@ export const eventSchema = z.object({
   images: z.array(imageSchema).optional(),
 });
 
+export const homepageSectionSchema = z.object({
+  title: z.string(),
+  description: z.string().optional(),
+  order: z.number().optional(),
+});
+
 export const homepageSchema = z.object({
   heroEyebrow: z.string(),
   heroTitleLine1: z.string(),
   heroTitleLine2: z.string(),
   heroDateLabel: z.string(),
+  /** ISO datetime for the hero countdown target (optional; falls back in UI). */
+  heroCountdownEnd: z.string().optional(),
   featuredEventText: z.string().optional(),
+  /** Dynamic zone `homepage.section-item` entries from Strapi. */
+  sections: z.array(homepageSectionSchema).optional(),
 });
 
 export const galleryItemSchema = z.object({
@@ -41,4 +51,5 @@ export const galleryItemSchema = z.object({
 
 export type Event = z.infer<typeof eventSchema>;
 export type Homepage = z.infer<typeof homepageSchema>;
+export type HomepageSection = z.infer<typeof homepageSectionSchema>;
 export type GalleryItem = z.infer<typeof galleryItemSchema>;

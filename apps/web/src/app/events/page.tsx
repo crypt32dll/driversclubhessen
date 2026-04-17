@@ -2,7 +2,8 @@ import { Container } from "@/components/ui/Container";
 import { eventService } from "@/lib/services/events";
 import Link from "next/link";
 
-export const revalidate = 120;
+/** Strapi-backed; skip SSG so `next build` never blocks on CMS/network (e.g. Vercel). */
+export const dynamic = "force-dynamic";
 
 export default async function EventsPage() {
   const events = await eventService.getUpcomingEvents().catch(() => []);

@@ -6,6 +6,8 @@ const links = [
   { href: "/#about", label: "Über uns" },
   { href: "/#location", label: "Anfahrt" },
   { href: "/#social", label: "Social" },
+  { href: "/events", label: "Events" },
+  { href: "/gallery", label: "Galerie" },
 ] as const;
 
 export const SiteNav = () => {

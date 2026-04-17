@@ -29,7 +29,9 @@ export const navLogo = style({
 
 export const navLinks = style({
   display: "flex",
-  gap: "2rem",
+  gap: "1.25rem",
+  flexWrap: "wrap",
+  justifyContent: "flex-end",
   listStyle: "none",
   margin: 0,
   padding: 0,

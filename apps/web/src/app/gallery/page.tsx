@@ -2,7 +2,8 @@ import { Container } from "@/components/ui/Container";
 import { galleryService } from "@/lib/services/gallery";
 import Image from "next/image";
 
-export const revalidate = 300;
+/** Strapi-backed; skip SSG so `next build` never blocks on CMS/network (e.g. Vercel). */
+export const dynamic = "force-dynamic";
 
 export default async function GalleryPage() {
   const images = await galleryService.getGalleryItems().catch(() => []);

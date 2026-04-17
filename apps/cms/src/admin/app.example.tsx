@@ -1,4 +1,7 @@
+import { createLogger } from "@driversclub/logger";
 import type { StrapiApp } from "@strapi/strapi/admin";
+
+const log = createLogger("strapi-admin");
 
 export default {
   config: {
@@ -31,7 +34,7 @@ export default {
       // 'zh',
     ],
   },
-  bootstrap(app: StrapiApp) {
-    console.log(app);
+  bootstrap(_app: StrapiApp) {
+    log.debug("Strapi admin bootstrap");
   },
 };

@@ -9,9 +9,9 @@
     "dev:web": "npm run dev --workspace web",
     "dev:cms": "npm run develop --workspace cms",
     "build": "npm run build --workspaces --if-present",
-    "typecheck": "npm run typecheck --workspace @driversclub/shared",
-    "lint": "biome check apps/web/src apps/web/next.config.ts packages/shared/src",
-    "format": "biome format --write apps/web/src apps/web/next.config.ts packages/shared/src"
+    "typecheck": "npm run typecheck --workspace @driversclub/shared --workspace @driversclub/logger",
+    "lint": "biome check apps/web/src apps/web/next.config.ts packages/shared/src packages/logger/src",
+    "format": "biome format --write apps/web/src apps/web/next.config.ts packages/shared/src packages/logger/src"
   },
   "devDependencies": {
     "@biomejs/biome": "^1.9.4"

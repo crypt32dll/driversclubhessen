@@ -1,6 +1,7 @@
 import { EventDescription } from "@/components/strapi/EventDescription";
 import { Container } from "@/components/ui/Container";
 import { eventService } from "@/lib/services/events";
+import { STRAPI_ISR_SECONDS } from "@/lib/strapi/isr-config";
 import Image from "next/image";
 import { notFound } from "next/navigation";
 
@@ -8,7 +9,7 @@ type Props = {
   params: Promise<{ slug: string }>;
 };
 
-export const revalidate = 120;
+export const revalidate = STRAPI_ISR_SECONDS;
 
 export default async function EventDetailPage({ params }: Props) {
   const { slug } = await params;

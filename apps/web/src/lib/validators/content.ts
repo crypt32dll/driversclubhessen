@@ -7,6 +7,7 @@ import { z } from "zod";
 
 import { mapStrapiEventFromRest } from "@/lib/strapi/map-event";
 import { mapStrapiGalleryItemFromRest } from "@/lib/strapi/map-gallery";
+import { mapHomepageFromRest } from "@/lib/strapi/map-homepage";
 
 const eventListSchema = z.array(eventSchema);
 const galleryListSchema = z.array(galleryItemSchema);
@@ -21,5 +22,6 @@ export const validators = {
     const rows = Array.isArray(value) ? value : [];
     return galleryListSchema.parse(rows.map(mapStrapiGalleryItemFromRest));
   },
-  homepage: (value: unknown) => homepageSchema.parse(value),
+  homepage: (value: unknown) =>
+    homepageSchema.parse(mapHomepageFromRest(value)),
 };

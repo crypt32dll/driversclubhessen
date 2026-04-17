@@ -1,8 +1,12 @@
 import { ButtonLink } from "@/components/ui/ButtonLink";
 import { Container } from "@/components/ui/Container";
 import { Reveal } from "@/components/ui/Reveal";
+import type { HomepageSection } from "@driversclub/shared";
 import Link from "next/link";
 import {
+  cmsSection,
+  cmsSectionBody,
+  cmsSectionTitle,
   collabDesc,
   collabLogoBox,
   collabLogos,
@@ -92,9 +96,33 @@ const rules = [
 
 const MAP_URL = "https://maps.google.com/?q=Industriestraße+6+63633+Birstein";
 
-export const MarketingSections = () => {
+type Props = {
+  /** Dynamic zone blocks from Strapi (`homepage.section-item`). */
+  cmsSections?: HomepageSection[];
+};
+
+export const MarketingSections = ({ cmsSections }: Props) => {
+  const hasCmsSections = Boolean(cmsSections?.length);
+
   return (
     <>
+      {hasCmsSections ? (
+        <section className={featuresSection} id="cms-sections">
+          <Container>
+            {cmsSections?.map((block, index) => (
+              <Reveal key={`${block.title}-${index}`} className={cmsSection}>
+                <h2 className={cmsSectionTitle}>{block.title}</h2>
+                {block.description ? (
+                  <div className={cmsSectionBody}>{block.description}</div>
+                ) : null}
+              </Reveal>
+            ))}
+          </Container>
+        </section>
+      ) : null}
+
+      {hasCmsSections ? <div className={divider} aria-hidden /> : null}
+
       <section className={featuresSection} id="features">
         <Container>
           <Reveal>

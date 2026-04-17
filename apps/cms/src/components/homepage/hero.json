@@ -20,6 +20,9 @@
     "dateLabel": {
       "type": "string",
       "required": true
+    },
+    "countdownEnd": {
+      "type": "datetime"
     }
   }
 }

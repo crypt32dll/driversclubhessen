@@ -1,7 +1,8 @@
 "use client";
 
-import { BlocksRenderer } from "@strapi/blocks-react-renderer";
 import type { BlocksContent } from "@strapi/blocks-react-renderer";
+
+import { StrapiBlocks } from "@/components/strapi/StrapiBlocks";
 
 import type { Event } from "@driversclub/shared";
 
@@ -11,11 +12,7 @@ type Props = {
 
 export function EventDescription({ description }: Props) {
   if (Array.isArray(description)) {
-    return (
-      <div className="strapi-blocks">
-        <BlocksRenderer content={description as BlocksContent} />
-      </div>
-    );
+    return <StrapiBlocks content={description as BlocksContent} />;
   }
 
   const text = description.trim();

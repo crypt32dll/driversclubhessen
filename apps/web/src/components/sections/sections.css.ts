@@ -244,6 +244,29 @@ export const sectionTitleAccent = style({
   color: vars.color.cyan,
 });
 
+/** Strapi `homepage.section-item` dynamic zone blocks */
+export const cmsSection = style({
+  marginBottom: "3rem",
+  ":last-child": {
+    marginBottom: 0,
+  },
+});
+
+export const cmsSectionTitle = style({
+  fontFamily: vars.font.heading,
+  fontSize: "clamp(1.75rem, 4vw, 2.75rem)",
+  marginBottom: "1rem",
+  letterSpacing: "0.04em",
+});
+
+export const cmsSectionBody = style({
+  fontFamily: vars.font.body,
+  fontSize: "1rem",
+  lineHeight: 1.7,
+  color: "rgba(255,255,255,0.75)",
+  whiteSpace: "pre-wrap",
+});
+
 export const divider = style({
   width: "100%",
   height: "1px",

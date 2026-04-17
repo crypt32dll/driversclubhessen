@@ -1,7 +1,7 @@
 import { Container } from "@/components/ui/Container";
 import { Reveal } from "@/components/ui/Reveal";
-import { eventService } from "@/lib/services/events";
 import { excerptFromEventDescription } from "@/lib/strapi/excerpt";
+import type { Event } from "@driversclub/shared";
 import Link from "next/link";
 import {
   eventCard,
@@ -43,9 +43,14 @@ const STATIC_EVENT_CARDS = [
   },
 ] as const;
 
-export const UpcomingEventsSection = async () => {
-  const events = await eventService.getUpcomingEvents().catch(() => []);
+type Props = {
+  /** Optional line from CMS (linked featured event on homepage). */
+  featuredEventText?: string;
+  /** Prefetched in the page to parallelize with homepage (avoids RSC waterfalls). */
+  events: Event[];
+};
 
+export function UpcomingEventsSection({ featuredEventText, events }: Props) {
   return (
     <section className={eventSection} id="event">
       <Container>
@@ -54,6 +59,11 @@ export const UpcomingEventsSection = async () => {
           <h2 className={sectionTitle}>
             Was dich <span className={sectionTitleAccent}>erwartet</span>
           </h2>
+          {featuredEventText ? (
+            <p className={eventCardSub} style={{ marginTop: "0.75rem" }}>
+              {featuredEventText}
+            </p>
+          ) : null}
         </Reveal>
         <div className={eventGrid}>
           {events.length === 0
@@ -86,4 +96,4 @@ export const UpcomingEventsSection = async () => {
       </Container>
     </section>
   );
-};
+}
