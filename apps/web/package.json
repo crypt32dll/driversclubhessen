@@ -5,7 +5,7 @@
   "scripts": {
     "dev": "next dev --webpack",
     "prebuild": "node ./scripts/check-build-env.cjs",
-    "build": "next build --webpack",
+    "build": "node ./scripts/run-next-build.cjs build --webpack",
     "start": "next start",
     "typecheck": "tsc --noEmit"
   },

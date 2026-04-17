@@ -5,6 +5,10 @@
 /* eslint-disable no-console */
 
 const PREFIX = "[web:build-env]";
+const {
+  normalizePublicStrapiUrl,
+  isValidPublicStrapiUrl,
+} = require("./strapi-public-url.cjs");
 
 function isStrict() {
   return (
@@ -54,7 +58,7 @@ function logRemediation() {
   console.error("");
   console.error(`${PREFIX} ERROR --- Fix checklist (Vercel) ---`);
   console.error(
-    `${PREFIX} ERROR 1. Project → Settings → Environment Variables: set NEXT_PUBLIC_STRAPI_URL (public https Strapi base URL; trim whitespace).`,
+    `${PREFIX} ERROR 1. Project → Settings → Environment Variables: set NEXT_PUBLIC_STRAPI_URL (e.g. https://your-cms.vercel.app, or bare hostname — build prepends https://).`,
   );
   console.error(
     `${PREFIX} ERROR 2. Production: URL must be https. Preview/CI may use http only if policy allows.`,
@@ -67,17 +71,6 @@ function logRemediation() {
   );
   console.error(`${PREFIX} ERROR --- end checklist ---`);
   console.error("");
-}
-
-function validPublicStrapiUrl(value) {
-  if (!value || typeof value !== "string" || !value.trim()) return false;
-  try {
-    const u = new URL(value.trim());
-    if (u.protocol !== "http:" && u.protocol !== "https:") return false;
-    return !!u.hostname;
-  } catch {
-    return false;
-  }
 }
 
 /** Only Production deploys must use https; Preview builds also run with NODE_ENV=production. */
@@ -102,7 +95,7 @@ function main() {
   );
 
   const url = process.env.NEXT_PUBLIC_STRAPI_URL;
-  if (!validPublicStrapiUrl(url)) {
+  if (!isValidPublicStrapiUrl(url)) {
     const detail =
       url === undefined || String(url).trim() === ""
         ? "unset or empty"
@@ -120,8 +113,15 @@ function main() {
       `NEXT_PUBLIC_STRAPI_URL ${detail} (allowed locally; production deploys must set a public Strapi base URL).`,
     );
   } else {
+    const effective = normalizePublicStrapiUrl(url);
+    if (effective && String(url).trim() !== effective) {
+      log(
+        "INFO",
+        `NEXT_PUBLIC_STRAPI_URL will be normalized to ${effective} at build (add https:// in Vercel to silence).`,
+      );
+    }
     try {
-      const u = new URL(String(url).trim());
+      const u = new URL(effective);
       if (needsProductionHttps() && u.protocol !== "https:") {
         if (strict) {
           log(
