@@ -10,9 +10,33 @@ function isGalleryCta(href: string): boolean {
   return path === "/gallery" || path.startsWith("/gallery/");
 }
 
+/** In-app path + hash (no query string). */
+function parsePathAndHash(href: string): { path: string; hash: string } {
+  const noQuery = href.trim().split("?")[0] ?? "";
+  const hashIdx = noQuery.indexOf("#");
+  if (hashIdx === -1) return { path: noQuery, hash: "" };
+  return {
+    path: noQuery.slice(0, hashIdx),
+    hash: noQuery.slice(hashIdx + 1),
+  };
+}
+
+/** Homepage „Zum Event“ (`/#location`) or self-link to this event — useless on `/events/[slug]`. */
+function isRedundantOnEventDetail(href: string, eventSlug: string): boolean {
+  if (/^https?:\/\//i.test(href.trim())) return false;
+  const { path, hash } = parsePathAndHash(href);
+  const pathNorm = path === "" ? "/" : path;
+  if (pathNorm === `/events/${eventSlug}`) return true;
+  if (pathNorm === "/" && hash === "location") return true;
+  return false;
+}
+
 function ctasForEventDetail(event: Event): readonly HeroCta[] {
   const raw = event.heroCtas?.length ? event.heroCtas : [...DEFAULT_CTAS];
-  const filtered = raw.filter((c) => !isGalleryCta(c.href));
+  const filtered = raw.filter(
+    (c) =>
+      !isGalleryCta(c.href) && !isRedundantOnEventDetail(c.href, event.slug),
+  );
   return filtered.length > 0 ? filtered : [...DEFAULT_CTAS];
 }
 
