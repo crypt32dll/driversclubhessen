@@ -25,11 +25,30 @@ const rajdhani = Rajdhani({
   weight: ["400", "500", "600", "700"],
 });
 
+function siteMetadataBase(): URL {
+  const raw =
+    process.env.NEXT_PUBLIC_APP_URL ??
+    (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : null);
+  if (raw) {
+    try {
+      const normalized = raw.startsWith("http") ? raw : `https://${raw}`;
+      return new URL(normalized);
+    } catch {
+      /* fall through */
+    }
+  }
+  return new URL("http://localhost:3000");
+}
+
 export const metadata: Metadata = {
+  metadataBase: siteMetadataBase(),
   title: "DriversClub Hessen",
   description: "DriversClub Hessen - Tuning Treffen Community Plattform",
   /** Pinned tab / browser UI tint; matches `tokens.css` color.black */
   themeColor: "#06060a",
+  icons: {
+    icon: [{ url: "/icon", type: "image/png", sizes: "32x32" }],
+  },
 };
 
 /**

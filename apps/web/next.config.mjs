@@ -1,5 +1,5 @@
-import path from "node:path";
 import { createRequire } from "node:module";
+import path from "node:path";
 import { fileURLToPath } from "node:url";
 
 import { withPayload } from "@payloadcms/next/withPayload";
@@ -58,6 +58,9 @@ function buildPayloadImageRemotePatterns() {
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  async rewrites() {
+    return [{ source: "/favicon.ico", destination: "/icon" }];
+  },
   typescript: {
     ignoreBuildErrors: true,
   },
