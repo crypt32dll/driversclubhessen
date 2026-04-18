@@ -83,6 +83,7 @@ Expect `200` with JSON once content exists and **Public** permissions are set in
 
 ## 6. Troubleshooting
 
+- **`Failed to load native binding` (`@swc/core`) during `strapi build`:** the admin Vite build uses SWC. This repo declares **`@swc/core`** on `apps/cms` so Linux CI (Docker, Strapi Cloud) resolves the correct platform binary. Do not run `npm ci --omit=optional` or `--ignore-scripts` unless you know SWC’s install hooks are unnecessary (they usually are required).
 - **Build fails on native modules:** run install from **monorepo root** (`npm ci`); `better-sqlite3` is listed at repo root for workspace hoisting.
 - **Uploads disappear after deploy:** enable **Cloudinary** env vars on Railway.
 - **CORS in browser:** set `ALLOWED_ORIGINS` to your exact Vercel URL(s).
