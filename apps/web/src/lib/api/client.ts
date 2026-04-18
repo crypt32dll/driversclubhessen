@@ -12,7 +12,7 @@ type StrapiFetchCache = {
 
 /** Normalized base (no trailing slash) — matches `getStrapiBaseUrl()` for consistent URLs in dev and production. */
 const STRAPI_URL = (
-  process.env.NEXT_PUBLIC_STRAPI_URL ?? "http://localhost:1337"
+  process.env.NEXT_PUBLIC_STRAPI_URL?.trim() || "http://localhost:1337"
 ).replace(/\/$/, "");
 
 const parsedTimeoutMs = Number.parseInt(
@@ -57,7 +57,16 @@ export const apiClient = {
     });
 
     if (!response.ok) {
-      logger.error("API GET request failed", { path, status: response.status });
+      logger.error("API GET request failed", {
+        path,
+        status: response.status,
+        strapiBase: STRAPI_URL,
+        ...(response.status === 404
+          ? {
+              hint: "Strapi 404: often draft-only content (publish in Content Manager) or missing content-type on this deploy; see STRAPI_VERCEL_SETUP.md.",
+            }
+          : {}),
+      });
       throw new Error(`Request failed: ${response.status}`);
     }
 

@@ -3,7 +3,8 @@
  * Next `next/image` and browsers need an absolute URL when the app runs on another origin.
  */
 export function getStrapiBaseUrl(): string {
-  const base = process.env.NEXT_PUBLIC_STRAPI_URL ?? "http://localhost:1337";
+  const base =
+    process.env.NEXT_PUBLIC_STRAPI_URL?.trim() || "http://localhost:1337";
   return base.replace(/\/$/, "");
 }
 

@@ -38,17 +38,31 @@ Paste the production value in **Vercel → Project → Settings → Environment 
 
 ## 2. Vercel environment variables (web project)
 
-- **`NEXT_PUBLIC_STRAPI_URL`** — public base URL of Strapi, no path (e.g. `https://your-instance.strapiapp.com`).
+- **`NEXT_PUBLIC_STRAPI_URL`** — public base URL of Strapi (from your Strapi Cloud project or self-hosted host), no path, no `/admin`, no trailing slash.
 - Set for **Production** (and **Preview** if previews should hit the same CMS).
-- **Redeploy** after changes so the build embeds the value.
+- **`REVALIDATE_SECRET`** — same random string as in [`.env.production.example`](.env.production.example) / local `.env.local`; Strapi webhooks use `Authorization: Bearer <secret>` for [`/api/revalidate`](src/app/api/revalidate/route.ts).
+- **Redeploy** after changes so the build embeds public env vars.
 
-See [`.env.production.example`](.env.production.example) for optional vars (`REVALIDATE_SECRET`, timeouts, logging).
+See [`.env.production.example`](.env.production.example) for the full list (`REVALIDATE_SECRET`, timeouts, logging).
 
 ## 3. Strapi Cloud (or self-hosted) checklist
 
 - **Content:** Single type `homepage` and collections exist; entries are **Published** (not draft-only).
-- **API access:** **Settings → Users & Permissions → Roles → Public** — enable **`find`** / **`findOne`** for **Homepage**, **Event**, and **Gallery** as needed.
+- **API access:** **Settings → Plugins → Users & Permissions → Roles → Public** — enable **`find`** / **`findOne`** for **Homepage**, **Event**, and **Gallery** as needed. (This is **not** **Settings → Administration Panel → Roles**, which only governs admin users.)
 - **Browser / CORS:** Allow your Vercel site URL (and custom domain) in Strapi’s frontend / CORS settings if you call the API from the browser.
+
+### REST `404` while Admin shows a draft (`?status=draft`)
+
+This matches [Draft & Publish](https://docs.strapi.io/cms/features/draft-and-publish) and the REST [`status` parameter](https://docs.strapi.io/cms/api/rest/status):
+
+1. **Default API behavior** — Strapi returns **published** documents unless you pass `status=draft`. Saving in the Content Manager creates or updates a **draft** until you **Publish**.
+2. **Single types (Homepage)** — If there is **no published version yet**, `GET /api/homepage` (what this Next app calls) can respond with **404**, even though `/admin` shows the entry. Open **Homepage** → use the **Publish** button in the entry panel on the right. Fix any validation errors blocking publish.
+3. **Relations** — Strapi can require related entries (e.g. **Event**) to be published before the API returns full data; see the Draft & Publish “relations” caution in the docs above.
+4. **Wrong route** — The [REST reference](https://docs.strapi.io/cms/api/rest) uses **`GET /api/homepage`** for the `Homepage` single type (singular API ID). If the content-type does not exist on the deployed instance, you still get 404 until `apps/cms` is deployed to that environment.
+
+### Strapi Cloud: logs and console issues
+
+For Cloud-hosted projects, use the [Strapi Cloud documentation](https://docs.strapi.io/cloud/intro): **Deployments**, **Runtime logs**, and project settings to diagnose build/runtime errors. **403** usually means **Users & Permissions**; **404** on `GET /api/...` with types present often means **unpublished** content or a **draft-only** single type.
 
 ### Strapi Cloud: “Internal server error” on `/admin`
 
@@ -61,14 +75,16 @@ This is almost always resolved **on Strapi’s side**, not in Next.js:
 
 ## 4. Verify the API (before debugging Next)
 
-Replace the host with your Strapi URL:
+The **Content Manager** lives under **`/admin/...`** (e.g. `/admin/content-manager/single-types/api::homepage.homepage`). That is the **admin UI**, not the REST API. To verify JSON from Strapi, always use **`GET /api/<singularApiId>`** on the same host you set in **`NEXT_PUBLIC_STRAPI_URL`** (for Homepage: **`/api/homepage`**).
+
+Use your Strapi Cloud host (quote the URL; `-g` avoids shell glob issues):
 
 ```bash
-curl -sS -o /dev/null -w "%{http_code}\n" \
+curl -sS -g -o /dev/null -w "%{http_code}\n" \
   "https://YOUR_INSTANCE.strapiapp.com/api/homepage?populate[hero]=*&populate[featuredEvent]=*&populate[sections][on][homepage.section-item]=true&status=published"
 ```
 
-Expect **200**. **403/404** → permissions, missing type, or unpublished content.
+Expect **200** with JSON `data` when the instance is healthy and content is public. **403** → Public role permissions. **404** → unpublished entry (especially single types), wrong host, or type missing on that instance. **503** → Strapi Cloud temporarily unavailable or deployment starting; retry and check [Strapi Cloud](https://cloud.strapi.io) logs.
 
 ## 5. Cache / “still seeing old or fallback content”
 
