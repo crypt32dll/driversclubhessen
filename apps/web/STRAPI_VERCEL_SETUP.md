@@ -12,6 +12,25 @@ Strapi runs **outside** Vercel (e.g. [Strapi Cloud](https://cloud.strapi.io) on 
 
 **Preferred stack if you avoid Railway:** **Next.js on Vercel** + **Strapi on Strapi Cloud** — no extra PaaS required.
 
+### Local Next vs production Vercel
+
+| Environment | `NEXT_PUBLIC_STRAPI_URL` |
+|-------------|--------------------------|
+| **Vercel Production** | Your Strapi Cloud (or self-hosted) base URL from the Strapi dashboard — HTTPS, no `/admin`, no trailing slash |
+| **Local** (`apps/web/.env.local`) | `http://localhost:1337` when testing against local Strapi; or the Cloud URL if you only hit Cloud |
+
+Paste the production value in **Vercel → Project → Settings → Environment Variables → Production**, then **redeploy**.
+
+### Google sign-in (Admin vs API)
+
+- **Strapi Admin** defaults to **email + password**. Create the first admin user at setup or via CLI.
+- **“Login with Google”** is **not** enabled by default. It needs the Users & Permissions Google provider + a [Google Cloud OAuth client](https://console.cloud.google.com/) with **authorized redirect URIs** for both your Strapi URLs (e.g. Cloud admin and, if you use it, `http://localhost:1337/...` callbacks). If Google works on Cloud but not locally, add localhost redirect URIs in Google’s console.
+- Easiest path: use **email/password** for local Admin, or edit content on **Strapi Cloud** (`…/admin`) if SSO is only set up there.
+
+### Why the site still shows “static” marketing copy
+
+[`homepage.ts`](src/lib/services/homepage.ts) uses Strapi when `GET /api/homepage` succeeds. On **any** failure it logs a warning and shows **hardcoded fallback** text. Fix **URL + permissions + published content + cache** (sections below), not the Next route alone.
+
 ## 1. Vercel: one project for the frontend only
 
 - Keep **one** Vercel project connected to this repo, building **`apps/web`** (monorepo root + workspace/turbo as you already use).
