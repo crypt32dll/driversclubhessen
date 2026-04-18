@@ -1,3 +1,4 @@
+import type { SiteNavItem } from "@driversclub/shared";
 import Link from "next/link";
 import {
   footer,
@@ -8,30 +9,51 @@ import {
   footerSub,
 } from "./layout.css";
 
-const anchorLinks = [
-  { href: "/#event", label: "Event" },
-  { href: "/#about", label: "Über uns" },
-  { href: "/#location", label: "Anfahrt" },
-  { href: "/#social", label: "Social" },
+const legalLinks = [
+  { href: "/legal/impressum", label: "Impressum" },
+  { href: "/legal/datenschutz", label: "Datenschutz" },
 ] as const;
 
-export const SiteFooter = () => {
+function isExternalHref(href: string) {
+  return (
+    href.startsWith("http://") ||
+    href.startsWith("https://") ||
+    href.startsWith("mailto:")
+  );
+}
+
+type Props = {
+  primaryLinks: readonly SiteNavItem[];
+};
+
+export const SiteFooter = ({ primaryLinks }: Props) => {
   return (
     <footer className={footer}>
       <div className={footerLogo}>DriversClub Hessen</div>
       <div className={footerSub}>Est. 2024 · Hessen, Deutschland</div>
       <div className={footerLinks}>
-        {anchorLinks.map((link) => (
-          <Link key={link.href} href={link.href} className={footerLink}>
-            {link.label}
-          </Link>
-        ))}
-        <Link href="/events" className={footerLink}>
-          Events
-        </Link>
-        <Link href="/gallery" className={footerLink}>
-          Gallery
-        </Link>
+        {primaryLinks.map((link) => {
+          const external = Boolean(link.external) || isExternalHref(link.href);
+          return external ? (
+            <a
+              key={`${link.href}-${link.label}`}
+              href={link.href}
+              className={footerLink}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              {link.label}
+            </a>
+          ) : (
+            <Link
+              key={`${link.href}-${link.label}`}
+              href={link.href}
+              className={footerLink}
+            >
+              {link.label}
+            </Link>
+          );
+        })}
         <a
           href="https://www.instagram.com/driversclubhessen"
           className={footerLink}
@@ -40,12 +62,11 @@ export const SiteFooter = () => {
         >
           Instagram
         </a>
-        <Link href="/legal/impressum" className={footerLink}>
-          Impressum
-        </Link>
-        <Link href="/legal/datenschutz" className={footerLink}>
-          Datenschutz
-        </Link>
+        {legalLinks.map((link) => (
+          <Link key={link.href} href={link.href} className={footerLink}>
+            {link.label}
+          </Link>
+        ))}
       </div>
       <p className={footerCopy}>
         © {new Date().getFullYear()} DriversClub Hessen · Leidenschaft verbindet

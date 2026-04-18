@@ -10,6 +10,12 @@ export const imageSchema = z.object({
   height: z.number().optional(),
 });
 
+export const heroCtaSchema = z.object({
+  label: z.string(),
+  href: z.string(),
+  variant: z.enum(["primary", "outline"]).optional(),
+});
+
 export const eventSchema = z.object({
   id: z.number().optional(),
   documentId: z.string().optional(),
@@ -21,34 +27,30 @@ export const eventSchema = z.object({
   location: z.string(),
   createdAt: z.string().optional(),
   images: z.array(imageSchema).optional(),
-});
-
-export const homepageSectionVariantSchema = z.enum([
-  "highlight",
-  "rule",
-  "about",
-  "location",
-  "social",
-]);
-
-export const homepageSectionSchema = z.object({
-  title: z.string(),
-  description: z.string().optional(),
-  order: z.number().optional(),
-  variant: homepageSectionVariantSchema.optional(),
-  icon: z.string().optional(),
-});
-
-export const homepageSchema = z.object({
-  heroEyebrow: z.string(),
-  heroTitleLine1: z.string(),
-  heroTitleLine2: z.string(),
-  heroDateLabel: z.string(),
-  /** ISO datetime for the hero countdown target (optional; falls back in UI). */
+  /** Homepage hero when this event is the next upcoming (from Payload `homepageHero` group). */
+  heroEyebrow: z.string().optional(),
+  heroTitleLine1: z.string().optional(),
+  heroTitleLine2: z.string().optional(),
+  heroDateLabel: z.string().optional(),
+  /** ISO datetime for countdown target */
   heroCountdownEnd: z.string().optional(),
-  featuredEventText: z.string().optional(),
-  /** Dynamic zone `homepage.section-item` entries from Strapi. */
-  sections: z.array(homepageSectionSchema).optional(),
+  heroBadge: z.string().optional(),
+  heroTagline: z.string().optional(),
+  heroCtas: z.array(heroCtaSchema).optional(),
+  heroBackgroundImage: imageSchema.optional(),
+});
+
+export const eventInfoCardSchema = z.object({
+  icon: z.string(),
+  title: z.string(),
+  value: z.string(),
+  sub: z.string(),
+});
+
+export const socialCmsLinkSchema = z.object({
+  label: z.string(),
+  href: z.string(),
+  newTab: z.boolean().optional(),
 });
 
 export const galleryItemSchema = z.object({
@@ -59,7 +61,20 @@ export const galleryItemSchema = z.object({
   image: imageSchema,
 });
 
+export const siteNavItemSchema = z.object({
+  label: z.string(),
+  href: z.string(),
+  external: z.boolean().optional(),
+});
+
+export const siteNavigationSchema = z.object({
+  items: z.array(siteNavItemSchema),
+});
+
 export type Event = z.infer<typeof eventSchema>;
-export type Homepage = z.infer<typeof homepageSchema>;
-export type HomepageSection = z.infer<typeof homepageSectionSchema>;
 export type GalleryItem = z.infer<typeof galleryItemSchema>;
+export type HeroCta = z.infer<typeof heroCtaSchema>;
+export type EventInfoCard = z.infer<typeof eventInfoCardSchema>;
+export type SocialCmsLink = z.infer<typeof socialCmsLinkSchema>;
+export type SiteNavItem = z.infer<typeof siteNavItemSchema>;
+export type SiteNavigation = z.infer<typeof siteNavigationSchema>;

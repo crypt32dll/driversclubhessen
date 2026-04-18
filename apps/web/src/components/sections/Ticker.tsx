@@ -4,7 +4,7 @@ import {
   tickerTrack,
 } from "@/components/sections/sections.ticker.css";
 
-const ITEMS = [
+const DEFAULT_ITEMS = [
   "EINTRITT FREI",
   "19.04.2026",
   "BIRSTEIN",
@@ -15,10 +15,16 @@ const ITEMS = [
   "DRIVERSCLUB HESSEN",
 ] as const;
 
-export const Ticker = () => {
+type Props = {
+  /** CMS-driven ticker lines; falls back to marketing defaults when empty. */
+  items?: readonly string[];
+};
+
+export const Ticker = ({ items }: Props) => {
+  const source = items && items.length > 0 ? items : [...DEFAULT_ITEMS];
   const track = [
-    ...ITEMS.map((text) => ({ text, key: `t1-${text}` })),
-    ...ITEMS.map((text) => ({ text, key: `t2-${text}` })),
+    ...source.map((text) => ({ text, key: `t1-${text}` })),
+    ...source.map((text) => ({ text, key: `t2-${text}` })),
   ];
   return (
     <div className={ticker} aria-hidden>

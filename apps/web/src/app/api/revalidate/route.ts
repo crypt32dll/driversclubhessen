@@ -1,13 +1,13 @@
 import {
-  REVALIDATE_TAG_PROFILE,
+  CMS_ISR_SECONDS,
   REVALIDATE_TAGS,
-  STRAPI_ISR_SECONDS,
-} from "@/lib/strapi/isr-config";
+  REVALIDATE_TAG_PROFILE,
+} from "@/lib/cms/isr-config";
 import { logger } from "@/lib/logger";
 import { revalidatePath, revalidateTag } from "next/cache";
 import { NextResponse } from "next/server";
 
-type StrapiEntryWebhookBody = {
+type LegacyWebhookBody = {
   event?: string;
   model?: string;
   entry?: { slug?: string };
@@ -20,13 +20,13 @@ function getBearer(request: Request): string | undefined {
 }
 
 /**
- * On-demand revalidation for Strapi → Vercel.
+ * On-demand revalidation for Payload → Vercel.
  *
  * **Auth:** `Authorization: Bearer <REVALIDATE_SECRET>` (recommended), or `{ "secret": "..." }` in JSON.
  *
- * **Manual:** `POST { "secret": "...", "tags": ["strapi:homepage", "strapi:events"] }`
+ * **Manual:** `POST { "secret": "...", "tags": ["cms:homepage", "cms:events"] }`
  *
- * **Strapi webhook:** POST the default webhook JSON (`event`, `model`, `entry`). Maps `model` to tags + paths.
+ * **Legacy Strapi-shaped webhook:** POST JSON with `event`, `model`, `entry` — mapped to CMS tags + paths.
  */
 export async function POST(request: Request) {
   const configuredSecret =
@@ -40,16 +40,18 @@ export async function POST(request: Request) {
   }
 
   const raw = await request.text();
-  let body: Record<string, unknown> & StrapiEntryWebhookBody = {};
+  let body: Record<string, unknown> & LegacyWebhookBody = {};
   if (raw.length > 0) {
     try {
-      body = JSON.parse(raw) as Record<string, unknown> & StrapiEntryWebhookBody;
+      body = JSON.parse(raw) as Record<string, unknown> & LegacyWebhookBody;
     } catch {
       return NextResponse.json({ message: "Invalid JSON" }, { status: 400 });
     }
   }
 
-  const token = getBearer(request) ?? (typeof body.secret === "string" ? body.secret : undefined);
+  const token =
+    getBearer(request) ??
+    (typeof body.secret === "string" ? body.secret : undefined);
   if (token !== configuredSecret) {
     return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
   }
@@ -74,7 +76,7 @@ export async function POST(request: Request) {
   const model =
     typeof modelRaw === "string"
       ? modelRaw.includes("::")
-        ? modelRaw.split("::").pop()?.split(".").shift() ?? modelRaw
+        ? (modelRaw.split("::").pop()?.split(".").shift() ?? modelRaw)
         : modelRaw
       : "";
 
@@ -88,6 +90,28 @@ export async function POST(request: Request) {
   } else if (model === "homepage") {
     tags.push(REVALIDATE_TAGS.homepage);
     paths.push("/");
+  } else if (model === "legal-impressum") {
+    tags.push(REVALIDATE_TAGS.legalImpressum);
+    paths.push("/legal/impressum");
+  } else if (model === "legal-datenschutz") {
+    tags.push(REVALIDATE_TAGS.legalDatenschutz);
+    paths.push("/legal/datenschutz");
+  } else if (model === "cookie-banner") {
+    tags.push(REVALIDATE_TAGS.cookieBanner);
+    paths.push(
+      "/",
+      "/legal/impressum",
+      "/legal/datenschutz",
+    );
+  } else if (model === "navigation") {
+    tags.push(REVALIDATE_TAGS.navigation);
+    paths.push(
+      "/",
+      "/events",
+      "/gallery",
+      "/legal/impressum",
+      "/legal/datenschutz",
+    );
   } else if (model === "event") {
     tags.push(REVALIDATE_TAGS.events);
     paths.push("/", "/events");
@@ -100,7 +124,7 @@ export async function POST(request: Request) {
   } else if (model) {
     return NextResponse.json(
       {
-        message: `Unknown model "${model}". Use manual "tags" or model: homepage | event | gallery.`,
+        message: `Unknown model "${model}". Use manual "tags" or model: homepage | navigation | event | gallery | legal-impressum | legal-datenschutz | cookie-banner.`,
         supportedTags: Object.values(REVALIDATE_TAGS),
       },
       { status: 400 },
@@ -109,7 +133,7 @@ export async function POST(request: Request) {
     return NextResponse.json(
       {
         message:
-          "Provide \"tags\": [\"strapi:homepage\", ...] or a Strapi webhook body with \"model\".",
+          'Provide "tags": ["cms:homepage", ...] or a webhook body with "model".',
         hint: `Example: { \"secret\": \"…\", \"tags\": [\"${REVALIDATE_TAGS.homepage}\"] }`,
       },
       { status: 400 },
@@ -124,11 +148,16 @@ export async function POST(request: Request) {
     revalidatePath(path);
   }
 
-  logger.info("Revalidate: webhook", { event, model, tags, paths: uniquePaths });
+  logger.info("Revalidate: webhook", {
+    event,
+    model,
+    tags,
+    paths: uniquePaths,
+  });
   return NextResponse.json({
     revalidated: true,
     tags,
     paths: uniquePaths,
-    fallbackSeconds: STRAPI_ISR_SECONDS,
+    fallbackSeconds: CMS_ISR_SECONDS,
   });
 }

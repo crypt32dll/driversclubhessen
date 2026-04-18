@@ -1,23 +1,28 @@
-import { MarketingHomeRouteChunks } from "@/components/marketing/MarketingHomeRouteChunks";
+import { RenderBlocks } from "@/components/homepage/RenderBlocks";
 import { eventService } from "@/lib/services/events";
 import { homepageService } from "@/lib/services/homepage";
 import { marketingHome } from "@/styles/global.css";
 
 /**
  * Route-level ISR window (seconds). Next.js 16 only accepts a **numeric literal** here (see invalid-page-config).
- * Per-request Strapi `fetch` TTL still follows `STRAPI_ISR_REVALIDATE_SECONDS` in `api/client.ts`.
+ * Tag-based revalidation uses `CMS_ISR_REVALIDATE_SECONDS` / `unstable_cache` in services (see `lib/cms/isr-config.ts`).
  */
 export const revalidate = 3600;
 
 export default async function MarketingPage() {
-  const [homepage, events] = await Promise.all([
-    homepageService.getHomepage(),
+  const [bundle, events] = await Promise.all([
+    homepageService.getHomepageBundle(),
     eventService.getUpcomingEvents(),
   ]);
+  const nextEvent = events[0] ?? null;
 
   return (
     <main className={marketingHome}>
-      <MarketingHomeRouteChunks homepage={homepage} events={events} />
+      <RenderBlocks
+        blocks={bundle.layout.blocks}
+        events={events}
+        nextEvent={nextEvent}
+      />
     </main>
   );
 }

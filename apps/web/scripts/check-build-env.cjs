@@ -5,10 +5,6 @@
 /* eslint-disable no-console */
 
 const PREFIX = "[web:build-env]";
-const {
-  normalizePublicStrapiUrl,
-  isValidPublicStrapiUrl,
-} = require("./strapi-public-url.cjs");
 
 function isStrict() {
   return (
@@ -58,32 +54,33 @@ function logRemediation() {
   console.error("");
   console.error(`${PREFIX} ERROR --- Fix checklist (Vercel) ---`);
   console.error(
-    `${PREFIX} ERROR 1. Project → Settings → Environment Variables: set NEXT_PUBLIC_STRAPI_URL (e.g. https://your-cms.vercel.app, or bare hostname — build prepends https://).`,
+    `${PREFIX} ERROR 1. Project → Settings → Environment Variables: set PAYLOAD_SECRET, DATABASE_URL (Neon/Vercel Marketplace usually injects this), and NEXT_PUBLIC_APP_URL (public site URL for media links, e.g. https://your-domain.com).`,
   );
   console.error(
-    `${PREFIX} ERROR 2. Production: URL must be https. Preview/CI may use http only if policy allows.`,
+    `${PREFIX} ERROR 2. Optional: BLOB_READ_WRITE_TOKEN for Vercel Blob uploads (otherwise local/ephemeral storage in dev only).`,
   );
   console.error(
     `${PREFIX} ERROR 3. Redeploy after changing env (Preview vs Production scopes).`,
-  );
-  console.error(
-    `${PREFIX} ERROR 4. Monorepo: Root Directory should be repo root; Install Command / Build Command use root package.json (e.g. npm install; npm run build).`,
   );
   console.error(`${PREFIX} ERROR --- end checklist ---`);
   console.error("");
 }
 
-/** Only Production deploys must use https; Preview builds also run with NODE_ENV=production. */
 function needsProductionHttps() {
   return process.env.VERCEL_ENV === "production";
 }
 
+function isNonEmpty(s) {
+  return typeof s === "string" && s.trim().length > 0;
+}
+
 const optional = [
-  "STRAPI_FETCH_TIMEOUT_MS",
+  "CMS_ISR_REVALIDATE_SECONDS",
   "STRAPI_ISR_REVALIDATE_SECONDS",
   "REVALIDATE_SECRET",
   "LOG_LEVEL",
   "LOG_FORMAT",
+  "BLOB_READ_WRITE_TOKEN",
 ];
 
 function main() {
@@ -94,58 +91,81 @@ function main() {
     `check (strict=${strict}, VERCEL=${process.env.VERCEL ?? "0"}, CI=${process.env.CI ?? ""})`,
   );
 
-  const url = process.env.NEXT_PUBLIC_STRAPI_URL;
-  if (!isValidPublicStrapiUrl(url)) {
-    const detail =
-      url === undefined || String(url).trim() === ""
-        ? "unset or empty"
-        : `invalid URL (${String(url).slice(0, 80)})`;
+  const dbUrl =
+    process.env.DATABASE_URL?.trim() ||
+    process.env.DATABASE_URI?.trim() ||
+    process.env.POSTGRES_URL?.trim();
+  if (!isNonEmpty(dbUrl)) {
     if (strict) {
       log(
         "ERROR",
-        `NEXT_PUBLIC_STRAPI_URL is required on Vercel/CI — ${detail}. Set it in Project → Settings → Environment Variables.`,
+        "DATABASE_URL, DATABASE_URI, or POSTGRES_URL is required on Vercel/CI for Payload + Postgres (Neon sets DATABASE_URL when integrated).",
       );
       logRemediation();
       process.exit(1);
     }
     log(
       "WARN",
-      `NEXT_PUBLIC_STRAPI_URL ${detail} (allowed locally; production deploys must set a public Strapi base URL).`,
+      "DATABASE_URL / DATABASE_URI / POSTGRES_URL unset (allowed locally; required for production).",
     );
   } else {
-    const effective = normalizePublicStrapiUrl(url);
-    if (effective && String(url).trim() !== effective) {
+    log("OK", "Database connection string is set (DATABASE_URL / DATABASE_URI / POSTGRES_URL)");
+  }
+
+  if (!isNonEmpty(process.env.PAYLOAD_SECRET)) {
+    if (strict) {
+      log("ERROR", "PAYLOAD_SECRET is required on Vercel/CI.");
+      logRemediation();
+      process.exit(1);
+    }
+    log("WARN", "PAYLOAD_SECRET unset (allowed locally; required for production).");
+  } else {
+    log("OK", "PAYLOAD_SECRET is set");
+  }
+
+  const appUrl = process.env.NEXT_PUBLIC_APP_URL?.trim();
+  if (!isNonEmpty(appUrl)) {
+    if (strict) {
+      log(
+        "WARN",
+        "NEXT_PUBLIC_APP_URL unset — image URLs in emails/absolute links may be wrong; set to your public site origin (e.g. https://example.com).",
+      );
+    } else {
       log(
         "INFO",
-        `NEXT_PUBLIC_STRAPI_URL will be normalized to ${effective} at build (add https:// in Vercel to silence).`,
+        "NEXT_PUBLIC_APP_URL unset (optional locally; set on Vercel for correct media absolute URLs).",
       );
     }
+  } else {
     try {
-      const u = new URL(effective);
+      const u = new URL(
+        appUrl.startsWith("http") ? appUrl : `https://${appUrl}`,
+      );
       if (needsProductionHttps() && u.protocol !== "https:") {
         if (strict) {
           log(
             "ERROR",
-            "NEXT_PUBLIC_STRAPI_URL must use https in production (Vercel production / NODE_ENV=production).",
+            "NEXT_PUBLIC_APP_URL must use https in production.",
           );
           logRemediation();
           process.exit(1);
         }
-        log(
-          "WARN",
-          "NEXT_PUBLIC_STRAPI_URL should use https in production.",
-        );
+        log("WARN", "NEXT_PUBLIC_APP_URL should use https in production.");
       }
     } catch {
-      /* validated above */
+      if (strict) {
+        log("ERROR", "NEXT_PUBLIC_APP_URL is not a valid URL.");
+        logRemediation();
+        process.exit(1);
+      }
     }
-    log("OK", "NEXT_PUBLIC_STRAPI_URL is set and looks like a valid URL");
+    log("OK", "NEXT_PUBLIC_APP_URL is set");
   }
 
   if (strict && !process.env.REVALIDATE_SECRET) {
     log(
       "WARN",
-      "REVALIDATE_SECRET is unset — POST /api/revalidate will reject until you set it (Strapi webhooks).",
+      "REVALIDATE_SECRET is unset — POST /api/revalidate will reject until you set it.",
     );
   }
 

@@ -16,3 +16,5 @@ apps/web/.env
 apps/cms/.tmp/
 apps/cms/.cache/
 apps/cms/build/
+.vercel
+.env*.local

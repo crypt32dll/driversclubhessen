@@ -1,55 +1,46 @@
-import { apiClient } from "@/lib/api/client";
+import { CMS_ISR_SECONDS, REVALIDATE_TAGS } from "@/lib/cms/isr-config";
 import { logger } from "@/lib/logger";
-import { REVALIDATE_TAGS } from "@/lib/strapi/isr-config";
+import { getPayloadClient } from "@/lib/payload/get-payload";
 import { validators } from "@/lib/validators/content";
-import type { Homepage } from "@driversclub/shared";
-import { cache } from "react";
+import {
+  type HomepageLayoutView,
+  defaultHomepageLayoutView,
+} from "@driversclub/shared";
+import { unstable_cache } from "next/cache";
 
-type StrapiSingle<T> = {
-  data: T;
+export type HomepageBundle = {
+  layout: HomepageLayoutView;
 };
 
-const fallbackHomepage: Homepage = {
-  heroEyebrow: "Mi Familia & Friends praesentiert",
-  heroTitleLine1: "Tuning",
-  heroTitleLine2: "Treffen",
-  heroDateLabel: "19 · 04 · 2026",
-  featuredEventText: "Sonntag · 12:00 - 20:00 · Birstein",
-  heroCountdownEnd: "2026-04-19T12:00:00",
-};
-
-/**
- * Strapi 5 REST: explicit populate for single type + dynamic zone (reliable on Vercel build).
- * @see https://docs.strapi.io/cms/api/rest/guides/understanding-populate#populate-dynamic-zones
- */
-const HOMEPAGE_STRAPI_QUERY = {
-  "populate[hero]": "*",
-  "populate[featuredEvent]": "*",
-  "populate[sections][on][homepage.section-item]": "true",
-  status: "published",
-} as const;
-
-const loadHomepage = cache(async (): Promise<Homepage> => {
-  const payload = await apiClient.get<StrapiSingle<Record<string, unknown>>>(
-    "/api/homepage",
-    HOMEPAGE_STRAPI_QUERY,
-    { tags: [REVALIDATE_TAGS.homepage] },
-  );
-  return validators.homepage(payload.data);
-});
+const loadHomepageBundle = unstable_cache(
+  async (): Promise<HomepageBundle> => {
+    const payload = await getPayloadClient();
+    const doc = await payload.findGlobal({
+      slug: "homepage",
+      depth: 2,
+    });
+    const layout = validators.homepageLayout(doc) ?? defaultHomepageLayoutView;
+    return { layout };
+  },
+  ["cms-homepage"],
+  {
+    tags: [REVALIDATE_TAGS.homepage],
+    revalidate: CMS_ISR_SECONDS,
+  },
+);
 
 export const homepageService = {
-  async getHomepage(): Promise<Homepage> {
+  async getHomepageBundle(): Promise<HomepageBundle> {
     try {
-      return await loadHomepage();
+      return await loadHomepageBundle();
     } catch (err) {
       logger.warn(
-        "Strapi homepage unavailable; using static fallback copy. If the error was 502/503, the CMS host is down or busy (see apiClient logs). Otherwise check NEXT_PUBLIC_STRAPI_URL, Public permissions, published Homepage, ISR cache.",
+        "Payload homepage unavailable; using default block layout. Check DATABASE_URL, PAYLOAD_SECRET, and ISR cache.",
         err instanceof Error
           ? { name: err.name, message: err.message }
           : { err: String(err) },
       );
-      return fallbackHomepage;
+      return { layout: defaultHomepageLayoutView };
     }
   },
 };

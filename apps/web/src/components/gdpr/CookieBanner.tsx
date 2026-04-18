@@ -6,7 +6,20 @@ const CONSENT_KEY = "dch-cookie-consent";
 
 export type CookieConsentState = "accepted" | "rejected" | null;
 
-export const CookieBanner = () => {
+type Props = {
+  message?: string;
+  acceptLabel?: string;
+  rejectLabel?: string;
+};
+
+const DEFAULT_MESSAGE =
+  "Wir verwenden nur technisch notwendige Cookies. Optionale Cookies werden erst nach deiner Einwilligung aktiviert.";
+
+export const CookieBanner = ({
+  message = DEFAULT_MESSAGE,
+  acceptLabel = "Alle akzeptieren",
+  rejectLabel = "Nur notwendige",
+}: Props) => {
   const [consent, setConsent] = useState<CookieConsentState>(null);
   const [hydrated, setHydrated] = useState(false);
 
@@ -55,10 +68,10 @@ export const CookieBanner = () => {
         }}
       >
         <button type="button" onClick={() => persist("accepted")}>
-          Alle akzeptieren
+          {acceptLabel}
         </button>
         <button type="button" onClick={() => persist("rejected")}>
-          Nur notwendige
+          {rejectLabel}
         </button>
       </div>
     </aside>

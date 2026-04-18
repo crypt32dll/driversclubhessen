@@ -1,17 +1,25 @@
 /**
- * Runs `next` with NEXT_PUBLIC_STRAPI_URL normalized (bare host → https://…)
- * so Vercel env values match what `new URL()` and fetch expect at build time.
+ * Runs `next` with optional `NEXT_PUBLIC_APP_URL` normalization (bare host → https://…).
  */
 const { spawnSync } = require("node:child_process");
 const path = require("node:path");
-const { normalizePublicStrapiUrl } = require("./strapi-public-url.cjs");
 
-const raw = process.env.NEXT_PUBLIC_STRAPI_URL;
-const normalized = normalizePublicStrapiUrl(raw);
-if (normalized && normalized !== String(raw).trim()) {
-  process.env.NEXT_PUBLIC_STRAPI_URL = normalized;
+function normalizeAppUrl(raw) {
+  if (raw === undefined || raw === null) return null;
+  const t = String(raw).trim();
+  if (!t) return null;
+  if (t.startsWith("http://") || t.startsWith("https://")) {
+    return t.replace(/\/$/, "");
+  }
+  return `https://${t}`.replace(/\/$/, "");
+}
+
+const rawApp = process.env.NEXT_PUBLIC_APP_URL;
+const normalized = normalizeAppUrl(rawApp);
+if (normalized && normalized !== String(rawApp).trim()) {
+  process.env.NEXT_PUBLIC_APP_URL = normalized;
   process.stderr.write(
-    `[web:build] Normalized NEXT_PUBLIC_STRAPI_URL to ${normalized}\n`,
+    `[web:build] Normalized NEXT_PUBLIC_APP_URL to ${normalized}\n`,
   );
 }
 

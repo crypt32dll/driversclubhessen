@@ -1,7 +1,7 @@
 import { Container } from "@/components/ui/Container";
 import { Reveal } from "@/components/ui/Reveal";
-import { excerptFromEventDescription } from "@/lib/strapi/excerpt";
-import type { Event } from "@driversclub/shared";
+import { excerptFromEventDescription } from "@/lib/cms/excerpt";
+import type { Event, EventInfoCard } from "@driversclub/shared";
 import Link from "next/link";
 import {
   eventCard,
@@ -16,7 +16,7 @@ import {
   sectionTitleAccent,
 } from "./sections.css";
 
-const STATIC_EVENT_CARDS = [
+const STATIC_EVENT_CARDS: readonly EventInfoCard[] = [
   {
     icon: "📅",
     title: "Datum",
@@ -41,23 +41,43 @@ const STATIC_EVENT_CARDS = [
     value: "Kostenlos",
     sub: "Eintritt frei – jeder ist willkommen!",
   },
-] as const;
+];
 
 type Props = {
   /** Optional line from CMS (linked featured event on homepage). */
   featuredEventText?: string;
   /** Prefetched in the page to parallelize with homepage (avoids RSC waterfalls). */
   events: Event[];
+  sectionLabelText?: string;
+  titleLead?: string;
+  titleAccent?: string;
+  /** Shown when there are no events from Payload; otherwise optional detail cards. */
+  eventInfoCards?: readonly EventInfoCard[];
 };
 
-export function UpcomingEventsSection({ featuredEventText, events }: Props) {
+export function UpcomingEventsSection({
+  featuredEventText,
+  events,
+  sectionLabelText = "Das Event",
+  titleLead = "Was dich ",
+  titleAccent = "erwartet",
+  eventInfoCards,
+}: Props) {
+  const cardsSource =
+    events.length === 0
+      ? eventInfoCards && eventInfoCards.length > 0
+        ? eventInfoCards
+        : STATIC_EVENT_CARDS
+      : null;
+
   return (
     <section className={eventSection} id="event">
       <Container>
         <Reveal>
-          <p className={sectionLabel}>Das Event</p>
+          <p className={sectionLabel}>{sectionLabelText}</p>
           <h2 className={sectionTitle}>
-            Was dich <span className={sectionTitleAccent}>erwartet</span>
+            {titleLead}
+            <span className={sectionTitleAccent}>{titleAccent}</span>
           </h2>
           {featuredEventText ? (
             <p className={eventCardSub} style={{ marginTop: "0.75rem" }}>
@@ -66,8 +86,8 @@ export function UpcomingEventsSection({ featuredEventText, events }: Props) {
           ) : null}
         </Reveal>
         <div className={eventGrid}>
-          {events.length === 0
-            ? STATIC_EVENT_CARDS.map((card) => (
+          {cardsSource
+            ? cardsSource.map((card) => (
                 <Reveal key={card.title} className={eventCard}>
                   <div className={eventCardIcon}>{card.icon}</div>
                   <div className={eventCardTitle}>{card.title}</div>

@@ -4,23 +4,22 @@
   "private": true,
   "description": "DriversClub Hessen monorepo",
   "packageManager": "npm@10.9.2",
+  "overrides": {
+    "zod": "3.25.76"
+  },
   "workspaces": [
     "apps/*",
     "packages/*"
   ],
-  "dependencies": {
-    "better-sqlite3": "12.8.0"
-  },
   "scripts": {
     "dev": "npm run dev --workspace web",
     "dev:web": "npm run dev --workspace web",
-    "dev:cms": "npm run develop --workspace cms",
     "build": "turbo run build --filter=web",
     "build:web": "turbo run build --filter=web",
     "build:all": "turbo run build",
     "typecheck": "turbo run typecheck",
-    "lint": "biome check apps/web/src apps/web/next.config.ts packages/shared/src packages/logger/src",
-    "format": "biome format --write apps/web/src apps/web/next.config.ts packages/shared/src packages/logger/src"
+    "lint": "biome check apps/web/src apps/web/next.config.mjs packages/shared/src packages/logger/src",
+    "format": "biome format --write apps/web/src apps/web/next.config.mjs packages/shared/src packages/logger/src"
   },
   "devDependencies": {
     "@biomejs/biome": "^1.9.4",

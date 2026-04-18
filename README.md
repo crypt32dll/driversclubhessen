@@ -2,17 +2,16 @@
 
 Production-ready scaffold for the DriversClub Hessen platform:
 
-- `apps/web`: Next.js 16 App Router frontend (React 19, TypeScript strict, vanilla-extract)
-- `apps/cms`: Strapi v5 CMS (REST, SQLite by default)
+- `apps/web`: Next.js 16 App Router app (React 19, TypeScript strict, vanilla-extract) with **Payload CMS 3** embedded (admin + REST/GraphQL), Postgres, and optional Vercel Blob for uploads
 - `packages/shared`: Shared Zod schemas and shared content types
 
 ## Tech Decisions
 
 - Frontend: Next.js + React (latest stable), Server Components by default
 - Styling: `vanilla-extract` (zero-runtime CSS, recommended for modern Next.js)
-- API layer: Typed REST services with Zod validation
+- CMS: Payload 3 in-process (`getPayload`), collections `events`, `galleries`, `media`, global `homepage`
+- Data validation: Zod (`packages/shared`) at service boundaries
 - Formatting/linting: Biome
-- CMS: Strapi v5 with content types for Event, Homepage, Gallery
 - GDPR baseline: Cookie consent banner (opt-in), Impressum, Datenschutzerklaerung
 
 ## Project Structure
@@ -26,10 +25,8 @@ apps/
       hooks/
       lib/
       styles/
-  cms/
-    src/
-      api/
-      components/
+    next.config.mjs
+    src/payload.config.ts
 packages/
   shared/
 ```
@@ -40,6 +37,7 @@ Prerequisites:
 
 - Node.js LTS (recommended: Node 20 or Node 22)
 - npm
+- Postgres (local Docker, Neon, or similar) for Payload
 
 Install dependencies:
 
@@ -47,17 +45,17 @@ Install dependencies:
 npm install
 ```
 
-Run frontend:
+Run the web app (Next + Payload admin at `/admin`):
 
 ```bash
 npm run dev:web
 ```
 
-Run CMS:
+Copy [apps/web/.env.local.example](apps/web/.env.local.example) to `apps/web/.env.local` and set `DATABASE_URL`, `PAYLOAD_SECRET`, and `NEXT_PUBLIC_APP_URL`.
 
-```bash
-npm run dev:cms
-```
+After `vercel env pull .env.development.local` in `apps/web`, run **`npm run neon:check --workspace web`** to confirm Neon’s serverless driver can reach your database.
+
+If you see a **node `pg` SSL warning** about `sslmode=require` vs future libpq behavior, use **`sslmode=verify-full`** in `DATABASE_URL` for Neon, or rely on the small normalizer in [`apps/web/src/lib/postgres-url.ts`](apps/web/src/lib/postgres-url.ts) (Neon hosts only).
 
 ## Build and Quality Checks
 
@@ -85,24 +83,15 @@ Build web:
 npm run build --workspace web
 ```
 
-Build CMS:
-
-```bash
-npm run build --workspace cms
-```
-
 ## Environment
 
-Frontend reads Strapi URL from `NEXT_PUBLIC_STRAPI_URL` (code falls back to `http://localhost:1337` when unset).
+**Database:** Use [Neon Postgres via the Vercel Marketplace](https://vercel.com/marketplace/neon) so `DATABASE_URL` is wired for deploys; for local dev, paste the same Neon connection string (or a dev branch) into `apps/web/.env.local`.
 
-Templates (commit these; copy for real secrets):
+Also set `PAYLOAD_SECRET`, `NEXT_PUBLIC_APP_URL`, optional `BLOB_READ_WRITE_TOKEN`, and `REVALIDATE_SECRET` for `/api/revalidate`. See [apps/web/.env.production.example](apps/web/.env.production.example).
 
-- [apps/web/.env.local.example](apps/web/.env.local.example) — copy to `apps/web/.env.local` for local dev
-- [apps/web/.env.production.example](apps/web/.env.production.example) — paste into Vercel → Environment Variables → Production
-
-`next/image` allows Strapi media hosts via `remotePatterns` in [apps/web/next.config.ts](apps/web/next.config.ts): localhost/127.0.0.1, `**.strapiapp.com`, and the hostname of `NEXT_PUBLIC_STRAPI_URL`, all scoped to `/uploads/**`.
+`next/image` allows Payload media via `localPatterns` (`/api/media/file/**`) and remote patterns for Vercel Blob (`**.public.blob.vercel-storage.com`) and Cloudinary in [apps/web/next.config.mjs](apps/web/next.config.mjs).
 
 ## Notes
 
-- The frontend build currently skips Next.js build-time type validation due a Node 23 environment-specific TypeScript hang. Use Node LTS in CI and run dedicated typecheck there.
+- The frontend build may skip Next.js build-time type validation in some environments; run `npm run typecheck --workspace web` in CI.
 - Replace legal placeholder texts in `Impressum` and `Datenschutzerklaerung` with legally reviewed content before launch.

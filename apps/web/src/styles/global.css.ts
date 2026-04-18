@@ -8,10 +8,6 @@ globalStyle("main", {
   paddingTop: "5rem",
 });
 
-globalStyle(`main.${marketingHome}`, {
-  paddingTop: 0,
-});
-
 globalStyle("*, *::before, *::after", {
   boxSizing: "border-box",
   margin: 0,

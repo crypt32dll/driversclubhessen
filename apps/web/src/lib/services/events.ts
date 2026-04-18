@@ -1,52 +1,96 @@
-import { apiClient } from "@/lib/api/client";
+import { CMS_ISR_SECONDS, REVALIDATE_TAGS } from "@/lib/cms/isr-config";
 import { logger } from "@/lib/logger";
+import { getPayloadClient } from "@/lib/payload/get-payload";
 import { validators } from "@/lib/validators/content";
-import { REVALIDATE_TAGS } from "@/lib/strapi/isr-config";
+import type { Event as PayloadEventDoc } from "@/payload-types";
 import type { Event } from "@driversclub/shared";
-import { cache } from "react";
+import { unstable_cache } from "next/cache";
 
-type StrapiList<T> = {
-  data: T[];
-};
+function todayIsoDate(): string {
+  const t = new Date();
+  const y = t.getFullYear();
+  const m = String(t.getMonth() + 1).padStart(2, "0");
+  const d = String(t.getDate()).padStart(2, "0");
+  return `${y}-${m}-${d}`;
+}
 
-const EVENT_LIST_QUERY = {
-  "sort[0]": "createdAt:desc",
-  "populate[0]": "images",
-  status: "published",
-} as const;
+/** Event `date` is compared by calendar day (YYYY-MM-DD prefix). */
+function isEventOnOrAfterToday(dateIso: string): boolean {
+  const day = dateIso.slice(0, 10);
+  if (day.length !== 10) return true;
+  return day >= todayIsoDate();
+}
 
-const fetchUpcomingEvents = cache(async (): Promise<Event[]> => {
-  const payload = await apiClient.get<StrapiList<Record<string, unknown>>>(
-    "/api/events",
-    EVENT_LIST_QUERY,
-    { tags: [REVALIDATE_TAGS.events] },
+function sortEventsByDateAsc(events: Event[]): Event[] {
+  return [...events].sort((a, b) => {
+    const da = a.date.slice(0, 10);
+    const db = b.date.slice(0, 10);
+    if (da !== db) return da.localeCompare(db);
+    return a.slug.localeCompare(b.slug);
+  });
+}
+
+function filterUpcomingSorted(events: Event[]): Event[] {
+  return sortEventsByDateAsc(
+    events.filter((e) => isEventOnOrAfterToday(e.date)),
   );
-  return validators.eventList(payload.data);
-});
+}
 
-const fetchEventBySlug = cache(async (slug: string): Promise<Event | null> => {
-  const payload = await apiClient.get<StrapiList<Record<string, unknown>>>(
-    "/api/events",
-    {
-      "filters[slug][$eq]": slug,
-      "populate[0]": "images",
-      status: "published",
-      "pagination[pageSize]": 1,
+const fetchEventsFromCms = unstable_cache(
+  async (): Promise<Event[]> => {
+    const payload = await getPayloadClient();
+    const res = await payload.find({
+      collection: "events",
+      sort: "date",
+      depth: 2,
+      limit: 200,
+    });
+    return validators.eventList(res.docs as PayloadEventDoc[]);
+  },
+  ["cms-events-list"],
+  {
+    tags: [REVALIDATE_TAGS.events],
+    revalidate: CMS_ISR_SECONDS,
+  },
+);
+
+function fetchEventBySlugCached(slug: string) {
+  return unstable_cache(
+    async (): Promise<Event | null> => {
+      const payload = await getPayloadClient();
+      const res = await payload.find({
+        collection: "events",
+        where: { slug: { equals: slug } },
+        depth: 2,
+        limit: 1,
+      });
+      const row = res.docs[0];
+      if (!row) return null;
+      return validators.event(row as PayloadEventDoc);
     },
-    { tags: [REVALIDATE_TAGS.events] },
+    ["cms-event", slug],
+    {
+      tags: [REVALIDATE_TAGS.events],
+      revalidate: CMS_ISR_SECONDS,
+    },
   );
+}
 
-  if (!payload.data[0]) return null;
-  return validators.event(payload.data[0]);
-});
+async function loadUpcomingEvents(): Promise<Event[]> {
+  const all = await fetchEventsFromCms();
+  return filterUpcomingSorted(all);
+}
 
 export const eventService = {
+  /**
+   * Upcoming events (today or later), sorted by date ascending — first entry is the “next” event for the homepage hero.
+   */
   async getUpcomingEvents(): Promise<Event[]> {
     try {
-      return await fetchUpcomingEvents();
+      return await loadUpcomingEvents();
     } catch (err) {
       logger.warn(
-        "Strapi events unavailable; returning empty list",
+        "Payload events unavailable; returning empty list. Check DATABASE_URL, published events, and ISR cache.",
         err instanceof Error
           ? { name: err.name, message: err.message }
           : { err: String(err) },
@@ -55,7 +99,22 @@ export const eventService = {
     }
   },
 
+  async getNextUpcomingEvent(): Promise<Event | null> {
+    try {
+      const list = await loadUpcomingEvents();
+      return list[0] ?? null;
+    } catch (err) {
+      logger.warn(
+        "Payload events unavailable; next event unknown.",
+        err instanceof Error
+          ? { name: err.name, message: err.message }
+          : { err: String(err) },
+      );
+      return null;
+    }
+  },
+
   async getEventBySlug(slug: string): Promise<Event | null> {
-    return fetchEventBySlug(slug);
+    return fetchEventBySlugCached(slug)();
   },
 };

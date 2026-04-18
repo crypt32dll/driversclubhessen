@@ -3,27 +3,39 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev --webpack",
+    "dev": "next dev --webpack --no-server-fast-refresh",
     "prebuild": "node ./scripts/check-build-env.cjs",
     "build": "node ./scripts/run-next-build.cjs build --webpack",
     "start": "next start",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "payload:importmap": "payload generate:importmap --disable-transpile",
+    "payload:types": "payload generate:types --disable-transpile",
+    "neon:check": "node ./scripts/verify-neon-connection.mjs",
+    "seed:cms": "tsx ./scripts/seed-cms-defaults.ts"
   },
   "dependencies": {
     "@driversclub/logger": "^0.1.0",
     "@driversclub/shared": "^0.1.0",
-    "@strapi/blocks-react-renderer": "^1.0.2",
+    "@payloadcms/db-postgres": "^3.83.0",
+    "@payloadcms/next": "^3.83.0",
+    "@payloadcms/richtext-lexical": "^3.83.0",
+    "@payloadcms/storage-vercel-blob": "^3.83.0",
+    "@payloadcms/ui": "^3.83.0",
     "@vanilla-extract/css": "^1.20.1",
     "@vanilla-extract/next-plugin": "^2.5.2",
+    "graphql": "^16.13.2",
     "next": "16.2.4",
+    "payload": "^3.83.0",
     "react": "19.2.4",
     "react-dom": "19.2.4",
-    "zod": "^4.3.6"
+    "sharp": "^0.34.5",
+    "zod": "^3.25.76"
   },
   "devDependencies": {
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "tsx": "^4.21.0",
     "typescript": "^5"
   }
 }

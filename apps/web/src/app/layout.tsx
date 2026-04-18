@@ -1,49 +1,13 @@
-import { CookieBanner } from "@/components/gdpr/CookieBanner";
-import { SiteFooter } from "@/components/layout/SiteFooter";
-import { SiteNav } from "@/components/layout/SiteNav";
-import type { Metadata } from "next";
-import { Bebas_Neue, Orbitron, Rajdhani } from "next/font/google";
-import "@/styles/global.css";
+import type { ReactNode } from "react";
 
-const bebasNeue = Bebas_Neue({
-  variable: "--font-bebas-neue",
-  subsets: ["latin"],
-  weight: "400",
-});
-
-const orbitron = Orbitron({
-  variable: "--font-orbitron",
-  subsets: ["latin"],
-  weight: ["400", "700", "900"],
-});
-
-const rajdhani = Rajdhani({
-  variable: "--font-rajdhani",
-  subsets: ["latin"],
-  weight: ["400", "500", "600", "700"],
-});
-
-export const metadata: Metadata = {
-  title: "DriversClub Hessen",
-  description: "DriversClub Hessen - Tuning Treffen Community Plattform",
-};
-
-export default function RootLayout({
-  children,
-}: Readonly<{
-  children: React.ReactNode;
-}>) {
-  return (
-    <html
-      lang="de"
-      className={`${bebasNeue.variable} ${orbitron.variable} ${rajdhani.variable}`}
-    >
-      <body>
-        <SiteNav />
-        {children}
-        <SiteFooter />
-        <CookieBanner />
-      </body>
-    </html>
-  );
+/**
+ * Intentionally **does not** render `<html>` / `<body>` here.
+ * Next.js supports **multiple root layouts** via route groups: see `(marketing)/layout.tsx` and
+ * `(payload)/layout.tsx`. A top-level `<html>` would wrap Payload admin and cause nested `<html>`
+ * hydration errors.
+ *
+ * @see https://nextjs.org/docs/app/building-your-application/routing/route-groups#creating-multiple-root-layouts
+ */
+export default function RootLayout({ children }: { children: ReactNode }) {
+  return children;
 }
