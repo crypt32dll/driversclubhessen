@@ -54,7 +54,8 @@ const orbitron = Orbitron({
 const rajdhani = Rajdhani({
   variable: "--font-rajdhani",
   subsets: ["latin"],
-  weight: ["400", "600", "700"],
+  /** 400: body; 600: hero eyebrow. No CSS uses 700 — omitting avoids an unused font preload. */
+  weight: ["400", "600"],
 });
 
 function siteMetadataBase(): URL {
