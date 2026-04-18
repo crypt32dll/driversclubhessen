@@ -4,6 +4,7 @@ import { SiteNav } from "@/components/layout/SiteNav";
 import { navigationService } from "@/lib/services/navigation";
 import type { Metadata } from "next";
 import { Bebas_Neue, Orbitron, Rajdhani } from "next/font/google";
+import { Suspense } from "react";
 import "@/styles/global.css";
 
 const bebasNeue = Bebas_Neue({
@@ -50,7 +51,9 @@ export default async function MarketingRootLayout({
         <SiteNav items={items} />
         {children}
         <SiteFooter primaryLinks={items} />
-        <CookieBannerGate />
+        <Suspense fallback={null}>
+          <CookieBannerGate />
+        </Suspense>
       </body>
     </html>
   );
