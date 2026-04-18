@@ -19,6 +19,8 @@ export type RenderBlocksProps = {
 };
 
 export function RenderBlocks({ blocks, events, nextEvent }: RenderBlocksProps) {
+  const firstHeroIndex = blocks.findIndex((b) => b.blockType === "hero");
+
   return (
     <>
       {blocks.map((block, index) => {
@@ -38,6 +40,7 @@ export function RenderBlocks({ blocks, events, nextEvent }: RenderBlocksProps) {
                 tagline={merged.tagline}
                 ctas={merged.ctas}
                 backgroundImageUrl={merged.backgroundImageUrl}
+                priorityBackground={index === firstHeroIndex}
               />
             );
           }

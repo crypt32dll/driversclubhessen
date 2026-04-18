@@ -21,6 +21,20 @@ export const hero = style({
   overflow: "hidden",
 });
 
+/** CMS hero photo — behind gradients (`heroBg` z-index 0). */
+export const heroBackdropPhoto = style({
+  position: "absolute",
+  inset: 0,
+  zIndex: -1,
+  pointerEvents: "none",
+});
+
+export const heroBackdropImage = style({
+  objectFit: "cover",
+  objectPosition: "center",
+  opacity: 0.35,
+});
+
 export const heroBg = style({
   position: "absolute",
   inset: 0,

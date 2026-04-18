@@ -1,15 +1,12 @@
-"use client";
+import Image from "next/image";
 
 import { ButtonLink } from "@/components/ui/ButtonLink";
-import { useCountdown } from "@/hooks/useCountdown";
 import type { HeroCta } from "@driversclub/shared";
 import {
-  cdBlock,
-  cdLabel,
-  cdNum,
-  countdown,
   estTag,
   hero,
+  heroBackdropImage,
+  heroBackdropPhoto,
   badge as heroBadgePill,
   heroBg,
   heroContent,
@@ -21,6 +18,8 @@ import {
   heroTitleLine1,
   heroTitleLine2,
 } from "./sections.css";
+
+import { HeroCountdown } from "./HeroCountdown";
 
 const DEFAULT_COUNTDOWN_END = "2026-04-19T12:00:00";
 
@@ -46,7 +45,7 @@ function isExternalHref(href: string) {
   );
 }
 
-type Props = {
+export type HeroSectionProps = {
   eyebrow?: string;
   titleLine1?: string;
   titleLine2?: string;
@@ -58,9 +57,11 @@ type Props = {
   ctas?: readonly HeroCta[];
   /** Optional full-bleed background (CMS media URL). */
   backgroundImageUrl?: string;
+  /** When true, optimizes LCP for above-the-fold heroes (homepage / event detail). */
+  priorityBackground?: boolean;
 };
 
-export const HeroSection = ({
+export function HeroSection({
   eyebrow = "Mi Familia & Friends präsentiert",
   titleLine1 = "Tuning",
   titleLine2 = "Treffen",
@@ -70,28 +71,24 @@ export const HeroSection = ({
   tagline = DEFAULT_TAGLINE,
   ctas,
   backgroundImageUrl,
-}: Props) => {
-  const { days, hours, minutes, seconds, isLive } =
-    useCountdown(countdownEndIso);
-
+  priorityBackground = false,
+}: HeroSectionProps) {
   const resolvedCtas = ctas && ctas.length > 0 ? ctas : [...DEFAULT_CTAS];
 
   return (
     <section className={hero}>
       {backgroundImageUrl ? (
-        <div
-          aria-hidden
-          style={{
-            position: "absolute",
-            inset: 0,
-            backgroundImage: `url(${backgroundImageUrl})`,
-            backgroundSize: "cover",
-            backgroundPosition: "center",
-            opacity: 0.35,
-            pointerEvents: "none",
-            zIndex: -1,
-          }}
-        />
+        <div className={heroBackdropPhoto} aria-hidden>
+          <Image
+            src={backgroundImageUrl}
+            alt=""
+            fill
+            sizes="100vw"
+            className={heroBackdropImage}
+            priority={priorityBackground}
+            fetchPriority={priorityBackground ? "high" : "low"}
+          />
+        </div>
       ) : null}
       <div className={heroBg} aria-hidden />
       <div className={heroGrid} aria-hidden />
@@ -104,29 +101,7 @@ export const HeroSection = ({
         </h1>
         <p className={heroSub}>{dateLabel}</p>
 
-        {isLive ? (
-          <div className={countdown}>
-            <div className={cdBlock}>
-              <span className={cdNum}>JETZT LIVE</span>
-            </div>
-          </div>
-        ) : (
-          <div className={countdown}>
-            {[
-              { value: days, label: "Tage" },
-              { value: hours, label: "Stunden" },
-              { value: minutes, label: "Minuten" },
-              { value: seconds, label: "Sekunden" },
-            ].map((entry) => (
-              <div key={entry.label} className={cdBlock}>
-                <span className={cdNum}>
-                  {String(entry.value).padStart(2, "0")}
-                </span>
-                <span className={cdLabel}>{entry.label}</span>
-              </div>
-            ))}
-          </div>
-        )}
+        <HeroCountdown countdownEndIso={countdownEndIso} />
 
         <div className={heroCtas}>
           {resolvedCtas.map((c) => {
@@ -150,4 +125,4 @@ export const HeroSection = ({
       </div>
     </section>
   );
-};
+}

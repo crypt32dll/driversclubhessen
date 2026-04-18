@@ -44,8 +44,8 @@ export function EventDetailMedia({ event }: Props) {
             Eindrücke &amp; Stimmung
           </h2>
           <p className={mediaLede}>
-            Ausgewählte Medien aus dem CMS — zentriert und in Kartenrahmen wie auf
-            der Event-Übersicht.
+            Ausgewählte Medien aus dem CMS — zentriert und in Kartenrahmen wie
+            auf der Event-Übersicht.
           </p>
         </header>
         <div className={mediaGrid}>
@@ -57,6 +57,8 @@ export function EventDetailMedia({ event }: Props) {
                 width={img.width ?? 1200}
                 height={img.height ?? 800}
                 sizes="(max-width: 720px) 100vw, 50vw"
+                priority={i === 0}
+                fetchPriority={i === 0 ? "high" : "low"}
                 style={{ width: "100%", height: "auto", display: "block" }}
               />
               {img.alternativeText ? (

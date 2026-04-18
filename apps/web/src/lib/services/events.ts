@@ -42,7 +42,8 @@ const fetchEventsFromCms = unstable_cache(
     const res = await payload.find({
       collection: "events",
       sort: "date",
-      depth: 2,
+      /** List cards need populated media + hero group; avoid deeper relation graphs. */
+      depth: 1,
       limit: 200,
     });
     return validators.eventList(res.docs as PayloadEventDoc[]);
@@ -61,6 +62,7 @@ function fetchEventBySlugCached(slug: string) {
       const res = await payload.find({
         collection: "events",
         where: { slug: { equals: slug } },
+        /** Detail: nested hero CTAs + gallery media. */
         depth: 2,
         limit: 1,
       });
@@ -116,5 +118,22 @@ export const eventService = {
 
   async getEventBySlug(slug: string): Promise<Event | null> {
     return fetchEventBySlugCached(slug)();
+  },
+
+  /**
+   * All event slugs for `generateStaticParams` (build + ISR paths).
+   * Lightweight query — no `unstable_cache` so build picks current CMS slugs.
+   */
+  async getPublishedEventSlugs(): Promise<string[]> {
+    const payload = await getPayloadClient();
+    const res = await payload.find({
+      collection: "events",
+      sort: "date",
+      depth: 0,
+      limit: 500,
+    });
+    return res.docs
+      .map((d) => (typeof d.slug === "string" ? d.slug : null))
+      .filter((s): s is string => Boolean(s && s.length > 0));
   },
 };

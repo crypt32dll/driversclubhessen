@@ -4,12 +4,16 @@ import { SiteNav } from "@/components/layout/SiteNav";
 import { SITE_METADATA_DEFAULTS } from "@/lib/metadata/marketing-page-metadata";
 import { gdprService } from "@/lib/services/gdpr";
 import { navigationService } from "@/lib/services/navigation";
+import { Analytics } from "@vercel/analytics/react";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 import type { Metadata, Viewport } from "next";
 import { Bebas_Neue, Orbitron, Rajdhani } from "next/font/google";
-import { cache, Suspense } from "react";
+import { Suspense, cache } from "react";
 import "@/styles/global.css";
 
-const getMarketingNavigation = cache(() => navigationService.getSiteNavigation());
+const getMarketingNavigation = cache(() =>
+  navigationService.getSiteNavigation(),
+);
 
 async function MarketingSiteNav() {
   const { items } = await getMarketingNavigation();
@@ -42,13 +46,14 @@ const bebasNeue = Bebas_Neue({
 const orbitron = Orbitron({
   variable: "--font-orbitron",
   subsets: ["latin"],
-  weight: ["400", "700", "900"],
+  /** 400: UI copy on accent; 900: hero countdown numerals — drops unused 700 file. */
+  weight: ["400", "900"],
 });
 
 const rajdhani = Rajdhani({
   variable: "--font-rajdhani",
   subsets: ["latin"],
-  weight: ["400", "500", "600", "700"],
+  weight: ["400", "600", "700"],
 });
 
 function siteMetadataBase(): URL {
@@ -103,6 +108,8 @@ export default function MarketingRootLayout({
         <Suspense fallback={null}>
           <MarketingSiteFooterAndCookie />
         </Suspense>
+        <Analytics />
+        <SpeedInsights />
       </body>
     </html>
   );

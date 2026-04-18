@@ -25,6 +25,8 @@
     "@payloadcms/ui": "^3.83.0",
     "@vanilla-extract/css": "^1.20.1",
     "@vanilla-extract/next-plugin": "^2.5.2",
+    "@vercel/analytics": "^2.0.1",
+    "@vercel/speed-insights": "^2.0.0",
     "graphql": "^16.13.2",
     "next": "16.2.4",
     "payload": "^3.83.0",

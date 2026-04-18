@@ -1,8 +1,9 @@
 import { EventDetailMedia } from "@/components/events/EventDetailMedia";
 import { HeroSection } from "@/components/sections/HeroSection";
-import { marketingMetadataForPath } from "@/lib/metadata/marketing-page-metadata";
 import { formatEventDateTimeDe } from "@/lib/format-event-date";
 import { mapEventToHeroProps } from "@/lib/map-event-detail-hero";
+import { marketingMetadataForPath } from "@/lib/metadata/marketing-page-metadata";
+import { getCachedEventBySlug } from "@/lib/services/event-detail";
 import { eventService } from "@/lib/services/events";
 import { marketingHome } from "@/styles/global.css";
 import type { Metadata } from "next";
@@ -15,12 +16,19 @@ type Props = {
 /** ISR — literal required by Next.js 16 segment config; see marketing `page.tsx` comment. */
 export const revalidate = 3600;
 
+export async function generateStaticParams() {
+  const slugs = await eventService.getPublishedEventSlugs();
+  return slugs.map((slug) => ({ slug }));
+}
+
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
-  const event = await eventService.getEventBySlug(slug).catch(() => null);
+  const event = await getCachedEventBySlug(slug).catch(() => null);
   const when = event ? formatEventDateTimeDe(event.date) : null;
   return marketingMetadataForPath(`/events/${slug}`, {
-    title: event ? `${event.title} | DriversClub Hessen` : "Event | DriversClub Hessen",
+    title: event
+      ? `${event.title} | DriversClub Hessen`
+      : "Event | DriversClub Hessen",
     description: event
       ? `${event.title}${when ? ` — ${when}` : ""}${event.location ? ` · ${event.location}` : ""}.`
       : "Event-Details bei DriversClub Hessen.",
@@ -29,7 +37,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 export default async function EventDetailPage({ params }: Props) {
   const { slug } = await params;
-  const event = await eventService.getEventBySlug(slug);
+  const event = await getCachedEventBySlug(slug);
 
   if (!event) {
     notFound();
@@ -49,6 +57,7 @@ export default async function EventDetailPage({ params }: Props) {
         tagline={hero.tagline}
         ctas={hero.ctas}
         backgroundImageUrl={hero.backgroundImageUrl}
+        priorityBackground
       />
       <EventDetailMedia event={event} />
     </main>

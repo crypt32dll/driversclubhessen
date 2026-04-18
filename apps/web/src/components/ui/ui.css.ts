@@ -12,7 +12,7 @@ export const container = style({
 export const button = style({
   fontFamily: vars.font.accent,
   fontSize: "0.75rem",
-  fontWeight: 700,
+  fontWeight: 900,
   letterSpacing: "0.15em",
   textTransform: "uppercase",
   borderRadius: "3px",
