@@ -30,7 +30,6 @@ const DEFAULT_TAGLINE = "DriversClub Hessen × Mi Familia & Friends";
 const DEFAULT_CTAS: readonly HeroCta[] = [
   { href: "/#location", label: "Zum Event", variant: "primary" },
   { href: "/events", label: "Alle Events", variant: "outline" },
-  { href: "/gallery", label: "Galerie", variant: "outline" },
   {
     href: "https://www.instagram.com/driversclubhessen",
     label: "@driversclubhessen",

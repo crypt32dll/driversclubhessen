@@ -1,4 +1,9 @@
 import type { Event, HeroCta } from "@driversclub/shared";
+
+function isGalleryCta(href: string): boolean {
+  const path = href.trim().split("?")[0]?.split("#")[0] ?? "";
+  return path === "/gallery" || path.startsWith("/gallery/");
+}
 import type { HomepageHeroBlockView } from "@driversclub/shared";
 
 const DEFAULT_COUNTDOWN_FALLBACK = "2026-04-19T12:00:00";
@@ -42,10 +47,9 @@ function countdownIsoFromEventDate(dateIso: string): string {
 }
 
 function ctasForFeaturedEvent(featured: Event): readonly HeroCta[] | undefined {
-  if (featured.heroCtas && featured.heroCtas.length > 0) {
-    return featured.heroCtas;
-  }
-  return undefined;
+  if (!featured.heroCtas?.length) return undefined;
+  const filtered = featured.heroCtas.filter((c) => !isGalleryCta(c.href));
+  return filtered.length > 0 ? filtered : undefined;
 }
 
 function staticHeroFallback(): MergedHeroProps {
