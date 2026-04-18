@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" role="img" aria-label="DriversClub Hessen">
+  <defs>
+    <linearGradient id="dch-brand" x1="4" y1="4" x2="28" y2="28" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#00e5ff"/>
+      <stop offset="1" stop-color="#8b2fc9"/>
+    </linearGradient>
+  </defs>
+  <!-- Matches tokens: color.black background, cyan ’ purple gradient -->
+  <rect width="32" height="32" rx="8" fill="#06060a"/>
+  <!-- D monogram: outer shell -->
+  <path
+    fill="url(#dch-brand)"
+    d="M8 6.5h9.2c5.4 0 9.3 3.7 9.3 9.6 0 5.8-3.9 9.4-9.3 9.4H8v-19z"
+  />
+  <!-- Inner counter-shape (same as page bg) -->
+  <path
+    fill="#06060a"
+    d="M12 10.5h4.4c2.9 0 4.8 2 4.8 5.6 0 3.7-1.9 5.9-4.8 5.9H12v-11.5z"
+  />
+</svg>

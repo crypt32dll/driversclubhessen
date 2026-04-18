@@ -28,6 +28,8 @@ const rajdhani = Rajdhani({
 export const metadata: Metadata = {
   title: "DriversClub Hessen",
   description: "DriversClub Hessen - Tuning Treffen Community Plattform",
+  /** Pinned tab / browser UI tint; matches `tokens.css` color.black */
+  themeColor: "#06060a",
 };
 
 /**
