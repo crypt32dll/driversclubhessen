@@ -44,6 +44,7 @@ async function fetchEventsListFromPayload(): Promise<Event[]> {
     sort: "date",
     /** List cards need populated media + hero group; avoid deeper relation graphs. */
     depth: 1,
+    /** Upper bound for list + homepage “next event” pick; increase if you publish more rows per season. */
     limit: 200,
   });
   return validators.eventList(res.docs as PayloadEventDoc[]);
@@ -144,6 +145,7 @@ export const eventService = {
       collection: "events",
       sort: "date",
       depth: 0,
+      /** Slugs only; cap above list `limit` so prerender paths stay in sync with CMS. */
       limit: 500,
     });
     return res.docs

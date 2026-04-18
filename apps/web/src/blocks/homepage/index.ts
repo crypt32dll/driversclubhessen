@@ -190,7 +190,8 @@ export const homepageLayoutBlocks: Block[] = [
         type: "array",
         labels: { singular: "Regel", plural: "Regeln" },
         admin: {
-          description: "Aufzaehlung der Verhaltens-/Treffen-Regeln auf der Startseite.",
+          description:
+            "Aufzaehlung der Verhaltens-/Treffen-Regeln auf der Startseite.",
         },
         fields: [
           {
@@ -261,7 +262,8 @@ export const homepageLayoutBlocks: Block[] = [
         type: "textarea",
         label: "Beschreibung",
         admin: {
-          description: "Fliesstext im «Ueber uns»-Bereich zwischen den beiden Spalten.",
+          description:
+            "Fliesstext im «Ueber uns»-Bereich zwischen den beiden Spalten.",
         },
       },
     ],
@@ -359,7 +361,8 @@ export const homepageLayoutBlocks: Block[] = [
         type: "array",
         labels: { singular: "Link", plural: "Links" },
         admin: {
-          description: "Social- oder externe Links im Footer-Bereich der Startseite.",
+          description:
+            "Social- oder externe Links im Footer-Bereich der Startseite.",
         },
         fields: [
           {

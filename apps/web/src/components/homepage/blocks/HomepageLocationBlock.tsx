@@ -1,8 +1,3 @@
-import { ButtonLink } from "@/components/ui/ButtonLink";
-import { Container } from "@/components/ui/Container";
-import { Reveal } from "@/components/ui/Reveal";
-import type { HomepageLocationBlockView } from "@driversclub/shared";
-import Link from "next/link";
 import {
   locIcon,
   locLabel,
@@ -19,6 +14,11 @@ import {
   sectionTitle,
   sectionTitleAccent,
 } from "@/components/sections/sections.css";
+import { ButtonLink } from "@/components/ui/ButtonLink";
+import { Container } from "@/components/ui/Container";
+import { Reveal } from "@/components/ui/Reveal";
+import type { HomepageLocationBlockView } from "@driversclub/shared";
+import Link from "next/link";
 
 const DEFAULT_MAP =
   "https://maps.google.com/?q=Industriestraße+6+63633+Birstein";
@@ -143,9 +143,7 @@ export function HomepageLocationBlock({ block }: Props) {
                 <br />
                 63633 Birstein
               </span>
-              <span className={mapHint}>
-                Klicken um Google Maps zu öffnen
-              </span>
+              <span className={mapHint}>Klicken um Google Maps zu öffnen</span>
             </Link>
           </Reveal>
         </div>

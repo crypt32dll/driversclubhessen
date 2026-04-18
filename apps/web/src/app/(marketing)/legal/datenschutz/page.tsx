@@ -1,8 +1,8 @@
 import { LexicalRichText } from "@/components/cms/LexicalRichText";
 import { Container } from "@/components/ui/Container";
 import {
-  marketingMetadataForPath,
   SITE_METADATA_DEFAULTS,
+  marketingMetadataForPath,
 } from "@/lib/metadata/marketing-page-metadata";
 import { gdprService } from "@/lib/services/gdpr";
 import type { SerializedEditorState } from "lexical";
@@ -35,7 +35,9 @@ export default async function DatenschutzPage() {
       <Container>
         <h1>{doc?.title ?? "Datenschutz"}</h1>
         {doc?.body ? (
-          <LexicalRichText data={doc.body as unknown as SerializedEditorState} />
+          <LexicalRichText
+            data={doc.body as unknown as SerializedEditorState}
+          />
         ) : (
           <DatenschutzFallback />
         )}

@@ -1,6 +1,3 @@
-import { Container } from "@/components/ui/Container";
-import { Reveal } from "@/components/ui/Reveal";
-import type { HomepageFeaturesBlockView } from "@driversclub/shared";
 import {
   feature,
   featureIcon,
@@ -12,6 +9,9 @@ import {
   sectionTitle,
   sectionTitleAccent,
 } from "@/components/sections/sections.css";
+import { Container } from "@/components/ui/Container";
+import { Reveal } from "@/components/ui/Reveal";
+import type { HomepageFeaturesBlockView } from "@driversclub/shared";
 
 const DEFAULT_ICONS = ["🚗", "⛽", "🍔", "👥", "📸", "🔥"] as const;
 

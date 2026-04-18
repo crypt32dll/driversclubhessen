@@ -6,9 +6,9 @@ export default function MarketingLoading() {
   return (
     <main className={marketingHome}>
       <Container>
-        <p role="status" aria-live="polite">
+        <output aria-live="polite" style={{ display: "block" }}>
           Startseite wird geladen…
-        </p>
+        </output>
       </Container>
     </main>
   );

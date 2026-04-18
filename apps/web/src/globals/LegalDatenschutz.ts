@@ -34,7 +34,8 @@ export const LegalDatenschutz: GlobalConfig = {
       required: true,
       label: "Inhalt",
       admin: {
-        description: "Datenschutzerklaerung (wird auf der Datenschutz-Route gerendert).",
+        description:
+          "Datenschutzerklaerung (wird auf der Datenschutz-Route gerendert).",
       },
     },
   ],

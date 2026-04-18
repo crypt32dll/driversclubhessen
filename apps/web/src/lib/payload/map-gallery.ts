@@ -1,4 +1,4 @@
-import type { Gallery as PayloadGallery, Media } from "@/payload-types";
+import type { Media, Gallery as PayloadGallery } from "@/payload-types";
 import type { GalleryItem } from "@driversclub/shared";
 
 import { mapPayloadMediaToImage } from "@/lib/payload/map-media";

@@ -1,6 +1,3 @@
-import { Container } from "@/components/ui/Container";
-import { Reveal } from "@/components/ui/Reveal";
-import type { HomepageSocialBlockView } from "@driversclub/shared";
 import {
   sectionLabel,
   sectionTitle,
@@ -10,6 +7,9 @@ import {
   socialLinks,
   socialSection,
 } from "@/components/sections/sections.css";
+import { Container } from "@/components/ui/Container";
+import { Reveal } from "@/components/ui/Reveal";
+import type { HomepageSocialBlockView } from "@driversclub/shared";
 
 const DEFAULT_INTRO =
   "Kein Event verpassen, aktuelle Updates und Content direkt aus der Szene.";
@@ -34,15 +34,13 @@ export function HomepageSocialBlock({ block }: Props) {
         <Reveal>
           <p className={sectionLabel}>{block.sectionLabel ?? "Folg uns"}</p>
           <h2 className={sectionTitle}>
-            {`${block.titleLead ?? "Bleib" } `}
+            {`${block.titleLead ?? "Bleib"} `}
             <span className={sectionTitleAccent}>
               {block.titleAccent ?? "connected"}
             </span>
           </h2>
         </Reveal>
-        <Reveal className={socialIntro}>
-          {block.intro ?? DEFAULT_INTRO}
-        </Reveal>
+        <Reveal className={socialIntro}>{block.intro ?? DEFAULT_INTRO}</Reveal>
         <div className={socialLinks}>
           {links.map((row, index) => {
             const isIg = row.href.toLowerCase().includes("instagram.com");

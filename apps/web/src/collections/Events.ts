@@ -109,7 +109,8 @@ export const Events: CollectionConfig = {
           type: "text",
           label: "Eyebrow",
           admin: {
-            description: "Kleine Zeile ueber dem grossen Titel im Hero auf der Startseite.",
+            description:
+              "Kleine Zeile ueber dem grossen Titel im Hero auf der Startseite.",
           },
         },
         {
@@ -125,7 +126,8 @@ export const Events: CollectionConfig = {
           type: "text",
           label: "Titel Zeile 2",
           admin: {
-            description: "Zweite grosse Titelzeile im Startseiten-Hero (oft Akzent-Wort).",
+            description:
+              "Zweite grosse Titelzeile im Startseiten-Hero (oft Akzent-Wort).",
           },
         },
         {
@@ -154,7 +156,8 @@ export const Events: CollectionConfig = {
           type: "text",
           label: "Badge",
           admin: {
-            description: "Kompaktes Label im Hero (z. B. Event-Name oder Sponsoring).",
+            description:
+              "Kompaktes Label im Hero (z. B. Event-Name oder Sponsoring).",
           },
         },
         {
@@ -181,7 +184,8 @@ export const Events: CollectionConfig = {
           relationTo: "media",
           label: "Hintergrundbild (optional)",
           admin: {
-            description: "Grossflaechiges Hero-Hintergrundbild auf der Startseite (LCP-relevant).",
+            description:
+              "Grossflaechiges Hero-Hintergrundbild auf der Startseite (LCP-relevant).",
           },
         },
       ],

@@ -4,9 +4,9 @@ export default function EventDetailLoading() {
   return (
     <main>
       <Container>
-        <p role="status" aria-live="polite">
+        <output aria-live="polite" style={{ display: "block" }}>
           Event wird geladen…
-        </p>
+        </output>
       </Container>
     </main>
   );

@@ -55,7 +55,9 @@ export function mapPayloadEvent(doc: PayloadEvent): Event {
     id: typeof doc.id === "number" ? doc.id : undefined,
     slug: doc.slug,
     title: doc.title,
-    ...(nonEmptyString(doc.metaTitle) ? { metaTitle: nonEmptyString(doc.metaTitle) } : {}),
+    ...(nonEmptyString(doc.metaTitle)
+      ? { metaTitle: nonEmptyString(doc.metaTitle) }
+      : {}),
     ...(nonEmptyString(doc.metaDescription)
       ? { metaDescription: nonEmptyString(doc.metaDescription) }
       : {}),

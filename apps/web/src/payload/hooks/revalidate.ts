@@ -5,13 +5,13 @@ import type {
 } from "payload";
 
 import {
+  REVALIDATE_TAGS,
+  REVALIDATE_TAG_PROFILE,
+} from "../../lib/cms/isr-config.ts";
+import {
   pathsToRevalidateForTags,
   pathsWhenEventsCollectionChanged,
 } from "../../lib/cms/paths-for-revalidate-tags.ts";
-import {
-  REVALIDATE_TAG_PROFILE,
-  REVALIDATE_TAGS,
-} from "../../lib/cms/isr-config.ts";
 
 async function tag(profile: typeof REVALIDATE_TAG_PROFILE, tagName: string) {
   const { revalidateTag } = await import("next/cache");
@@ -44,7 +44,9 @@ async function tagAndPaths(tagName: string) {
 
 export const revalidateEvents: CollectionAfterChangeHook = async ({ doc }) => {
   await tag(REVALIDATE_TAG_PROFILE, REVALIDATE_TAGS.events);
-  await revalidatePathsQuiet(pathsWhenEventsCollectionChanged(eventDocSlug(doc)));
+  await revalidatePathsQuiet(
+    pathsWhenEventsCollectionChanged(eventDocSlug(doc)),
+  );
 };
 
 export const revalidateEventsDelete: CollectionAfterDeleteHook = async ({

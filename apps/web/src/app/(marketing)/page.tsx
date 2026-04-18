@@ -1,7 +1,7 @@
 import { RenderBlocks } from "@/components/homepage/RenderBlocks";
 import {
-  marketingMetadataForPath,
   SITE_METADATA_DEFAULTS,
+  marketingMetadataForPath,
 } from "@/lib/metadata/marketing-page-metadata";
 import { eventService } from "@/lib/services/events";
 import { homepageService } from "@/lib/services/homepage";

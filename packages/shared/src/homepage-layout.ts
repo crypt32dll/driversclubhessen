@@ -108,31 +108,44 @@ export const homepageSocialBlockViewSchema = z.object({
   links: z.array(homepageSocialLinkSchema).optional(),
 });
 
-export const homepageLayoutBlockViewSchema = z.discriminatedUnion(
-  "blockType",
-  [
-    homepageHeroBlockViewSchema,
-    homepageTickerBlockViewSchema,
-    homepageEventBlockViewSchema,
-    homepageFeaturesBlockViewSchema,
-    homepageRulesBlockViewSchema,
-    homepageAboutBlockViewSchema,
-    homepageLocationBlockViewSchema,
-    homepageSocialBlockViewSchema,
-  ],
-);
+export const homepageLayoutBlockViewSchema = z.discriminatedUnion("blockType", [
+  homepageHeroBlockViewSchema,
+  homepageTickerBlockViewSchema,
+  homepageEventBlockViewSchema,
+  homepageFeaturesBlockViewSchema,
+  homepageRulesBlockViewSchema,
+  homepageAboutBlockViewSchema,
+  homepageLocationBlockViewSchema,
+  homepageSocialBlockViewSchema,
+]);
 
 export const homepageLayoutViewSchema = z.object({
   blocks: z.array(homepageLayoutBlockViewSchema),
 });
 
 export type HomepageHeroBlockView = z.infer<typeof homepageHeroBlockViewSchema>;
-export type HomepageTickerBlockView = z.infer<typeof homepageTickerBlockViewSchema>;
-export type HomepageEventBlockView = z.infer<typeof homepageEventBlockViewSchema>;
-export type HomepageFeaturesBlockView = z.infer<typeof homepageFeaturesBlockViewSchema>;
-export type HomepageRulesBlockView = z.infer<typeof homepageRulesBlockViewSchema>;
-export type HomepageAboutBlockView = z.infer<typeof homepageAboutBlockViewSchema>;
-export type HomepageLocationBlockView = z.infer<typeof homepageLocationBlockViewSchema>;
-export type HomepageSocialBlockView = z.infer<typeof homepageSocialBlockViewSchema>;
-export type HomepageLayoutBlockView = z.infer<typeof homepageLayoutBlockViewSchema>;
+export type HomepageTickerBlockView = z.infer<
+  typeof homepageTickerBlockViewSchema
+>;
+export type HomepageEventBlockView = z.infer<
+  typeof homepageEventBlockViewSchema
+>;
+export type HomepageFeaturesBlockView = z.infer<
+  typeof homepageFeaturesBlockViewSchema
+>;
+export type HomepageRulesBlockView = z.infer<
+  typeof homepageRulesBlockViewSchema
+>;
+export type HomepageAboutBlockView = z.infer<
+  typeof homepageAboutBlockViewSchema
+>;
+export type HomepageLocationBlockView = z.infer<
+  typeof homepageLocationBlockViewSchema
+>;
+export type HomepageSocialBlockView = z.infer<
+  typeof homepageSocialBlockViewSchema
+>;
+export type HomepageLayoutBlockView = z.infer<
+  typeof homepageLayoutBlockViewSchema
+>;
 export type HomepageLayoutView = z.infer<typeof homepageLayoutViewSchema>;

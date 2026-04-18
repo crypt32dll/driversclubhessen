@@ -2,7 +2,7 @@ import { CookieBanner } from "@/components/gdpr/CookieBanner";
 import { SiteFooter } from "@/components/layout/SiteFooter";
 import { SiteNav } from "@/components/layout/SiteNav";
 import { PayloadLivePreviewRefresh } from "@/components/payload/PayloadLivePreviewRefresh";
-import { SITE_METADATA_DEFAULTS } from "@/lib/metadata/marketing-page-metadata";
+import { SITE_METADATA_DEFAULTS } from "@/lib/metadata/site-defaults";
 import { gdprService } from "@/lib/services/gdpr";
 import { navigationService } from "@/lib/services/navigation";
 import { Analytics } from "@vercel/analytics/react";
@@ -78,6 +78,14 @@ export const metadata: Metadata = {
   description: SITE_METADATA_DEFAULTS.description,
   icons: {
     icon: [{ url: "/brand/dch-mark.svg", type: "image/svg+xml" }],
+  },
+  openGraph: {
+    siteName: SITE_METADATA_DEFAULTS.title,
+    type: "website",
+    locale: "de_DE",
+  },
+  twitter: {
+    card: "summary_large_image",
   },
 };
 

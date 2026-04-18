@@ -18,7 +18,9 @@
       "**/.next/**",
       "**/dist/**",
       "**/build/**",
-      "**/.strapi/**"
+      "**/.strapi/**",
+      "**/admin/importMap.js",
+      "**/payload-types.ts"
     ]
   }
 }

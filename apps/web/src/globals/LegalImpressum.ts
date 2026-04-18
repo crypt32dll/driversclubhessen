@@ -34,7 +34,8 @@ export const LegalImpressum: GlobalConfig = {
       required: true,
       label: "Inhalt",
       admin: {
-        description: "Rechtlicher Impressum-Text (wird auf der Impressum-Route gerendert).",
+        description:
+          "Rechtlicher Impressum-Text (wird auf der Impressum-Route gerendert).",
       },
     },
   ],

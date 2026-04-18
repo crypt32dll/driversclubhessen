@@ -1,6 +1,3 @@
-import { Container } from "@/components/ui/Container";
-import { Reveal } from "@/components/ui/Reveal";
-import type { HomepageRulesBlockView } from "@driversclub/shared";
 import {
   rule,
   ruleIcon,
@@ -11,6 +8,9 @@ import {
   sectionTitle,
   sectionTitleAccent,
 } from "@/components/sections/sections.css";
+import { Container } from "@/components/ui/Container";
+import { Reveal } from "@/components/ui/Reveal";
+import type { HomepageRulesBlockView } from "@driversclub/shared";
 
 const FALLBACK_RULES = [
   { icon: "✅", text: "Angemessenes Verhalten & Einhaltung der StVO" },

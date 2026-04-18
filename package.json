@@ -14,9 +14,9 @@
   "scripts": {
     "dev": "npm run dev --workspace web",
     "dev:web": "npm run dev --workspace web",
-    "build": "turbo run build --filter=web",
-    "build:web": "turbo run build --filter=web",
-    "build:all": "turbo run build",
+    "build": "npm run typecheck && turbo run build --filter=web",
+    "build:web": "npm run typecheck && turbo run build --filter=web",
+    "build:all": "npm run typecheck && turbo run build",
     "typecheck": "turbo run typecheck",
     "lint": "biome check apps/web/src apps/web/next.config.mjs packages/shared/src packages/logger/src",
     "format": "biome format --write apps/web/src apps/web/next.config.mjs packages/shared/src packages/logger/src"

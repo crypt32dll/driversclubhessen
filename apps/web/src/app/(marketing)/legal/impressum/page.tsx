@@ -1,8 +1,8 @@
 import { LexicalRichText } from "@/components/cms/LexicalRichText";
 import { Container } from "@/components/ui/Container";
 import {
-  marketingMetadataForPath,
   SITE_METADATA_DEFAULTS,
+  marketingMetadataForPath,
 } from "@/lib/metadata/marketing-page-metadata";
 import { gdprService } from "@/lib/services/gdpr";
 import type { SerializedEditorState } from "lexical";
@@ -22,8 +22,8 @@ function ImpressumFallback() {
   return (
     <>
       <p>
-        Angaben gemaess Abschnitt 5 TMG. Bitte die folgenden Platzhalter durch die
-        tatsaechlichen Vereins-/Betreiberdaten ersetzen.
+        Angaben gemaess Abschnitt 5 TMG. Bitte die folgenden Platzhalter durch
+        die tatsaechlichen Vereins-/Betreiberdaten ersetzen.
       </p>
       <p>DriversClub Hessen</p>
       <p>Strasse und Hausnummer</p>
@@ -41,7 +41,9 @@ export default async function ImpressumPage() {
       <Container>
         <h1>{doc?.title ?? "Impressum"}</h1>
         {doc?.body ? (
-          <LexicalRichText data={doc.body as unknown as SerializedEditorState} />
+          <LexicalRichText
+            data={doc.body as unknown as SerializedEditorState}
+          />
         ) : (
           <ImpressumFallback />
         )}

@@ -2,11 +2,12 @@ import { eventService } from "@/lib/services/events";
 import { homepageService } from "@/lib/services/homepage";
 import type { Metadata } from "next";
 
-/** Matches `(marketing)/layout.tsx` defaults when no CMS row exists. */
-export const SITE_METADATA_DEFAULTS = {
-  title: "DriversClub Hessen",
-  description: "DriversClub Hessen - Tuning Treffen Community Plattform",
-} as const;
+import {
+  ogTwitterForRoute,
+  pickEventShareImageUrl,
+} from "@/lib/metadata/og-twitter";
+
+export { SITE_METADATA_DEFAULTS } from "@/lib/metadata/site-defaults";
 
 function normalizePath(pathname: string): string {
   const t = pathname.trim();
@@ -30,25 +31,34 @@ export async function marketingMetadataForPath(
 
   if (path === "/") {
     const { marketingSeo: s } = await homepageService.getHomepageBundle();
+    const title = s.homeMetaTitle ?? defaults.title;
+    const description = s.homeMetaDescription ?? defaults.description;
     return {
-      title: s.homeMetaTitle ?? defaults.title,
-      description: s.homeMetaDescription ?? defaults.description,
+      title,
+      description,
+      ...ogTwitterForRoute(path, title, description),
     };
   }
 
   if (path === "/events") {
     const { marketingSeo: s } = await homepageService.getHomepageBundle();
+    const title = s.eventsIndexMetaTitle ?? defaults.title;
+    const description = s.eventsIndexMetaDescription ?? defaults.description;
     return {
-      title: s.eventsIndexMetaTitle ?? defaults.title,
-      description: s.eventsIndexMetaDescription ?? defaults.description,
+      title,
+      description,
+      ...ogTwitterForRoute(path, title, description),
     };
   }
 
   if (path === "/gallery") {
     const { marketingSeo: s } = await homepageService.getHomepageBundle();
+    const title = s.galleryMetaTitle ?? defaults.title;
+    const description = s.galleryMetaDescription ?? defaults.description;
     return {
-      title: s.galleryMetaTitle ?? defaults.title,
-      description: s.galleryMetaDescription ?? defaults.description,
+      title,
+      description,
+      ...ogTwitterForRoute(path, title, description),
     };
   }
 
@@ -56,11 +66,21 @@ export async function marketingMetadataForPath(
   if (m) {
     const slug = m[1];
     const ev = await eventService.getEventBySlug(slug).catch(() => null);
+    const title = ev?.metaTitle?.trim() || defaults.title;
+    const description = ev?.metaDescription?.trim() || defaults.description;
+    const shareImageUrl = pickEventShareImageUrl(ev);
     return {
-      title: ev?.metaTitle?.trim() || defaults.title,
-      description: ev?.metaDescription?.trim() || defaults.description,
+      title,
+      description,
+      ...ogTwitterForRoute(path, title, description, {
+        ...(shareImageUrl ? { shareImageUrl } : {}),
+      }),
     };
   }
 
-  return { title: defaults.title, description: defaults.description };
+  return {
+    title: defaults.title,
+    description: defaults.description,
+    ...ogTwitterForRoute(path, defaults.title, defaults.description),
+  };
 }

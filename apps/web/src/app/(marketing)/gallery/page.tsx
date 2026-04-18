@@ -10,12 +10,12 @@ import {
 } from "@/components/marketing/MarketingListPage.css";
 import { Container } from "@/components/ui/Container";
 import {
-  marketingMetadataForPath,
   SITE_METADATA_DEFAULTS,
+  marketingMetadataForPath,
 } from "@/lib/metadata/marketing-page-metadata";
 import { galleryService } from "@/lib/services/gallery";
-import Image from "next/image";
 import type { Metadata } from "next";
+import Image from "next/image";
 
 /** ISR — literal required by Next.js 16 segment config; see marketing `page.tsx` comment. */
 export const revalidate = 3600;

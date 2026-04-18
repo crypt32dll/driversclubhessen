@@ -38,7 +38,8 @@ export const Galleries: CollectionConfig = {
       relationTo: "media",
       required: true,
       admin: {
-        description: "Das angezeigte Galerie-Bild. Alt-Text kommt aus dem Medien-Eintrag.",
+        description:
+          "Das angezeigte Galerie-Bild. Alt-Text kommt aus dem Medien-Eintrag.",
       },
     },
   ],

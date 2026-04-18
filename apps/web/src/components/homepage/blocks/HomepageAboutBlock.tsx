@@ -1,6 +1,3 @@
-import { Container } from "@/components/ui/Container";
-import { Reveal } from "@/components/ui/Reveal";
-import type { HomepageAboutBlockView } from "@driversclub/shared";
 import {
   collabDesc,
   collabLogoBox,
@@ -15,6 +12,9 @@ import {
   sectionTitle,
   sectionTitleAccent,
 } from "@/components/sections/sections.css";
+import { Container } from "@/components/ui/Container";
+import { Reveal } from "@/components/ui/Reveal";
+import type { HomepageAboutBlockView } from "@driversclub/shared";
 
 const DEFAULT_BODY =
   "Zwei Communities. Eine Leidenschaft. Der DriversClub Hessen wurde 2024 gegründet und steht für die Leidenschaft für Autos in Hessen. Gemeinsam mit Mi Familia & Friends bringen wir die Szene zusammen – für ein Treffen, das Erinnerungen hinterlässt.";
@@ -33,7 +33,7 @@ export function HomepageAboutBlock({ block }: Props) {
         <Reveal>
           <p className={sectionLabel}>{block.sectionLabel ?? "Veranstalter"}</p>
           <h2 className={sectionTitle}>
-            {`${block.titleLead ?? "Die" } `}
+            {`${block.titleLead ?? "Die"} `}
             <span className={sectionTitleAccent}>
               {block.titleAccent ?? "Kollaboration"}
             </span>

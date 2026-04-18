@@ -104,11 +104,7 @@ export async function POST(request: Request) {
     paths.push("/legal/datenschutz");
   } else if (model === "cookie-banner") {
     tags.push(REVALIDATE_TAGS.cookieBanner);
-    paths.push(
-      "/",
-      "/legal/impressum",
-      "/legal/datenschutz",
-    );
+    paths.push("/", "/legal/impressum", "/legal/datenschutz");
   } else if (model === "navigation") {
     tags.push(REVALIDATE_TAGS.navigation);
     paths.push(

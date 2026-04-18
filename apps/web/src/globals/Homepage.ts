@@ -45,7 +45,8 @@ export const Homepage: GlobalConfig = {
           type: "text",
           label: "Meta-Titel",
           admin: {
-            description: "Browser-Tab und Hauptzeile in Suchergebnissen fuer die Startseite.",
+            description:
+              "Browser-Tab und Hauptzeile in Suchergebnissen fuer die Startseite.",
           },
         },
         {
@@ -73,7 +74,8 @@ export const Homepage: GlobalConfig = {
           type: "text",
           label: "Meta-Titel",
           admin: {
-            description: "Titel fuer die Events-Uebersicht im Tab und in Suchmaschinen.",
+            description:
+              "Titel fuer die Events-Uebersicht im Tab und in Suchmaschinen.",
           },
         },
         {
@@ -81,7 +83,8 @@ export const Homepage: GlobalConfig = {
           type: "textarea",
           label: "Meta-Beschreibung",
           admin: {
-            description: "Snippet-Text fuer /events. Leer = Standardtext der Events-Seite.",
+            description:
+              "Snippet-Text fuer /events. Leer = Standardtext der Events-Seite.",
           },
         },
       ],
@@ -108,7 +111,8 @@ export const Homepage: GlobalConfig = {
           type: "textarea",
           label: "Meta-Beschreibung",
           admin: {
-            description: "Snippet-Text fuer die Galerie. Leer = Standardtext der Galerie-Seite.",
+            description:
+              "Snippet-Text fuer die Galerie. Leer = Standardtext der Galerie-Seite.",
           },
         },
       ],

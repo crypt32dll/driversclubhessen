@@ -12,7 +12,9 @@ async function loadGalleryFromPayload(draft: boolean): Promise<GalleryItem[]> {
   const res = await payload.find({
     collection: "galleries",
     sort: "-createdAt",
-    depth: 2,
+    /** One hop populates `image` → Media (url/alt). Deeper graphs unused by `mapPayloadGalleryItem`. */
+    depth: 1,
+    /** Upper bound for `/gallery`; raise if the archive exceeds this (watch Payload response size). */
     limit: 200,
     draft,
   });

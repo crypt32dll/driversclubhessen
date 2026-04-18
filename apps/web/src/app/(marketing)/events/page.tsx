@@ -10,11 +10,11 @@ import {
   title,
 } from "@/components/marketing/MarketingListPage.css";
 import { Container } from "@/components/ui/Container";
-import {
-  marketingMetadataForPath,
-  SITE_METADATA_DEFAULTS,
-} from "@/lib/metadata/marketing-page-metadata";
 import { formatEventDateTimeDe } from "@/lib/format-event-date";
+import {
+  SITE_METADATA_DEFAULTS,
+  marketingMetadataForPath,
+} from "@/lib/metadata/marketing-page-metadata";
 import { eventService } from "@/lib/services/events";
 import type { Metadata } from "next";
 import Link from "next/link";

@@ -1,4 +1,4 @@
-import type { Event as PayloadEvent, Homepage, Media } from "@/payload-types";
+import type { Homepage, Media, Event as PayloadEvent } from "@/payload-types";
 import type {
   Event,
   EventInfoCard,
@@ -19,7 +19,9 @@ function nonEmptyString(v: unknown): string | undefined {
   return s.length > 0 ? s : undefined;
 }
 
-function formatFeaturedEventText(ev: PayloadEvent | null | undefined): string | undefined {
+function formatFeaturedEventText(
+  ev: PayloadEvent | null | undefined,
+): string | undefined {
   if (!ev || typeof ev !== "object") return undefined;
   try {
     const mapped = mapPayloadEvent(ev);
@@ -108,7 +110,9 @@ function mapEventBlock(
     ...(nonEmptyString(b.sectionLabel)
       ? { sectionLabel: nonEmptyString(b.sectionLabel) }
       : {}),
-    ...(nonEmptyString(b.titleLead) ? { titleLead: nonEmptyString(b.titleLead) } : {}),
+    ...(nonEmptyString(b.titleLead)
+      ? { titleLead: nonEmptyString(b.titleLead) }
+      : {}),
     ...(nonEmptyString(b.titleAccent)
       ? { titleAccent: nonEmptyString(b.titleAccent) }
       : {}),
@@ -119,7 +123,10 @@ function mapEventBlock(
 }
 
 function mapFeaturesBlock(
-  b: Extract<NonNullable<Homepage["layout"]>[number], { blockType: "features" }>,
+  b: Extract<
+    NonNullable<Homepage["layout"]>[number],
+    { blockType: "features" }
+  >,
 ): HomepageLayoutBlockView {
   const items: HomepageFeaturesBlockView["items"] = [];
   const raw = b.items;
@@ -151,7 +158,9 @@ function mapFeaturesBlock(
     ...(nonEmptyString(b.sectionLabel)
       ? { sectionLabel: nonEmptyString(b.sectionLabel) }
       : {}),
-    ...(nonEmptyString(b.titleLead) ? { titleLead: nonEmptyString(b.titleLead) } : {}),
+    ...(nonEmptyString(b.titleLead)
+      ? { titleLead: nonEmptyString(b.titleLead) }
+      : {}),
     ...(nonEmptyString(b.titleAccent)
       ? { titleAccent: nonEmptyString(b.titleAccent) }
       : {}),
@@ -180,7 +189,9 @@ function mapRulesBlock(
     ...(nonEmptyString(b.sectionLabel)
       ? { sectionLabel: nonEmptyString(b.sectionLabel) }
       : {}),
-    ...(nonEmptyString(b.titleLead) ? { titleLead: nonEmptyString(b.titleLead) } : {}),
+    ...(nonEmptyString(b.titleLead)
+      ? { titleLead: nonEmptyString(b.titleLead) }
+      : {}),
     ...(nonEmptyString(b.titleAccent)
       ? { titleAccent: nonEmptyString(b.titleAccent) }
       : {}),
@@ -197,22 +208,33 @@ function mapAboutBlock(
     ...(nonEmptyString(b.sectionLabel)
       ? { sectionLabel: nonEmptyString(b.sectionLabel) }
       : {}),
-    ...(nonEmptyString(b.titleLead) ? { titleLead: nonEmptyString(b.titleLead) } : {}),
+    ...(nonEmptyString(b.titleLead)
+      ? { titleLead: nonEmptyString(b.titleLead) }
+      : {}),
     ...(nonEmptyString(b.titleAccent)
       ? { titleAccent: nonEmptyString(b.titleAccent) }
       : {}),
-    ...(nonEmptyString(b.leftBadge) ? { leftBadge: nonEmptyString(b.leftBadge) } : {}),
-    ...(nonEmptyString(b.leftName) ? { leftName: nonEmptyString(b.leftName) } : {}),
+    ...(nonEmptyString(b.leftBadge)
+      ? { leftBadge: nonEmptyString(b.leftBadge) }
+      : {}),
+    ...(nonEmptyString(b.leftName)
+      ? { leftName: nonEmptyString(b.leftName) }
+      : {}),
     ...(nonEmptyString(b.rightBadge)
       ? { rightBadge: nonEmptyString(b.rightBadge) }
       : {}),
-    ...(nonEmptyString(b.rightName) ? { rightName: nonEmptyString(b.rightName) } : {}),
+    ...(nonEmptyString(b.rightName)
+      ? { rightName: nonEmptyString(b.rightName) }
+      : {}),
     ...(nonEmptyString(b.body) ? { body: nonEmptyString(b.body) } : {}),
   };
 }
 
 function mapLocationBlock(
-  b: Extract<NonNullable<Homepage["layout"]>[number], { blockType: "location" }>,
+  b: Extract<
+    NonNullable<Homepage["layout"]>[number],
+    { blockType: "location" }
+  >,
 ): HomepageLayoutBlockView {
   const rows: HomepageLocationBlockView["rows"] = [];
   const raw = b.rows;
@@ -243,7 +265,9 @@ function mapLocationBlock(
     ...(nonEmptyString(b.sectionLabel)
       ? { sectionLabel: nonEmptyString(b.sectionLabel) }
       : {}),
-    ...(nonEmptyString(b.titleLead) ? { titleLead: nonEmptyString(b.titleLead) } : {}),
+    ...(nonEmptyString(b.titleLead)
+      ? { titleLead: nonEmptyString(b.titleLead) }
+      : {}),
     ...(nonEmptyString(b.titleAccent)
       ? { titleAccent: nonEmptyString(b.titleAccent) }
       : {}),
@@ -278,7 +302,9 @@ function mapSocialBlock(
     ...(nonEmptyString(b.sectionLabel)
       ? { sectionLabel: nonEmptyString(b.sectionLabel) }
       : {}),
-    ...(nonEmptyString(b.titleLead) ? { titleLead: nonEmptyString(b.titleLead) } : {}),
+    ...(nonEmptyString(b.titleLead)
+      ? { titleLead: nonEmptyString(b.titleLead) }
+      : {}),
     ...(nonEmptyString(b.titleAccent)
       ? { titleAccent: nonEmptyString(b.titleAccent) }
       : {}),
@@ -287,7 +313,9 @@ function mapSocialBlock(
   };
 }
 
-export function mapPayloadHomepageLayout(global: Homepage): HomepageLayoutView | null {
+export function mapPayloadHomepageLayout(
+  global: Homepage,
+): HomepageLayoutView | null {
   const raw = global.layout;
   if (!Array.isArray(raw) || raw.length === 0) return null;
 

@@ -1,6 +1,6 @@
-import { formatEventDateTimeDe } from "@/lib/format-event-date";
 import { Container } from "@/components/ui/Container";
 import { Reveal } from "@/components/ui/Reveal";
+import { formatEventDateTimeDe } from "@/lib/format-event-date";
 import type { Event, EventInfoCard } from "@driversclub/shared";
 import Link from "next/link";
 import {
@@ -64,8 +64,7 @@ export function UpcomingEventsSection({
   eventInfoCards,
 }: Props) {
   /** CMS “Info-Karten” always win when present — otherwise we used `events` and hid all info cards. */
-  const hasCmsInfoCards =
-    eventInfoCards != null && eventInfoCards.length > 0;
+  const hasCmsInfoCards = eventInfoCards != null && eventInfoCards.length > 0;
 
   const cardsSource = hasCmsInfoCards
     ? eventInfoCards

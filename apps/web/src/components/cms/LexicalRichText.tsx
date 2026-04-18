@@ -15,9 +15,7 @@ export async function LexicalRichText({ data, className }: Props) {
     converters: defaultHTMLConvertersAsync,
   });
   return (
-    <div
-      className={className}
-      dangerouslySetInnerHTML={{ __html: html }}
-    />
+    // biome-ignore lint/security/noDangerouslySetInnerHtml: HTML from Payload Lexical (trusted CMS output).
+    <div className={className} dangerouslySetInnerHTML={{ __html: html }} />
   );
 }

@@ -62,7 +62,7 @@ const nextConfig = {
     return [{ source: "/favicon.ico", destination: "/brand/dch-mark.svg" }];
   },
   typescript: {
-    ignoreBuildErrors: true,
+    ignoreBuildErrors: false,
   },
   logging: isVercelBuild ? { fetches: { fullUrl: true } } : undefined,
   compiler: {
