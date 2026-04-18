@@ -74,6 +74,10 @@ export const revalidateNavigation: GlobalAfterChangeHook = async () => {
   await tagAndPaths(REVALIDATE_TAGS.navigation);
 };
 
+export const revalidateCommunityFaq: GlobalAfterChangeHook = async () => {
+  await tagAndPaths(REVALIDATE_TAGS.communityFaq);
+};
+
 export const revalidateLegalImpressum: GlobalAfterChangeHook = async () => {
   await tagAndPaths(REVALIDATE_TAGS.legalImpressum);
 };

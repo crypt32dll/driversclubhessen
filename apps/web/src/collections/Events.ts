@@ -6,11 +6,14 @@ import {
   revalidateEventsDelete,
 } from "../payload/hooks/revalidate.ts";
 
+const SLUG_PATTERN = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
+
 export const Events: CollectionConfig = {
   slug: "events",
+  defaultSort: "date",
   admin: {
     useAsTitle: "title",
-    defaultColumns: ["title", "slug", "date", "updatedAt"],
+    defaultColumns: ["title", "slug", "date", "status", "updatedAt"],
     description:
       "Events erscheinen in der Liste unter /events und als Detailseite unter /events/<slug>. Bilder und Startseiten-Hero-Felder steuern zusaetzlich die Startseite.",
   },
@@ -33,6 +36,15 @@ export const Events: CollectionConfig = {
       required: true,
       unique: true,
       index: true,
+      validate: (value: unknown) => {
+        if (value === null || value === undefined) return true;
+        if (typeof value !== "string") return "Ungültiger Slug.";
+        const v = value.trim();
+        if (!SLUG_PATTERN.test(v)) {
+          return "Nur Kleinbuchstaben, Zahlen und einzelne Bindestriche (keine Leerzeichen, keine Slashes).";
+        }
+        return true;
+      },
       admin: {
         description:
           "URL-Pfad ohne Schraegstriche und Leerzeichen: nur Kleinbuchstaben, Zahlen und Bindestriche (z. B. birstein-19-4-2026). Im Web: https://…/events/<slug> — der Slug ist der letzte Teil der Adresse.",
@@ -44,7 +56,10 @@ export const Events: CollectionConfig = {
       required: true,
       admin: {
         description:
-          "Event-Datum (und ggf. Uhrzeit je nach Feld-Konfiguration). Wird auf der Event-Seite, in Listen und fuer Countdown-/Datums-Fallbacks genutzt.",
+          "Datum und optional Uhrzeit (Kalender-Export und Event-Seite). Ohne Uhrzeit = ganztägig im Kalender.",
+        date: {
+          pickerAppearance: "dayAndTime",
+        },
       },
     },
     {
@@ -55,6 +70,94 @@ export const Events: CollectionConfig = {
         description:
           "Kurzer Orts- oder Treffpunkt-Text auf der Event-Seite und in Snippets, wenn keine eigene Meta-Beschreibung gesetzt ist.",
       },
+    },
+    {
+      name: "address",
+      type: "text",
+      admin: {
+        description:
+          "Optionale vollständige Adresse (Straße, PLZ Ort). Wird in Kalender-Einträgen (ICS / Google) zusätzlich zum Treffpunkt übernommen.",
+      },
+    },
+    {
+      name: "status",
+      type: "select",
+      required: true,
+      defaultValue: "planned",
+      options: [
+        {
+          label: "Geplant",
+          value: "planned",
+        },
+        {
+          label: "Bestätigt",
+          value: "confirmed",
+        },
+        {
+          label: "Ausverkauft",
+          value: "sold_out",
+        },
+        {
+          label: "Abgesagt",
+          value: "cancelled",
+        },
+      ],
+      admin: {
+        description:
+          "«Abgesagt» blendet das Event auf der öffentlichen Übersicht und im Kalender-Feed aus; die Detail-URL bleibt erreichbar. «Ausverkauft» zeigt ein Badge, bleibt aber sichtbar.",
+      },
+    },
+    {
+      type: "collapsible",
+      label: "FAQ & Checkliste",
+      admin: {
+        initCollapsed: true,
+        description:
+          "Optional: Fragen/Antworten und «Was mitbringen» — rein textbasiert, ohne Galerie.",
+      },
+      fields: [
+        {
+          name: "faq",
+          type: "array",
+          labels: { singular: "FAQ", plural: "FAQ" },
+          admin: {
+            description:
+              "Kurze Fragen und Antworten zur Event-Seite (z. B. Anmeldung, Treffpunkt).",
+          },
+          fields: [
+            {
+              name: "question",
+              type: "text",
+              required: true,
+              admin: { description: "Frage (kurz)." },
+            },
+            {
+              name: "answer",
+              type: "textarea",
+              required: true,
+              admin: {
+                description: "Antwort — ein bis zwei Sätze reichen oft.",
+              },
+            },
+          ],
+        },
+        {
+          name: "bringList",
+          type: "array",
+          labels: { singular: "Punkt", plural: "Checkliste" },
+          admin: {
+            description:
+              "Stichpunkte «Was mitbringen» (z. B. Ausweis, Wetterjacke).",
+          },
+          fields: [
+            {
+              name: "item",
+              type: "text",
+              required: true,
+            },
+          ],
+        },
+      ],
     },
     {
       name: "images",
@@ -88,6 +191,17 @@ export const Events: CollectionConfig = {
           name: "metaDescription",
           type: "textarea",
           label: "Meta-Beschreibung",
+          validate: (value: unknown) => {
+            if (value === null || value === undefined || value === "") {
+              return true;
+            }
+            if (typeof value !== "string")
+              return "Ungültige Meta-Beschreibung.";
+            if (value.length > 160) {
+              return "Maximal 160 Zeichen (Such-Snippet).";
+            }
+            return true;
+          },
           admin: {
             description:
               "Kurzer Teaser unter dem Titel in Suchergebnissen (ca. 150–160 Zeichen empfohlen). Beeinflusst die Klickrate, nicht direkt das Ranking. Leer = automatische Zeile aus Titel, Datum und Ort.",
@@ -192,6 +306,15 @@ export const Events: CollectionConfig = {
     },
   ],
   hooks: {
+    beforeValidate: [
+      ({ data }) => {
+        if (!data || typeof data !== "object") return;
+        const d = data as Record<string, unknown>;
+        if (d.status === undefined || d.status === null) {
+          d.status = "planned";
+        }
+      },
+    ],
     afterChange: [revalidateEvents],
     afterDelete: [revalidateEventsDelete],
   },

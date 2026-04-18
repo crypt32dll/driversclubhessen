@@ -29,6 +29,48 @@ function normalizeImages(
   return out.length ? out : undefined;
 }
 
+function normalizeFaq(raw: PayloadEvent["faq"]): Event["faq"] | undefined {
+  if (!raw?.length) return undefined;
+  const out: NonNullable<Event["faq"]> = [];
+  for (const row of raw) {
+    if (!row || typeof row !== "object") continue;
+    const question =
+      typeof row.question === "string" ? row.question.trim() : "";
+    const answer = typeof row.answer === "string" ? row.answer.trim() : "";
+    if (question.length > 0 && answer.length > 0) {
+      out.push({ question, answer });
+    }
+  }
+  return out.length ? out : undefined;
+}
+
+function normalizeBringList(
+  raw: PayloadEvent["bringList"],
+): Event["bringList"] | undefined {
+  if (!raw?.length) return undefined;
+  const out: NonNullable<Event["bringList"]> = [];
+  for (const row of raw) {
+    if (!row || typeof row !== "object") continue;
+    const item = typeof row.item === "string" ? row.item.trim() : "";
+    if (item.length > 0) out.push({ item });
+  }
+  return out.length ? out : undefined;
+}
+
+const EVENT_STATUSES = new Set([
+  "planned",
+  "confirmed",
+  "sold_out",
+  "cancelled",
+]);
+
+function normalizeStatus(raw: PayloadEvent["status"]): Event["status"] {
+  if (typeof raw === "string" && EVENT_STATUSES.has(raw)) {
+    return raw as NonNullable<Event["status"]>;
+  }
+  return "planned";
+}
+
 export function mapPayloadEvent(doc: PayloadEvent): Event {
   const dateRaw = doc.date;
   const date =
@@ -51,10 +93,15 @@ export function mapPayloadEvent(doc: PayloadEvent): Event {
     heroCtas = mapPayloadCtaRows(h.ctas);
   }
 
+  const status = normalizeStatus(doc.status);
+  const faq = normalizeFaq(doc.faq);
+  const bringList = normalizeBringList(doc.bringList);
+
   return {
     id: typeof doc.id === "number" ? doc.id : undefined,
     slug: doc.slug,
     title: doc.title,
+    status,
     ...(nonEmptyString(doc.metaTitle)
       ? { metaTitle: nonEmptyString(doc.metaTitle) }
       : {}),
@@ -63,8 +110,13 @@ export function mapPayloadEvent(doc: PayloadEvent): Event {
       : {}),
     date,
     location: doc.location,
+    ...(nonEmptyString(doc.address)
+      ? { address: nonEmptyString(doc.address) }
+      : {}),
     createdAt: doc.createdAt,
     images: normalizeImages(doc.images),
+    ...(faq ? { faq } : {}),
+    ...(bringList ? { bringList } : {}),
     ...(h && typeof h === "object"
       ? {
           ...(nonEmptyString(h.eyebrow)

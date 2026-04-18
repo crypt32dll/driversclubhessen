@@ -10,6 +10,7 @@ const internalTargetOptions = [
   { label: "Startseite · Social", value: "homeSocial" },
   { label: "Events", value: "events" },
   { label: "Galerie", value: "gallery" },
+  { label: "FAQ & Community", value: "faq" },
   { label: "Impressum", value: "impressum" },
   { label: "Datenschutz", value: "datenschutz" },
 ] as const;
@@ -71,7 +72,7 @@ export const Navigation: GlobalConfig = {
           admin: {
             condition: (_data, sibling) => sibling?.linkType !== "external",
             description:
-              "Startseite → / · Aktuell → /#aktuell · Ueber uns → /#about · Anfahrt → /#location · Social → /#social · Events → /events · Galerie → /gallery · Impressum → /legal/impressum · Datenschutz → /legal/datenschutz",
+              "Startseite → / · Aktuell → /#aktuell · Ueber uns → /#about · Anfahrt → /#location · Social → /#social · Events → /events · Galerie → /gallery · FAQ → /faq · Impressum → /legal/impressum · Datenschutz → /legal/datenschutz",
           },
         },
         {

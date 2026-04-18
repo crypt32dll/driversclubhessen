@@ -96,6 +96,9 @@ export async function POST(request: Request) {
   } else if (model === "homepage") {
     tags.push(REVALIDATE_TAGS.homepage);
     paths.push("/", "/events", "/gallery");
+  } else if (model === "community-faq") {
+    tags.push(REVALIDATE_TAGS.communityFaq);
+    paths.push("/faq");
   } else if (model === "legal-impressum") {
     tags.push(REVALIDATE_TAGS.legalImpressum);
     paths.push("/legal/impressum");
@@ -104,13 +107,14 @@ export async function POST(request: Request) {
     paths.push("/legal/datenschutz");
   } else if (model === "cookie-banner") {
     tags.push(REVALIDATE_TAGS.cookieBanner);
-    paths.push("/", "/legal/impressum", "/legal/datenschutz");
+    paths.push("/", "/faq", "/legal/impressum", "/legal/datenschutz");
   } else if (model === "navigation") {
     tags.push(REVALIDATE_TAGS.navigation);
     paths.push(
       "/",
       "/events",
       "/gallery",
+      "/faq",
       "/legal/impressum",
       "/legal/datenschutz",
     );
@@ -126,7 +130,7 @@ export async function POST(request: Request) {
   } else if (model) {
     return NextResponse.json(
       {
-        message: `Unknown model "${model}". Use manual "tags" or model: homepage | navigation | event | gallery | legal-impressum | legal-datenschutz | cookie-banner.`,
+        message: `Unknown model "${model}". Use manual "tags" or model: homepage | navigation | community-faq | event | gallery | legal-impressum | legal-datenschutz | cookie-banner.`,
         supportedTags: Object.values(REVALIDATE_TAGS),
       },
       { status: 400 },

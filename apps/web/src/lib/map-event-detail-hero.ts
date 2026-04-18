@@ -53,6 +53,16 @@ function splitTitle(title: string): { line1: string; line2: string } {
   };
 }
 
+function badgeFromStatus(
+  status: Event["status"] | undefined,
+): string | undefined {
+  if (!status) return undefined;
+  if (status === "sold_out") return "Ausverkauft";
+  if (status === "cancelled") return "Abgesagt";
+  if (status === "planned") return "Geplant";
+  return undefined;
+}
+
 /** Maps CMS + core event fields into homepage-style hero props. */
 export function mapEventToHeroProps(event: Event) {
   const split = splitTitle(event.title);
@@ -60,6 +70,7 @@ export function mapEventToHeroProps(event: Event) {
   const titleLine2 = event.heroTitleLine2 ?? split.line2;
   const backgroundImageUrl =
     event.heroBackgroundImage?.url ?? event.images?.[0]?.url;
+  const statusBadge = badgeFromStatus(event.status);
 
   return {
     eyebrow: event.heroEyebrow ?? "DriversClub Hessen präsentiert",
@@ -67,7 +78,7 @@ export function mapEventToHeroProps(event: Event) {
     titleLine2,
     dateLabel: event.heroDateLabel ?? formatEventDateLabelDe(event.date),
     countdownEndIso: event.heroCountdownEnd ?? event.date,
-    badgeText: event.heroBadge ?? "Event",
+    badgeText: event.heroBadge ?? statusBadge ?? "Event",
     tagline: event.heroTagline ?? event.location,
     ctas: ctasForEventDetail(event),
     backgroundImageUrl,

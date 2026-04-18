@@ -1,3 +1,4 @@
+import { EventDetailExtras } from "@/components/events/EventDetailExtras";
 import { EventDetailMedia } from "@/components/events/EventDetailMedia";
 import { HeroSection } from "@/components/sections/HeroSection";
 import { formatEventDateTimeDe } from "@/lib/format-event-date";
@@ -59,6 +60,7 @@ export default async function EventDetailPage({ params }: Props) {
         backgroundImageUrl={hero.backgroundImageUrl}
         priorityBackground
       />
+      <EventDetailExtras event={event} />
       <EventDetailMedia event={event} />
     </main>
   );

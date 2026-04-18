@@ -68,13 +68,43 @@ export const eventCard = style({
   },
 });
 
+export const eventCardTitleRow = style({
+  display: "flex",
+  flexWrap: "wrap",
+  alignItems: "baseline",
+  gap: "0.5rem",
+  margin: "0 0 0.5rem",
+});
+
 export const eventCardTitle = style({
   fontFamily: vars.font.heading,
   fontSize: "1.5rem",
   letterSpacing: "0.03em",
-  margin: "0 0 0.5rem",
+  margin: 0,
   color: vars.color.white,
 });
+
+export const eventCardBadge = style({
+  flexShrink: 0,
+  fontFamily: vars.font.accent,
+  fontSize: "0.65rem",
+  letterSpacing: "0.12em",
+  textTransform: "uppercase",
+  padding: "0.2rem 0.45rem",
+  borderRadius: "4px",
+  border: "1px solid rgba(255, 120, 80, 0.45)",
+  color: "rgb(255, 160, 130)",
+  background: "rgba(40, 18, 12, 0.6)",
+});
+
+export const eventCardBadgeMuted = style([
+  eventCardBadge,
+  {
+    border: "1px solid rgba(0, 229, 255, 0.25)",
+    color: vars.color.cyan,
+    background: "rgba(12, 28, 40, 0.5)",
+  },
+]);
 
 export const eventCardMeta = style({
   fontSize: "0.95rem",

@@ -12,6 +12,7 @@ import { Events } from "./collections/Events.ts";
 import { Galleries } from "./collections/Galleries.ts";
 import { Media } from "./collections/Media.ts";
 import { Users } from "./collections/Users.ts";
+import { CommunityFaq } from "./globals/CommunityFaq.ts";
 import { CookieBannerGlobal } from "./globals/CookieBannerGlobal.ts";
 import { Homepage } from "./globals/Homepage.ts";
 import { LegalDatenschutz } from "./globals/LegalDatenschutz.ts";
@@ -70,6 +71,7 @@ export default buildConfig({
   globals: [
     Homepage,
     Navigation,
+    CommunityFaq,
     LegalImpressum,
     LegalDatenschutz,
     CookieBannerGlobal,

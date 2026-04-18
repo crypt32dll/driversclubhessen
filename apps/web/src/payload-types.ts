@@ -94,6 +94,7 @@ export interface Config {
   globals: {
     homepage: Homepage;
     navigation: Navigation;
+    'community-faq': CommunityFaq;
     'legal-impressum': LegalImpressum;
     'legal-datenschutz': LegalDatenschutz;
     'cookie-banner': CookieBanner;
@@ -101,6 +102,7 @@ export interface Config {
   globalsSelect: {
     homepage: HomepageSelect<false> | HomepageSelect<true>;
     navigation: NavigationSelect<false> | NavigationSelect<true>;
+    'community-faq': CommunityFaqSelect<false> | CommunityFaqSelect<true>;
     'legal-impressum': LegalImpressumSelect<false> | LegalImpressumSelect<true>;
     'legal-datenschutz': LegalDatenschutzSelect<false> | LegalDatenschutzSelect<true>;
     'cookie-banner': CookieBannerSelect<false> | CookieBannerSelect<true>;
@@ -199,13 +201,46 @@ export interface Event {
    */
   slug: string;
   /**
-   * Event-Datum (und ggf. Uhrzeit je nach Feld-Konfiguration). Wird auf der Event-Seite, in Listen und fuer Countdown-/Datums-Fallbacks genutzt.
+   * Datum und optional Uhrzeit (Kalender-Export und Event-Seite). Ohne Uhrzeit = ganztägig im Kalender.
    */
   date: string;
   /**
    * Kurzer Orts- oder Treffpunkt-Text auf der Event-Seite und in Snippets, wenn keine eigene Meta-Beschreibung gesetzt ist.
    */
   location: string;
+  /**
+   * Optionale vollständige Adresse (Straße, PLZ Ort). Wird in Kalender-Einträgen (ICS / Google) zusätzlich zum Treffpunkt übernommen.
+   */
+  address?: string | null;
+  /**
+   * «Abgesagt» blendet das Event auf der öffentlichen Übersicht und im Kalender-Feed aus; die Detail-URL bleibt erreichbar. «Ausverkauft» zeigt ein Badge, bleibt aber sichtbar.
+   */
+  status: 'planned' | 'confirmed' | 'sold_out' | 'cancelled';
+  /**
+   * Kurze Fragen und Antworten zur Event-Seite (z. B. Anmeldung, Treffpunkt).
+   */
+  faq?:
+    | {
+        /**
+         * Frage (kurz).
+         */
+        question: string;
+        /**
+         * Antwort — ein bis zwei Sätze reichen oft.
+         */
+        answer: string;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * Stichpunkte «Was mitbringen» (z. B. Ausweis, Wetterjacke).
+   */
+  bringList?:
+    | {
+        item: string;
+        id?: string | null;
+      }[]
+    | null;
   /**
    * Galerie auf der Event-Detailseite. Reihenfolge entspricht der Anzeige; erstes Bild wird oft als Hauptmotiv genutzt.
    */
@@ -434,6 +469,21 @@ export interface EventsSelect<T extends boolean = true> {
   slug?: T;
   date?: T;
   location?: T;
+  address?: T;
+  status?: T;
+  faq?:
+    | T
+    | {
+        question?: T;
+        answer?: T;
+        id?: T;
+      };
+  bringList?:
+    | T
+    | {
+        item?: T;
+        id?: T;
+      };
   images?: T;
   metaTitle?: T;
   metaDescription?: T;
@@ -865,7 +915,7 @@ export interface Navigation {
          */
         linkType: 'internal' | 'external';
         /**
-         * Startseite → / · Aktuell → /#aktuell · Ueber uns → /#about · Anfahrt → /#location · Social → /#social · Events → /events · Galerie → /gallery · Impressum → /legal/impressum · Datenschutz → /legal/datenschutz
+         * Startseite → / · Aktuell → /#aktuell · Ueber uns → /#about · Anfahrt → /#location · Social → /#social · Events → /events · Galerie → /gallery · FAQ → /faq · Impressum → /legal/impressum · Datenschutz → /legal/datenschutz
          */
         internalTarget?:
           | (
@@ -876,6 +926,7 @@ export interface Navigation {
               | 'homeSocial'
               | 'events'
               | 'gallery'
+              | 'faq'
               | 'impressum'
               | 'datenschutz'
             )
@@ -888,6 +939,44 @@ export interface Navigation {
         id?: string | null;
       }[]
     | null;
+  _status?: ('draft' | 'published') | null;
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
+ * Inhalt der Seite /faq (Regeln, Gruppenstruktur, Partner). Leer = festes Fallback aus dem Frontend.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "community-faq".
+ */
+export interface CommunityFaq {
+  id: number;
+  /**
+   * H1 auf /faq.
+   */
+  title: string;
+  /**
+   * Kurztext für Suchmaschinen / Social. Leer = Standardbeschreibung aus dem Code.
+   */
+  metaDescription?: string | null;
+  /**
+   * Wenn gesetzt, ersetzt dieser Block den Standard-Text aus dem Frontend vollständig.
+   */
+  body?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
   _status?: ('draft' | 'published') | null;
   updatedAt?: string | null;
   createdAt?: string | null;
@@ -1166,6 +1255,19 @@ export interface NavigationSelect<T extends boolean = true> {
         openInNewTab?: T;
         id?: T;
       };
+  _status?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "community-faq_select".
+ */
+export interface CommunityFaqSelect<T extends boolean = true> {
+  title?: T;
+  metaDescription?: T;
+  body?: T;
   _status?: T;
   updatedAt?: T;
   createdAt?: T;

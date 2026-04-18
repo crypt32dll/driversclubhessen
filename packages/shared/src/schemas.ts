@@ -18,6 +18,23 @@ export const heroCtaSchema = z.object({
   openInNewTab: z.boolean().optional(),
 });
 
+/** Public event lifecycle — drives badges and upcoming list visibility. */
+export const eventStatusSchema = z.enum([
+  "planned",
+  "confirmed",
+  "sold_out",
+  "cancelled",
+]);
+
+export const eventFaqItemSchema = z.object({
+  question: z.string(),
+  answer: z.string(),
+});
+
+export const eventBringItemSchema = z.object({
+  item: z.string(),
+});
+
 export const eventSchema = z.object({
   id: z.number().optional(),
   documentId: z.string().optional(),
@@ -25,6 +42,10 @@ export const eventSchema = z.object({
   title: z.string(),
   date: z.string(),
   location: z.string(),
+  /** Straße, PLZ Ort — für Kalender-LOCATION und Beschreibung. */
+  address: z.string().optional(),
+  /** Defaults to `planned` in the mapper when missing (legacy rows). */
+  status: eventStatusSchema.optional(),
   createdAt: z.string().optional(),
   images: z.array(imageSchema).optional(),
   /** Homepage hero when this event is the next upcoming (from Payload `homepageHero` group). */
@@ -41,6 +62,8 @@ export const eventSchema = z.object({
   /** Override for `<title>` / OG title on `/events/[slug]` */
   metaTitle: z.string().optional(),
   metaDescription: z.string().optional(),
+  faq: z.array(eventFaqItemSchema).optional(),
+  bringList: z.array(eventBringItemSchema).optional(),
 });
 
 export const eventInfoCardSchema = z.object({
@@ -75,6 +98,9 @@ export const siteNavigationSchema = z.object({
 });
 
 export type Event = z.infer<typeof eventSchema>;
+export type EventStatus = z.infer<typeof eventStatusSchema>;
+export type EventFaqItem = z.infer<typeof eventFaqItemSchema>;
+export type EventBringItem = z.infer<typeof eventBringItemSchema>;
 export type GalleryItem = z.infer<typeof galleryItemSchema>;
 export type HeroCta = z.infer<typeof heroCtaSchema>;
 export type EventInfoCard = z.infer<typeof eventInfoCardSchema>;

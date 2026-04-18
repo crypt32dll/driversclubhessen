@@ -9,6 +9,7 @@ const INTERNAL_HREF: Record<string, string> = {
   homeSocial: "/#social",
   events: "/events",
   gallery: "/gallery",
+  faq: "/faq",
   impressum: "/legal/impressum",
   datenschutz: "/legal/datenschutz",
 };

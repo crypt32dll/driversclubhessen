@@ -33,7 +33,10 @@ function sortEventsByDateAsc(events: Event[]): Event[] {
 
 function filterUpcomingSorted(events: Event[]): Event[] {
   return sortEventsByDateAsc(
-    events.filter((e) => isEventOnOrAfterToday(e.date)),
+    events.filter((e) => {
+      if (e.status === "cancelled") return false;
+      return isEventOnOrAfterToday(e.date);
+    }),
   );
 }
 

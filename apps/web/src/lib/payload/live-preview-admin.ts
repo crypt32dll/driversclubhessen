@@ -31,6 +31,7 @@ const redirectForCollection: Record<
 const redirectForGlobal: Record<string, () => string> = {
   homepage: () => "/",
   navigation: () => "/",
+  "community-faq": () => "/faq",
   "legal-impressum": () => "/legal/impressum",
   "legal-datenschutz": () => "/legal/datenschutz",
   "cookie-banner": () => "/",
@@ -42,6 +43,7 @@ export const livePreviewConfig: RootLivePreviewConfig = {
   globals: [
     "homepage",
     "navigation",
+    "community-faq",
     "legal-impressum",
     "legal-datenschutz",
     "cookie-banner",

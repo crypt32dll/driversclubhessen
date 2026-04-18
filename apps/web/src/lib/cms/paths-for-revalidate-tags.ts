@@ -20,11 +20,15 @@ export function pathsToRevalidateForTags(tags: string[]): string[] {
       "/",
       "/events",
       "/gallery",
+      "/faq",
       "/legal/impressum",
       "/legal/datenschutz",
     ]) {
       out.add(p);
     }
+  }
+  if (tags.includes(REVALIDATE_TAGS.communityFaq)) {
+    out.add("/faq");
   }
   if (tags.includes(REVALIDATE_TAGS.legalImpressum)) {
     out.add("/legal/impressum");
@@ -34,6 +38,7 @@ export function pathsToRevalidateForTags(tags: string[]): string[] {
   }
   if (tags.includes(REVALIDATE_TAGS.cookieBanner)) {
     out.add("/");
+    out.add("/faq");
     out.add("/legal/impressum");
     out.add("/legal/datenschutz");
   }

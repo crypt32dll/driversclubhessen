@@ -14,6 +14,7 @@ const DEFAULT_NAV_ITEMS: readonly SiteNavItem[] = [
   { href: "/#social", label: "Social" },
   { href: "/events", label: "Events" },
   { href: "/gallery", label: "Galerie" },
+  { href: "/faq", label: "FAQ" },
 ] as const;
 
 async function loadNavigationFromPayload(

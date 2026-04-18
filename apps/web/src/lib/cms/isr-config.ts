@@ -7,6 +7,7 @@ export const REVALIDATE_TAGS = {
   events: "cms:events",
   gallery: "cms:gallery",
   navigation: "cms:navigation",
+  communityFaq: "cms:community-faq",
   legalImpressum: "cms:legal-impressum",
   legalDatenschutz: "cms:legal-datenschutz",
   cookieBanner: "cms:cookie-banner",
