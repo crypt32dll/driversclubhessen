@@ -2,7 +2,6 @@ import { MarketingHomeRouteChunks } from "@/components/marketing/MarketingHomeRo
 import { eventService } from "@/lib/services/events";
 import { homepageService } from "@/lib/services/homepage";
 import { marketingHome } from "@/styles/global.css";
-import type { Event } from "@driversclub/shared";
 
 /**
  * Route-level ISR window (seconds). Next.js 16 only accepts a **numeric literal** here (see invalid-page-config).
@@ -13,7 +12,7 @@ export const revalidate = 3600;
 export default async function MarketingPage() {
   const [homepage, events] = await Promise.all([
     homepageService.getHomepage(),
-    eventService.getUpcomingEvents().catch(() => [] as Event[]),
+    eventService.getUpcomingEvents(),
   ]);
 
   return (

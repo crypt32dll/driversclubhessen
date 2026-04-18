@@ -1,4 +1,5 @@
 import { apiClient } from "@/lib/api/client";
+import { logger } from "@/lib/logger";
 import { validators } from "@/lib/validators/content";
 import { REVALIDATE_TAGS } from "@/lib/strapi/isr-config";
 import type { Event } from "@driversclub/shared";
@@ -41,7 +42,17 @@ const fetchEventBySlug = cache(async (slug: string): Promise<Event | null> => {
 
 export const eventService = {
   async getUpcomingEvents(): Promise<Event[]> {
-    return fetchUpcomingEvents();
+    try {
+      return await fetchUpcomingEvents();
+    } catch (err) {
+      logger.warn(
+        "Strapi events unavailable; returning empty list",
+        err instanceof Error
+          ? { name: err.name, message: err.message }
+          : { err: String(err) },
+      );
+      return [];
+    }
   },
 
   async getEventBySlug(slug: string): Promise<Event | null> {

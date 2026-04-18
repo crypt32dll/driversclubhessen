@@ -1,4 +1,5 @@
 import { apiClient } from "@/lib/api/client";
+import { logger } from "@/lib/logger";
 import { REVALIDATE_TAGS } from "@/lib/strapi/isr-config";
 import { validators } from "@/lib/validators/content";
 import type { Homepage } from "@driversclub/shared";
@@ -41,7 +42,13 @@ export const homepageService = {
   async getHomepage(): Promise<Homepage> {
     try {
       return await loadHomepage();
-    } catch {
+    } catch (err) {
+      logger.warn(
+        "Strapi homepage unavailable; using static fallback copy (check NEXT_PUBLIC_STRAPI_URL, Public permissions, published content, ISR cache)",
+        err instanceof Error
+          ? { name: err.name, message: err.message }
+          : { err: String(err) },
+      );
       return fallbackHomepage;
     }
   },

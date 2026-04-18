@@ -5,8 +5,8 @@ type RemotePattern = NonNullable<
 >[number];
 
 /**
- * Patterns for `next/image` when loading Strapi uploads (always under `/uploads`).
- * Covers local dev, Strapi Cloud, and any Vercel-deployed Strapi from `NEXT_PUBLIC_STRAPI_URL`.
+ * Patterns for `next/image` when loading Strapi media.
+ * Local `/uploads`, Strapi Cloud, self-hosted Strapi, and Cloudinary (`@strapi/provider-upload-cloudinary`).
  */
 export function buildStrapiImageRemotePatterns(): RemotePattern[] {
   const patterns: RemotePattern[] = [
@@ -26,6 +26,11 @@ export function buildStrapiImageRemotePatterns(): RemotePattern[] {
       protocol: "https",
       hostname: "**.strapiapp.com",
       pathname: "/uploads/**",
+    },
+    {
+      protocol: "https",
+      hostname: "res.cloudinary.com",
+      pathname: "/**",
     },
   ];
 
