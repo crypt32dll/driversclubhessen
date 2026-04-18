@@ -48,14 +48,18 @@ function main() {
   for (const key of REQUIRED) {
     const val = process.env[key];
     if (!val || !String(val).trim()) {
-      log("ERROR", `${key} is missing or empty`);
+      // In strict mode (Vercel/CI) this fails the build; elsewhere WARN avoids fake "errors" in Strapi Cloud logs.
+      log(
+        strict ? "ERROR" : "WARN",
+        `${key} is missing or empty`,
+      );
       failed = true;
       continue;
     }
     if (looksLikePlaceholder(val)) {
       log(
         "WARN",
-        `${key} still looks like a placeholder — set a strong secret in Vercel env.`,
+        `${key} still looks like a placeholder — set a strong secret in your hosting env.`,
       );
     } else {
       log("OK", `${key} is set`);
@@ -70,7 +74,7 @@ function main() {
   if (failed && strict) {
     log(
       "ERROR",
-      "Fix the variables above (Vercel → Project → Environment Variables) and redeploy.",
+      "Fix the variables above (hosting dashboard → Environment Variables) and redeploy.",
     );
     process.exit(1);
   }
