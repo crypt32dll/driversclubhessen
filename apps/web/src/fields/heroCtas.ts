@@ -2,7 +2,14 @@ import type { Field } from "payload";
 
 /** Reused by homepage hero block and Event `homepageHero` CTAs. */
 export const heroCtaRowFields: Field[] = [
-  { name: "label", type: "text", required: true },
+  {
+    name: "label",
+    type: "text",
+    required: true,
+    admin: {
+      description: "Beschriftung auf dem Button im Hero.",
+    },
+  },
   {
     name: "linkMode",
     type: "select",
@@ -61,5 +68,8 @@ export const heroCtaRowFields: Field[] = [
       { label: "Primary", value: "primary" },
       { label: "Outline", value: "outline" },
     ],
+    admin: {
+      description: "Visuelle Button-Variante (gefuellt vs. Umrandung).",
+    },
   },
 ];

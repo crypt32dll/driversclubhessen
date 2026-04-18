@@ -1,8 +1,10 @@
+import path from "node:path";
+import { fileURLToPath } from "node:url";
 import { postgresAdapter } from "@payloadcms/db-postgres";
 import { lexicalEditor } from "@payloadcms/richtext-lexical";
 import { vercelBlobStorage } from "@payloadcms/storage-vercel-blob";
-import path from "node:path";
-import { fileURLToPath } from "node:url";
+import { de } from "@payloadcms/translations/languages/de";
+import { en } from "@payloadcms/translations/languages/en";
 import { buildConfig } from "payload";
 import sharp from "sharp";
 
@@ -15,6 +17,7 @@ import { Homepage } from "./globals/Homepage.ts";
 import { LegalDatenschutz } from "./globals/LegalDatenschutz.ts";
 import { LegalImpressum } from "./globals/LegalImpressum.ts";
 import { Navigation } from "./globals/Navigation.ts";
+import { livePreviewConfig } from "./lib/payload/live-preview-admin.ts";
 import { normalizePostgresUrlForNodePg } from "./lib/postgres-url.ts";
 
 const filename = fileURLToPath(import.meta.url);
@@ -34,6 +37,25 @@ export default buildConfig({
     importMap: {
       baseDir: path.resolve(dirname),
     },
+    livePreview: livePreviewConfig,
+    meta: {
+      titleSuffix: " · DriversClub CMS",
+      icons: [{ url: "/brand/dch-mark.svg", type: "image/svg+xml" }],
+    },
+    components: {
+      graphics: {
+        Logo: {
+          path: "./payload/graphics/AdminLogo.tsx",
+        },
+        Icon: {
+          path: "./payload/graphics/AdminIcon.tsx",
+        },
+      },
+    },
+  },
+  i18n: {
+    fallbackLanguage: "en",
+    supportedLanguages: { en, de },
   },
   collections: [Users, Media, Events, Galleries],
   db: postgresAdapter({

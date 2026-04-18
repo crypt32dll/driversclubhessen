@@ -1,3 +1,4 @@
+import { isCmsPreviewRequest } from "@/lib/cms/cms-draft";
 import { CMS_ISR_SECONDS, REVALIDATE_TAGS } from "@/lib/cms/isr-config";
 import { logger } from "@/lib/logger";
 import { getPayloadClient } from "@/lib/payload/get-payload";
@@ -41,19 +42,24 @@ function pickMarketingSeoFromHomepageDoc(doc: unknown): HomepageMarketingSeo {
   };
 }
 
+async function loadHomepageFromPayload(
+  draft: boolean,
+): Promise<HomepageBundle> {
+  const payload = await getPayloadClient();
+  const doc = await payload.findGlobal({
+    slug: "homepage",
+    depth: 2,
+    draft,
+  });
+  const layout = validators.homepageLayout(doc) ?? defaultHomepageLayoutView;
+  return {
+    layout,
+    marketingSeo: pickMarketingSeoFromHomepageDoc(doc),
+  };
+}
+
 const loadHomepageBundle = unstable_cache(
-  async (): Promise<HomepageBundle> => {
-    const payload = await getPayloadClient();
-    const doc = await payload.findGlobal({
-      slug: "homepage",
-      depth: 2,
-    });
-    const layout = validators.homepageLayout(doc) ?? defaultHomepageLayoutView;
-    return {
-      layout,
-      marketingSeo: pickMarketingSeoFromHomepageDoc(doc),
-    };
-  },
+  async (): Promise<HomepageBundle> => loadHomepageFromPayload(false),
   ["cms-homepage"],
   {
     tags: [REVALIDATE_TAGS.homepage],
@@ -64,6 +70,9 @@ const loadHomepageBundle = unstable_cache(
 export const homepageService = {
   async getHomepageBundle(): Promise<HomepageBundle> {
     try {
+      if (await isCmsPreviewRequest()) {
+        return await loadHomepageFromPayload(true);
+      }
       return await loadHomepageBundle();
     } catch (err) {
       logger.warn(

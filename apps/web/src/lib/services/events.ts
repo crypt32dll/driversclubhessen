@@ -1,3 +1,4 @@
+import { isCmsPreviewRequest } from "@/lib/cms/cms-draft";
 import { CMS_ISR_SECONDS, REVALIDATE_TAGS } from "@/lib/cms/isr-config";
 import { logger } from "@/lib/logger";
 import { getPayloadClient } from "@/lib/payload/get-payload";
@@ -36,18 +37,20 @@ function filterUpcomingSorted(events: Event[]): Event[] {
   );
 }
 
+async function fetchEventsListFromPayload(): Promise<Event[]> {
+  const payload = await getPayloadClient();
+  const res = await payload.find({
+    collection: "events",
+    sort: "date",
+    /** List cards need populated media + hero group; avoid deeper relation graphs. */
+    depth: 1,
+    limit: 200,
+  });
+  return validators.eventList(res.docs as PayloadEventDoc[]);
+}
+
 const fetchEventsFromCms = unstable_cache(
-  async (): Promise<Event[]> => {
-    const payload = await getPayloadClient();
-    const res = await payload.find({
-      collection: "events",
-      sort: "date",
-      /** List cards need populated media + hero group; avoid deeper relation graphs. */
-      depth: 1,
-      limit: 200,
-    });
-    return validators.eventList(res.docs as PayloadEventDoc[]);
-  },
+  async (): Promise<Event[]> => fetchEventsListFromPayload(),
   ["cms-events-list"],
   {
     tags: [REVALIDATE_TAGS.events],
@@ -55,21 +58,25 @@ const fetchEventsFromCms = unstable_cache(
   },
 );
 
+async function fetchSingleEventFromPayload(
+  slug: string,
+): Promise<Event | null> {
+  const payload = await getPayloadClient();
+  const res = await payload.find({
+    collection: "events",
+    where: { slug: { equals: slug } },
+    /** Detail: nested hero CTAs + gallery media. */
+    depth: 2,
+    limit: 1,
+  });
+  const row = res.docs[0];
+  if (!row) return null;
+  return validators.event(row as PayloadEventDoc);
+}
+
 function fetchEventBySlugCached(slug: string) {
   return unstable_cache(
-    async (): Promise<Event | null> => {
-      const payload = await getPayloadClient();
-      const res = await payload.find({
-        collection: "events",
-        where: { slug: { equals: slug } },
-        /** Detail: nested hero CTAs + gallery media. */
-        depth: 2,
-        limit: 1,
-      });
-      const row = res.docs[0];
-      if (!row) return null;
-      return validators.event(row as PayloadEventDoc);
-    },
+    async (): Promise<Event | null> => fetchSingleEventFromPayload(slug),
     ["cms-event", slug],
     {
       tags: [REVALIDATE_TAGS.events],
@@ -79,6 +86,10 @@ function fetchEventBySlugCached(slug: string) {
 }
 
 async function loadUpcomingEvents(): Promise<Event[]> {
+  if (await isCmsPreviewRequest()) {
+    const all = await fetchEventsListFromPayload();
+    return filterUpcomingSorted(all);
+  }
   const all = await fetchEventsFromCms();
   return filterUpcomingSorted(all);
 }
@@ -117,6 +128,9 @@ export const eventService = {
   },
 
   async getEventBySlug(slug: string): Promise<Event | null> {
+    if (await isCmsPreviewRequest()) {
+      return fetchSingleEventFromPayload(slug);
+    }
     return fetchEventBySlugCached(slug)();
   },
 

@@ -1,6 +1,7 @@
 import { CookieBanner } from "@/components/gdpr/CookieBanner";
 import { SiteFooter } from "@/components/layout/SiteFooter";
 import { SiteNav } from "@/components/layout/SiteNav";
+import { PayloadLivePreviewRefresh } from "@/components/payload/PayloadLivePreviewRefresh";
 import { SITE_METADATA_DEFAULTS } from "@/lib/metadata/marketing-page-metadata";
 import { gdprService } from "@/lib/services/gdpr";
 import { navigationService } from "@/lib/services/navigation";
@@ -76,7 +77,7 @@ export const metadata: Metadata = {
   title: SITE_METADATA_DEFAULTS.title,
   description: SITE_METADATA_DEFAULTS.description,
   icons: {
-    icon: [{ url: "/icon", type: "image/png", sizes: "32x32" }],
+    icon: [{ url: "/brand/dch-mark.svg", type: "image/svg+xml" }],
   },
 };
 
@@ -110,6 +111,7 @@ export default function MarketingRootLayout({
         </Suspense>
         <Analytics />
         <SpeedInsights />
+        <PayloadLivePreviewRefresh />
       </body>
     </html>
   );

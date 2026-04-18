@@ -159,11 +159,16 @@ export interface User {
   collection: 'users';
 }
 /**
+ * Zentrale Bilddateien. Alt-Texte sind Pflicht fuer Barrierefreiheit und SEO; sie werden bei next/image und Screenreadern genutzt.
+ *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "media".
  */
 export interface Media {
   id: number;
+  /**
+   * Kurze Bildbeschreibung (was zu sehen ist). Wird als alt-Attribut ausgespielt — nicht keyword-stuffen, sondern inhaltlich treffend.
+   */
   alt: string;
   updatedAt: string;
   createdAt: string;
@@ -178,24 +183,56 @@ export interface Media {
   focalY?: number | null;
 }
 /**
+ * Events erscheinen in der Liste unter /events und als Detailseite unter /events/<slug>. Bilder und Startseiten-Hero-Felder steuern zusaetzlich die Startseite.
+ *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "events".
  */
 export interface Event {
   id: number;
+  /**
+   * Oeffentlicher Event-Name. Wird auf Karten, der Event-Seite und — falls kein Meta-Titel gesetzt ist — im Browser-Tab verwendet.
+   */
   title: string;
+  /**
+   * URL-Pfad ohne Schraegstriche und Leerzeichen: nur Kleinbuchstaben, Zahlen und Bindestriche (z. B. birstein-19-4-2026). Im Web: https://…/events/<slug> — der Slug ist der letzte Teil der Adresse.
+   */
   slug: string;
+  /**
+   * Event-Datum (und ggf. Uhrzeit je nach Feld-Konfiguration). Wird auf der Event-Seite, in Listen und fuer Countdown-/Datums-Fallbacks genutzt.
+   */
   date: string;
+  /**
+   * Kurzer Orts- oder Treffpunkt-Text auf der Event-Seite und in Snippets, wenn keine eigene Meta-Beschreibung gesetzt ist.
+   */
   location: string;
+  /**
+   * Galerie auf der Event-Detailseite. Reihenfolge entspricht der Anzeige; erstes Bild wird oft als Hauptmotiv genutzt.
+   */
   images?: (number | Media)[] | null;
+  /**
+   * Erscheint im Browser-Tab und als Hauptzeile in Suchergebnissen. Leer = automatisch der Eventtitel plus «| DriversClub Hessen».
+   */
   metaTitle?: string | null;
+  /**
+   * Kurzer Teaser unter dem Titel in Suchergebnissen (ca. 150–160 Zeichen empfohlen). Beeinflusst die Klickrate, nicht direkt das Ranking. Leer = automatische Zeile aus Titel, Datum und Ort.
+   */
   metaDescription?: string | null;
   /**
    * Wenn dieses Event das naechste anstehende ist, ersetzt es die Hero-Inhalte der Startseite (Titel, Countdown, optional Hintergrund). Leere Felder nutzen sinnvolle Standardwerte aus Titel und Datum.
    */
   homepageHero?: {
+    /**
+     * Kleine Zeile ueber dem grossen Titel im Hero auf der Startseite.
+     */
     eyebrow?: string | null;
+    /**
+     * Erste grosse Titelzeile im Startseiten-Hero.
+     */
     titleLine1?: string | null;
+    /**
+     * Zweite grosse Titelzeile im Startseiten-Hero (oft Akzent-Wort).
+     */
     titleLine2?: string | null;
     /**
      * Steht unter dem Titel, z. B. formatiertes Datum. Leer = automatisch aus Event-Datum.
@@ -205,10 +242,22 @@ export interface Event {
      * Datum und Uhrzeit fuer den Countdown. Leer = Event-Datum um 12:00 Uhr.
      */
     countdownEnd?: string | null;
+    /**
+     * Kompaktes Label im Hero (z. B. Event-Name oder Sponsoring).
+     */
     badge?: string | null;
+    /**
+     * Text unter den Buttons im Hero.
+     */
     tagline?: string | null;
+    /**
+     * Call-to-Actions im Startseiten-Hero. «Intern (Event)» verlinkt auf /events/<slug> des gewaehlten Events.
+     */
     ctas?:
       | {
+          /**
+           * Beschriftung auf dem Button im Hero.
+           */
           label: string;
           /**
            * Intern: waehle ein Event aus der Liste. Extern: vollstaendige URL (oeffnet in neuem Tab).
@@ -219,25 +268,40 @@ export interface Event {
            * z. B. https://instagram.com/…
            */
           externalUrl?: string | null;
+          /**
+           * Visuelle Button-Variante (gefuellt vs. Umrandung).
+           */
           variant?: ('primary' | 'outline') | null;
           id?: string | null;
         }[]
       | null;
+    /**
+     * Grossflaechiges Hero-Hintergrundbild auf der Startseite (LCP-relevant).
+     */
     backgroundImage?: (number | null) | Media;
   };
   updatedAt: string;
   createdAt: string;
 }
 /**
+ * Einzelbilder fuer die Galerie-Seite unter /gallery. Veroeffentlichte Eintraege erscheinen im Raster; Entwuerfe nicht.
+ *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "galleries".
  */
 export interface Gallery {
   id: number;
+  /**
+   * Bildunterschrift / Titel unter dem Foto auf /gallery.
+   */
   title: string;
+  /**
+   * Das angezeigte Galerie-Bild. Alt-Text kommt aus dem Medien-Eintrag.
+   */
   image: number | Media;
   updatedAt: string;
   createdAt: string;
+  _status?: ('draft' | 'published') | null;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -407,6 +471,7 @@ export interface GalleriesSelect<T extends boolean = true> {
   image?: T;
   updatedAt?: T;
   createdAt?: T;
+  _status?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -449,6 +514,8 @@ export interface PayloadMigrationsSelect<T extends boolean = true> {
   createdAt?: T;
 }
 /**
+ * Startseiten-Layout (Blockreihenfolge) und SEO-Felder fuer /, /events, /gallery. Aenderungen wirken nach Veroeffentlichung und Revalidierung auf die Live-Site.
+ *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "homepage".
  */
@@ -469,12 +536,31 @@ export interface Homepage {
         | HomepageSocialBlock
       )[]
     | null;
+  /**
+   * Browser-Tab und Hauptzeile in Suchergebnissen fuer die Startseite.
+   */
   homeMetaTitle?: string | null;
+  /**
+   * Kurztext in Snippets (ca. 150–160 Zeichen). Leer = Standardbeschreibung der Site aus dem Code.
+   */
   homeMetaDescription?: string | null;
+  /**
+   * Titel fuer die Events-Uebersicht im Tab und in Suchmaschinen.
+   */
   eventsIndexMetaTitle?: string | null;
+  /**
+   * Snippet-Text fuer /events. Leer = Standardtext der Events-Seite.
+   */
   eventsIndexMetaDescription?: string | null;
+  /**
+   * Titel fuer die Galerie-Uebersicht.
+   */
   galleryMetaTitle?: string | null;
+  /**
+   * Snippet-Text fuer die Galerie. Leer = Standardtext der Galerie-Seite.
+   */
   galleryMetaDescription?: string | null;
+  _status?: ('draft' | 'published') | null;
   updatedAt?: string | null;
   createdAt?: string | null;
 }
@@ -496,8 +582,14 @@ export interface HomepageHeroBlock {
  * via the `definition` "HomepageTickerBlock".
  */
 export interface HomepageTickerBlock {
+  /**
+   * Lauftext-Zeilen unter dem Hero. Reihenfolge = Darstellungsreihenfolge.
+   */
   items?:
     | {
+        /**
+         * Eine Zeile im Ticker (kurz halten).
+         */
         text: string;
         id?: string | null;
       }[]
@@ -511,8 +603,17 @@ export interface HomepageTickerBlock {
  * via the `definition` "HomepageEventBlock".
  */
 export interface HomepageEventBlock {
+  /**
+   * Kleine Ueberschrift ueber dem Abschnitt.
+   */
   sectionLabel?: string | null;
+  /**
+   * Titel-Anfang (normale Schrift).
+   */
   titleLead?: string | null;
+  /**
+   * Titel-Akzentteil (hervorgehoben).
+   */
   titleAccent?: string | null;
   /**
    * Anzeige wenn keine Events aus der Datenbank geladen werden.
@@ -526,6 +627,9 @@ export interface HomepageEventBlock {
         id?: string | null;
       }[]
     | null;
+  /**
+   * Daten fuer den Event-Teaser (wenn die Seite Events aus der API laedt). Info-Karten darueber gelten als Fallback ohne API-Daten.
+   */
   featuredEvent?: (number | null) | Event;
   id?: string | null;
   blockName?: string | null;
@@ -536,14 +640,38 @@ export interface HomepageEventBlock {
  * via the `definition` "HomepageFeaturesBlock".
  */
 export interface HomepageFeaturesBlock {
+  /**
+   * Kleine Ueberschrift ueber dem Abschnitt.
+   */
   sectionLabel?: string | null;
+  /**
+   * Titel-Anfang.
+   */
   titleLead?: string | null;
+  /**
+   * Titel-Akzent.
+   */
   titleAccent?: string | null;
+  /**
+   * Kacheln im Highlights-Bereich der Startseite.
+   */
   items?:
     | {
+        /**
+         * Kurzes Emoji oder Symbol neben dem Titel.
+         */
         icon?: string | null;
+        /**
+         * Optional: ersetzt oder ergaenzt das Text-Icon.
+         */
         iconImage?: (number | null) | Media;
+        /**
+         * Feature-Ueberschrift.
+         */
         title: string;
+        /**
+         * Kurzer Erklaertext unter dem Titel.
+         */
         description: string;
         id?: string | null;
       }[]
@@ -557,12 +685,30 @@ export interface HomepageFeaturesBlock {
  * via the `definition` "HomepageRulesBlock".
  */
 export interface HomepageRulesBlock {
+  /**
+   * Kleine Ueberschrift.
+   */
   sectionLabel?: string | null;
+  /**
+   * Titel-Anfang.
+   */
   titleLead?: string | null;
+  /**
+   * Titel-Akzent.
+   */
   titleAccent?: string | null;
+  /**
+   * Aufzaehlung der Verhaltens-/Treffen-Regeln auf der Startseite.
+   */
   items?:
     | {
+        /**
+         * Kleines Symbol vor dem Regeltext.
+         */
         icon?: string | null;
+        /**
+         * Formulierung der Regel.
+         */
         text: string;
         id?: string | null;
       }[]
@@ -576,13 +722,37 @@ export interface HomepageRulesBlock {
  * via the `definition` "HomepageAboutBlock".
  */
 export interface HomepageAboutBlock {
+  /**
+   * Kleine Ueberschrift.
+   */
   sectionLabel?: string | null;
+  /**
+   * Titel-Anfang.
+   */
   titleLead?: string | null;
+  /**
+   * Titel-Akzent.
+   */
   titleAccent?: string | null;
+  /**
+   * Kleines Label in der linken Spalte.
+   */
   leftBadge?: string | null;
+  /**
+   * Name / Titel in der linken Spalte.
+   */
   leftName?: string | null;
+  /**
+   * Kleines Label in der rechten Spalte.
+   */
   rightBadge?: string | null;
+  /**
+   * Name / Titel in der rechten Spalte.
+   */
   rightName?: string | null;
+  /**
+   * Fliesstext im «Ueber uns»-Bereich zwischen den beiden Spalten.
+   */
   body?: string | null;
   id?: string | null;
   blockName?: string | null;
@@ -593,10 +763,25 @@ export interface HomepageAboutBlock {
  * via the `definition` "HomepageLocationBlock".
  */
 export interface HomepageLocationBlock {
+  /**
+   * Kleine Ueberschrift.
+   */
   sectionLabel?: string | null;
+  /**
+   * Titel-Anfang.
+   */
   titleLead?: string | null;
+  /**
+   * Titel-Akzent.
+   */
   titleAccent?: string | null;
+  /**
+   * Link, der beim Klick auf die Karte geoeffnet wird (vollstaendige https://… URL).
+   */
   mapUrl?: string | null;
+  /**
+   * Statisches Vorschaubild statt eingebetteter Karte.
+   */
   mapImage?: (number | null) | Media;
   /**
    * Optional: strukturierte Infos (Adresse, Zeiten, …). Leer = Standard-Fallback im Frontend.
@@ -618,14 +803,38 @@ export interface HomepageLocationBlock {
  * via the `definition` "HomepageSocialBlock".
  */
 export interface HomepageSocialBlock {
+  /**
+   * Kleine Ueberschrift.
+   */
   sectionLabel?: string | null;
+  /**
+   * Titel-Anfang.
+   */
   titleLead?: string | null;
+  /**
+   * Titel-Akzent.
+   */
   titleAccent?: string | null;
+  /**
+   * Kurzer Text vor der Link-Liste.
+   */
   intro?: string | null;
+  /**
+   * Social- oder externe Links im Footer-Bereich der Startseite.
+   */
   links?:
     | {
+        /**
+         * Sichtbarer Link-Text.
+         */
         label: string;
+        /**
+         * Ziel-URL mit https:// (z. B. Instagram, TikTok).
+         */
         url: string;
+        /**
+         * Externe Seiten typischerweise in neuem Tab.
+         */
         openInNewTab?: boolean | null;
         id?: string | null;
       }[]
@@ -635,6 +844,8 @@ export interface HomepageSocialBlock {
   blockType: 'social';
 }
 /**
+ * Header-Navigation der Marketing-Site. Interne Ziele werden zu festen URLs (inkl. Anker auf der Startseite).
+ *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "navigation".
  */
@@ -645,8 +856,17 @@ export interface Navigation {
    */
   items?:
     | {
+        /**
+         * Sichtbarer Text im Menue.
+         */
         label: string;
+        /**
+         * Intern: Seite oder Anker in dieser App. Extern: beliebige URL (z. B. Social).
+         */
         linkType: 'internal' | 'external';
+        /**
+         * Startseite → / · Aktuell → /#aktuell · Ueber uns → /#about · Anfahrt → /#location · Social → /#social · Events → /events · Galerie → /gallery · Impressum → /legal/impressum · Datenschutz → /legal/datenschutz
+         */
         internalTarget?:
           | (
               | 'home'
@@ -668,16 +888,25 @@ export interface Navigation {
         id?: string | null;
       }[]
     | null;
+  _status?: ('draft' | 'published') | null;
   updatedAt?: string | null;
   createdAt?: string | null;
 }
 /**
+ * Inhalt der Seite /legal/impressum (Titel + Rich Text).
+ *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "legal-impressum".
  */
 export interface LegalImpressum {
   id: number;
+  /**
+   * Seitenueberschrift auf /legal/impressum.
+   */
   title: string;
+  /**
+   * Rechtlicher Impressum-Text (wird auf der Impressum-Route gerendert).
+   */
   body: {
     root: {
       type: string;
@@ -693,16 +922,25 @@ export interface LegalImpressum {
     };
     [k: string]: unknown;
   };
+  _status?: ('draft' | 'published') | null;
   updatedAt?: string | null;
   createdAt?: string | null;
 }
 /**
+ * Inhalt der Seite /legal/datenschutz (Titel + Rich Text).
+ *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "legal-datenschutz".
  */
 export interface LegalDatenschutz {
   id: number;
+  /**
+   * Seitenueberschrift auf /legal/datenschutz.
+   */
   title: string;
+  /**
+   * Datenschutzerklaerung (wird auf der Datenschutz-Route gerendert).
+   */
   body: {
     root: {
       type: string;
@@ -718,18 +956,31 @@ export interface LegalDatenschutz {
     };
     [k: string]: unknown;
   };
+  _status?: ('draft' | 'published') | null;
   updatedAt?: string | null;
   createdAt?: string | null;
 }
 /**
+ * Texte und Schaltflaechen des Cookie-Hinweises (erscheint auf allen Marketing-Seiten bis zur Entscheidung).
+ *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "cookie-banner".
  */
 export interface CookieBanner {
   id: number;
+  /**
+   * Haupttext im Banner-Dialog.
+   */
   message: string;
+  /**
+   * Beschriftung der Zustimmen-Schaltflaeche.
+   */
   acceptLabel?: string | null;
+  /**
+   * Beschriftung fuer ablehnen / nur notwendige Cookies.
+   */
   rejectLabel?: string | null;
+  _status?: ('draft' | 'published') | null;
   updatedAt?: string | null;
   createdAt?: string | null;
 }
@@ -756,6 +1007,7 @@ export interface HomepageSelect<T extends boolean = true> {
   eventsIndexMetaDescription?: T;
   galleryMetaTitle?: T;
   galleryMetaDescription?: T;
+  _status?: T;
   updatedAt?: T;
   createdAt?: T;
   globalType?: T;
@@ -914,6 +1166,7 @@ export interface NavigationSelect<T extends boolean = true> {
         openInNewTab?: T;
         id?: T;
       };
+  _status?: T;
   updatedAt?: T;
   createdAt?: T;
   globalType?: T;
@@ -925,6 +1178,7 @@ export interface NavigationSelect<T extends boolean = true> {
 export interface LegalImpressumSelect<T extends boolean = true> {
   title?: T;
   body?: T;
+  _status?: T;
   updatedAt?: T;
   createdAt?: T;
   globalType?: T;
@@ -936,6 +1190,7 @@ export interface LegalImpressumSelect<T extends boolean = true> {
 export interface LegalDatenschutzSelect<T extends boolean = true> {
   title?: T;
   body?: T;
+  _status?: T;
   updatedAt?: T;
   createdAt?: T;
   globalType?: T;
@@ -948,6 +1203,7 @@ export interface CookieBannerSelect<T extends boolean = true> {
   message?: T;
   acceptLabel?: T;
   rejectLabel?: T;
+  _status?: T;
   updatedAt?: T;
   createdAt?: T;
   globalType?: T;

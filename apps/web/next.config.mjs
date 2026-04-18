@@ -59,7 +59,7 @@ function buildPayloadImageRemotePatterns() {
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   async rewrites() {
-    return [{ source: "/favicon.ico", destination: "/icon" }];
+    return [{ source: "/favicon.ico", destination: "/brand/dch-mark.svg" }];
   },
   typescript: {
     ignoreBuildErrors: true,

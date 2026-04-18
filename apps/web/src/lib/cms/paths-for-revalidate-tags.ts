@@ -1,4 +1,4 @@
-import { REVALIDATE_TAGS } from "@/lib/cms/isr-config";
+import { REVALIDATE_TAGS } from "./isr-config.ts";
 
 /** Routes to refresh when the given cache tags are invalidated (ISR + RSC). */
 export function pathsToRevalidateForTags(tags: string[]): string[] {
@@ -41,7 +41,9 @@ export function pathsToRevalidateForTags(tags: string[]): string[] {
 }
 
 /** After an event document change, also bust the detail route when known. */
-export function pathsWhenEventsCollectionChanged(slug?: string | null): string[] {
+export function pathsWhenEventsCollectionChanged(
+  slug?: string | null,
+): string[] {
   const paths = pathsToRevalidateForTags([REVALIDATE_TAGS.events]);
   if (typeof slug === "string" && slug.length > 0) {
     paths.push(`/events/${slug}`);

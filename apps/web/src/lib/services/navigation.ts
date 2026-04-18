@@ -1,3 +1,4 @@
+import { isCmsPreviewRequest } from "@/lib/cms/cms-draft";
 import { CMS_ISR_SECONDS, REVALIDATE_TAGS } from "@/lib/cms/isr-config";
 import { logger } from "@/lib/logger";
 import { getPayloadClient } from "@/lib/payload/get-payload";
@@ -15,15 +16,20 @@ const DEFAULT_NAV_ITEMS: readonly SiteNavItem[] = [
   { href: "/gallery", label: "Galerie" },
 ] as const;
 
+async function loadNavigationFromPayload(
+  draft: boolean,
+): Promise<SiteNavigation> {
+  const payload = await getPayloadClient();
+  const doc = await payload.findGlobal({
+    slug: "navigation",
+    depth: 0,
+    draft,
+  });
+  return validators.navigation(doc as PayloadNavigation);
+}
+
 const loadNavigation = unstable_cache(
-  async (): Promise<SiteNavigation> => {
-    const payload = await getPayloadClient();
-    const doc = await payload.findGlobal({
-      slug: "navigation",
-      depth: 0,
-    });
-    return validators.navigation(doc as PayloadNavigation);
-  },
+  async (): Promise<SiteNavigation> => loadNavigationFromPayload(false),
   ["cms-navigation"],
   {
     tags: [REVALIDATE_TAGS.navigation],
@@ -34,7 +40,9 @@ const loadNavigation = unstable_cache(
 export const navigationService = {
   async getSiteNavigation(): Promise<SiteNavigation> {
     try {
-      const nav = await loadNavigation();
+      const nav = (await isCmsPreviewRequest())
+        ? await loadNavigationFromPayload(true)
+        : await loadNavigation();
       if (nav.items.length > 0) return nav;
       return { items: [...DEFAULT_NAV_ITEMS] };
     } catch (err) {

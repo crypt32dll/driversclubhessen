@@ -16,6 +16,17 @@ const internalTargetOptions = [
 
 export const Navigation: GlobalConfig = {
   slug: "navigation",
+  admin: {
+    description:
+      "Header-Navigation der Marketing-Site. Interne Ziele werden zu festen URLs (inkl. Anker auf der Startseite).",
+  },
+  versions: {
+    drafts: {
+      autosave: {
+        interval: 500,
+      },
+    },
+  },
   label: "Navigation",
   access: {
     read: () => true,
@@ -30,7 +41,14 @@ export const Navigation: GlobalConfig = {
           "Hauptnavigation (Header). Interne Ziele entsprechen den Marketing-Routen in dieser App.",
       },
       fields: [
-        { name: "label", type: "text", required: true },
+        {
+          name: "label",
+          type: "text",
+          required: true,
+          admin: {
+            description: "Sichtbarer Text im Menue.",
+          },
+        },
         {
           name: "linkType",
           type: "select",
@@ -40,6 +58,10 @@ export const Navigation: GlobalConfig = {
             { label: "Interne Seite", value: "internal" },
             { label: "Externe URL", value: "external" },
           ],
+          admin: {
+            description:
+              "Intern: Seite oder Anker in dieser App. Extern: beliebige URL (z. B. Social).",
+          },
         },
         {
           name: "internalTarget",
@@ -48,6 +70,8 @@ export const Navigation: GlobalConfig = {
           options: [...internalTargetOptions],
           admin: {
             condition: (_data, sibling) => sibling?.linkType !== "external",
+            description:
+              "Startseite → / · Aktuell → /#aktuell · Ueber uns → /#about · Anfahrt → /#location · Social → /#social · Events → /events · Galerie → /gallery · Impressum → /legal/impressum · Datenschutz → /legal/datenschutz",
           },
         },
         {

@@ -1,1 +1,6 @@
-/* Payload admin theme overrides (optional) */
+/* Payload admin — DriversClub branding (Logo/Icon) lives in `src/payload.config.ts`. */
+
+[data-theme="dark"] {
+  /* Softer chrome line similar to marketing header */
+  --theme-border-color: rgba(139, 47, 201, 0.22);
+}
