@@ -1,14 +1,19 @@
+import { formatEventDateLabelDe } from "@/lib/format-event-date";
 import type { Event, HeroCta } from "@driversclub/shared";
 
 const DEFAULT_CTAS: readonly HeroCta[] = [
   { href: "/events", label: "Alle Events", variant: "outline" },
 ];
 
-function formatWhen(dateIso: string) {
-  return new Date(dateIso).toLocaleString("de-DE", {
-    dateStyle: "full",
-    timeStyle: "short",
-  });
+function isGalleryCta(href: string): boolean {
+  const path = href.trim().split("?")[0]?.split("#")[0] ?? "";
+  return path === "/gallery" || path.startsWith("/gallery/");
+}
+
+function ctasForEventDetail(event: Event): readonly HeroCta[] {
+  const raw = event.heroCtas?.length ? event.heroCtas : [...DEFAULT_CTAS];
+  const filtered = raw.filter((c) => !isGalleryCta(c.href));
+  return filtered.length > 0 ? filtered : [...DEFAULT_CTAS];
 }
 
 function splitTitle(title: string): { line1: string; line2: string } {
@@ -36,11 +41,11 @@ export function mapEventToHeroProps(event: Event) {
     eyebrow: event.heroEyebrow ?? "DriversClub Hessen präsentiert",
     titleLine1,
     titleLine2,
-    dateLabel: event.heroDateLabel ?? formatWhen(event.date),
+    dateLabel: event.heroDateLabel ?? formatEventDateLabelDe(event.date),
     countdownEndIso: event.heroCountdownEnd ?? event.date,
     badgeText: event.heroBadge ?? "Event",
     tagline: event.heroTagline ?? event.location,
-    ctas: event.heroCtas?.length ? event.heroCtas : [...DEFAULT_CTAS],
+    ctas: ctasForEventDetail(event),
     backgroundImageUrl,
   };
 }

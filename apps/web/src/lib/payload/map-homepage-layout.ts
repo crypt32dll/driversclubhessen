@@ -9,6 +9,7 @@ import type {
   HomepageSocialBlockView,
 } from "@driversclub/shared";
 
+import { formatEventDateTimeDe } from "@/lib/format-event-date";
 import { mapPayloadEvent } from "@/lib/payload/map-event";
 import { mapPayloadMediaToImage } from "@/lib/payload/map-media";
 
@@ -25,10 +26,7 @@ function formatFeaturedEventText(ev: PayloadEvent | null | undefined): string | 
     if (!mapped.date) {
       return [mapped.title, mapped.location].filter(Boolean).join(" · ");
     }
-    const when = new Date(mapped.date).toLocaleString("de-DE", {
-      dateStyle: "medium",
-      timeStyle: "short",
-    });
+    const when = formatEventDateTimeDe(mapped.date);
     return [when, mapped.title, mapped.location].filter(Boolean).join(" · ");
   } catch {
     return undefined;

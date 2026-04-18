@@ -1,3 +1,4 @@
+import { formatEventDateTimeDe } from "@/lib/format-event-date";
 import { Container } from "@/components/ui/Container";
 import { Reveal } from "@/components/ui/Reveal";
 import type { Event, EventInfoCard } from "@driversclub/shared";
@@ -105,10 +106,7 @@ export function UpcomingEventsSection({
                   <div className={eventCardIcon}>📅</div>
                   <div className={eventCardTitle}>{event.title}</div>
                   <div className={eventCardValue}>
-                    {new Date(event.date).toLocaleString("de-DE", {
-                      dateStyle: "medium",
-                      timeStyle: "short",
-                    })}
+                    {formatEventDateTimeDe(event.date)}
                   </div>
                   <div className={eventCardSub}>{event.location}</div>
                   <Link href={`/events/${event.slug}`}>Details →</Link>

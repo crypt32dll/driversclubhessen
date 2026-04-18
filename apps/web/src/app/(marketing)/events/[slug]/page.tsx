@@ -1,6 +1,7 @@
 import { EventDetailMedia } from "@/components/events/EventDetailMedia";
 import { HeroSection } from "@/components/sections/HeroSection";
 import { marketingMetadataForPath } from "@/lib/metadata/marketing-page-metadata";
+import { formatEventDateTimeDe } from "@/lib/format-event-date";
 import { mapEventToHeroProps } from "@/lib/map-event-detail-hero";
 import { eventService } from "@/lib/services/events";
 import { marketingHome } from "@/styles/global.css";
@@ -17,12 +18,7 @@ export const revalidate = 3600;
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
   const event = await eventService.getEventBySlug(slug).catch(() => null);
-  const when = event
-    ? new Date(event.date).toLocaleString("de-DE", {
-        dateStyle: "medium",
-        timeStyle: "short",
-      })
-    : null;
+  const when = event ? formatEventDateTimeDe(event.date) : null;
   return marketingMetadataForPath(`/events/${slug}`, {
     title: event ? `${event.title} | DriversClub Hessen` : "Event | DriversClub Hessen",
     description: event

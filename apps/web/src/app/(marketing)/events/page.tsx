@@ -14,6 +14,7 @@ import {
   marketingMetadataForPath,
   SITE_METADATA_DEFAULTS,
 } from "@/lib/metadata/marketing-page-metadata";
+import { formatEventDateTimeDe } from "@/lib/format-event-date";
 import { eventService } from "@/lib/services/events";
 import type { Metadata } from "next";
 import Link from "next/link";
@@ -55,10 +56,7 @@ export default async function EventsPage() {
               >
                 <h2 className={eventCardTitle}>{event.title}</h2>
                 <p className={eventCardMeta}>
-                  {new Date(event.date).toLocaleString("de-DE", {
-                    dateStyle: "medium",
-                    timeStyle: "short",
-                  })}
+                  {formatEventDateTimeDe(event.date)}
                 </p>
                 <p className={eventCardMeta}>{event.location}</p>
               </Link>
