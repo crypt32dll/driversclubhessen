@@ -6,9 +6,6 @@ import {
 
 const DEFAULT_ITEMS = [
   "EINTRITT FREI",
-  "19.04.2026",
-  "BIRSTEIN",
-  "12:00 – 20:00 UHR",
   "JEDER IST WILLKOMMEN",
   "BENZINGESPRÄCHE",
   "ESSEN & GETRÄNKE",

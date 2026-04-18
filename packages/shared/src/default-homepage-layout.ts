@@ -13,13 +13,6 @@ export const defaultHomepageLayoutView: HomepageLayoutView =
     blocks: [
       {
         blockType: "hero",
-        eyebrow: "Mi Familia & Friends praesentiert",
-        titleLine1: "Tuning",
-        titleLine2: "Treffen",
-        dateLabel: "19 · 04 · 2026",
-        countdownEnd: "2026-04-19T12:00:00",
-        badge: "EST. 2024 • HESSEN",
-        tagline: "DriversClub Hessen × Mi Familia & Friends",
       },
       {
         blockType: "ticker",

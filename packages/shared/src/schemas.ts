@@ -38,6 +38,9 @@ export const eventSchema = z.object({
   heroTagline: z.string().optional(),
   heroCtas: z.array(heroCtaSchema).optional(),
   heroBackgroundImage: imageSchema.optional(),
+  /** Override for `<title>` / OG title on `/events/[slug]` */
+  metaTitle: z.string().optional(),
+  metaDescription: z.string().optional(),
 });
 
 export const eventInfoCardSchema = z.object({

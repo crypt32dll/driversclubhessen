@@ -33,6 +33,27 @@ export const Events: CollectionConfig = {
       hasMany: true,
     },
     {
+      type: "collapsible",
+      label: "SEO — Event-Detail (/events/…)",
+      admin: {
+        initCollapsed: true,
+        description:
+          "Suchmaschinen-Titel und -Text für diese Event-URL. Leer = automatisch aus Titel, Datum und Ort.",
+      },
+      fields: [
+        {
+          name: "metaTitle",
+          type: "text",
+          label: "Meta-Titel",
+        },
+        {
+          name: "metaDescription",
+          type: "textarea",
+          label: "Meta-Beschreibung",
+        },
+      ],
+    },
+    {
       name: "homepageHero",
       type: "group",
       label: "Startseiten-Hero",

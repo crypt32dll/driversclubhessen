@@ -88,10 +88,13 @@ const nextConfig = {
   },
   webpack: (webpackConfig) => {
     webpackConfig.resolve = webpackConfig.resolve ?? {};
+    /**
+     * Do not map `.js` → `.ts` globally: it breaks precompiled packages (e.g. `@payloadcms/ui`
+     * client chunks) with `TypeError: __webpack_modules__[moduleId] is not a function`.
+     * App code uses explicit `.ts` / `.tsx` paths where needed (`allowImportingTsExtensions`).
+     */
     webpackConfig.resolve.extensionAlias = {
       ".cjs": [".cts", ".cjs"],
-      ".js": [".ts", ".tsx", ".js", ".jsx"],
-      ".mjs": [".mts", ".mjs"],
     };
     return webpackConfig;
   },

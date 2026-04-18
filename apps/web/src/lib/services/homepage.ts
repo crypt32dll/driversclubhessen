@@ -8,9 +8,38 @@ import {
 } from "@driversclub/shared";
 import { unstable_cache } from "next/cache";
 
+export type HomepageMarketingSeo = {
+  homeMetaTitle?: string;
+  homeMetaDescription?: string;
+  eventsIndexMetaTitle?: string;
+  eventsIndexMetaDescription?: string;
+  galleryMetaTitle?: string;
+  galleryMetaDescription?: string;
+};
+
 export type HomepageBundle = {
   layout: HomepageLayoutView;
+  marketingSeo: HomepageMarketingSeo;
 };
+
+function pickMarketingSeoFromHomepageDoc(doc: unknown): HomepageMarketingSeo {
+  if (!doc || typeof doc !== "object") return {};
+  const d = doc as Record<string, unknown>;
+  const pick = (key: string): string | undefined => {
+    const v = d[key];
+    if (typeof v !== "string") return undefined;
+    const t = v.trim();
+    return t.length > 0 ? t : undefined;
+  };
+  return {
+    homeMetaTitle: pick("homeMetaTitle"),
+    homeMetaDescription: pick("homeMetaDescription"),
+    eventsIndexMetaTitle: pick("eventsIndexMetaTitle"),
+    eventsIndexMetaDescription: pick("eventsIndexMetaDescription"),
+    galleryMetaTitle: pick("galleryMetaTitle"),
+    galleryMetaDescription: pick("galleryMetaDescription"),
+  };
+}
 
 const loadHomepageBundle = unstable_cache(
   async (): Promise<HomepageBundle> => {
@@ -20,7 +49,10 @@ const loadHomepageBundle = unstable_cache(
       depth: 2,
     });
     const layout = validators.homepageLayout(doc) ?? defaultHomepageLayoutView;
-    return { layout };
+    return {
+      layout,
+      marketingSeo: pickMarketingSeoFromHomepageDoc(doc),
+    };
   },
   ["cms-homepage"],
   {
@@ -40,7 +72,7 @@ export const homepageService = {
           ? { name: err.name, message: err.message }
           : { err: String(err) },
       );
-      return { layout: defaultHomepageLayoutView };
+      return { layout: defaultHomepageLayoutView, marketingSeo: {} };
     }
   },
 };

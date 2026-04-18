@@ -7,7 +7,7 @@ import type { SiteNavItem, SiteNavigation } from "@driversclub/shared";
 import { unstable_cache } from "next/cache";
 
 const DEFAULT_NAV_ITEMS: readonly SiteNavItem[] = [
-  { href: "/#event", label: "Event" },
+  { href: "/#aktuell", label: "Aktuell" },
   { href: "/#about", label: "Über uns" },
   { href: "/#location", label: "Anfahrt" },
   { href: "/#social", label: "Social" },

@@ -69,7 +69,6 @@ export interface Config {
   collections: {
     users: User;
     media: Media;
-    pages: Page;
     events: Event;
     galleries: Gallery;
     'payload-kv': PayloadKv;
@@ -81,7 +80,6 @@ export interface Config {
   collectionsSelect: {
     users: UsersSelect<false> | UsersSelect<true>;
     media: MediaSelect<false> | MediaSelect<true>;
-    pages: PagesSelect<false> | PagesSelect<true>;
     events: EventsSelect<false> | EventsSelect<true>;
     galleries: GalleriesSelect<false> | GalleriesSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
@@ -180,29 +178,6 @@ export interface Media {
   focalY?: number | null;
 }
 /**
- * Meta-Titel und -Beschreibung pro Route. Slug **home** = Startseite; sonst ohne Domain und ohne führenden Slash (z. B. events, gallery, legal/impressum, events/dein-event-slug).
- *
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "pages".
- */
-export interface Page {
-  id: number;
-  /**
-   * **home** für die Startseite. Beispiele: **events**, **gallery**, **legal/impressum**, **events/meet-2026**.
-   */
-  slug: string;
-  /**
-   * Optional. Leer = Standard aus dem Code für diese Route.
-   */
-  metaTitle?: string | null;
-  /**
-   * Empfohlen bis ca. 160 Zeichen.
-   */
-  metaDescription?: string | null;
-  updatedAt: string;
-  createdAt: string;
-}
-/**
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "events".
  */
@@ -213,6 +188,8 @@ export interface Event {
   date: string;
   location: string;
   images?: (number | Media)[] | null;
+  metaTitle?: string | null;
+  metaDescription?: string | null;
   /**
    * Wenn dieses Event das naechste anstehende ist, ersetzt es die Hero-Inhalte der Startseite (Titel, Countdown, optional Hintergrund). Leere Felder nutzen sinnvolle Standardwerte aus Titel und Datum.
    */
@@ -293,10 +270,6 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'media';
         value: number | Media;
-      } | null)
-    | ({
-        relationTo: 'pages';
-        value: number | Page;
       } | null)
     | ({
         relationTo: 'events';
@@ -390,17 +363,6 @@ export interface MediaSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "pages_select".
- */
-export interface PagesSelect<T extends boolean = true> {
-  slug?: T;
-  metaTitle?: T;
-  metaDescription?: T;
-  updatedAt?: T;
-  createdAt?: T;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "events_select".
  */
 export interface EventsSelect<T extends boolean = true> {
@@ -409,6 +371,8 @@ export interface EventsSelect<T extends boolean = true> {
   date?: T;
   location?: T;
   images?: T;
+  metaTitle?: T;
+  metaDescription?: T;
   homepageHero?:
     | T
     | {
@@ -505,6 +469,12 @@ export interface Homepage {
         | HomepageSocialBlock
       )[]
     | null;
+  homeMetaTitle?: string | null;
+  homeMetaDescription?: string | null;
+  eventsIndexMetaTitle?: string | null;
+  eventsIndexMetaDescription?: string | null;
+  galleryMetaTitle?: string | null;
+  galleryMetaDescription?: string | null;
   updatedAt?: string | null;
   createdAt?: string | null;
 }
@@ -514,32 +484,9 @@ export interface Homepage {
  */
 export interface HomepageHeroBlock {
   /**
-   * Fallback-Hero, wenn kein anstehendes Event existiert. Sobald ein Event ansteht, uebernimmt das naechste Event die Hero-Inhalte (siehe Event → Startseiten-Hero).
+   * Hero (Titel, Countdown, CTAs, Hintergrund, …) kommt aus dem Event-Dokument → Gruppe „Startseiten-Hero“. Leer = naechstes anstehendes Event aus der Liste. Wenn kein Event verfuegbar ist, nutzt das Frontend feste Fallback-Texte.
    */
-  eyebrow: string;
-  titleLine1: string;
-  titleLine2: string;
-  dateLabel: string;
-  countdownEnd?: string | null;
-  badge?: string | null;
-  tagline?: string | null;
-  ctas?:
-    | {
-        label: string;
-        /**
-         * Intern: waehle ein Event aus der Liste. Extern: vollstaendige URL (oeffnet in neuem Tab).
-         */
-        linkMode: 'reference' | 'external';
-        eventReference?: (number | null) | Event;
-        /**
-         * z. B. https://instagram.com/…
-         */
-        externalUrl?: string | null;
-        variant?: ('primary' | 'outline') | null;
-        id?: string | null;
-      }[]
-    | null;
-  backgroundImage?: (number | null) | Media;
+  heroEvent?: (number | null) | Event;
   id?: string | null;
   blockName?: string | null;
   blockType: 'hero';
@@ -803,6 +750,12 @@ export interface HomepageSelect<T extends boolean = true> {
         location?: T | HomepageLocationBlockSelect<T>;
         social?: T | HomepageSocialBlockSelect<T>;
       };
+  homeMetaTitle?: T;
+  homeMetaDescription?: T;
+  eventsIndexMetaTitle?: T;
+  eventsIndexMetaDescription?: T;
+  galleryMetaTitle?: T;
+  galleryMetaDescription?: T;
   updatedAt?: T;
   createdAt?: T;
   globalType?: T;
@@ -812,24 +765,7 @@ export interface HomepageSelect<T extends boolean = true> {
  * via the `definition` "HomepageHeroBlock_select".
  */
 export interface HomepageHeroBlockSelect<T extends boolean = true> {
-  eyebrow?: T;
-  titleLine1?: T;
-  titleLine2?: T;
-  dateLabel?: T;
-  countdownEnd?: T;
-  badge?: T;
-  tagline?: T;
-  ctas?:
-    | T
-    | {
-        label?: T;
-        linkMode?: T;
-        eventReference?: T;
-        externalUrl?: T;
-        variant?: T;
-        id?: T;
-      };
-  backgroundImage?: T;
+  heroEvent?: T;
   id?: T;
   blockName?: T;
 }

@@ -1,5 +1,6 @@
 "use client";
 
+import { buttonOutline, buttonPrimary } from "@/components/ui/ui.css";
 import { useEffect, useState } from "react";
 
 const CONSENT_KEY = "dch-cookie-consent";
@@ -55,10 +56,7 @@ export const CookieBanner = ({
         zIndex: 1200,
       }}
     >
-      <p>
-        Wir verwenden nur technisch notwendige Cookies. Optionale Cookies werden
-        erst nach deiner Einwilligung aktiviert.
-      </p>
+      <p>{message}</p>
       <div
         style={{
           display: "flex",
@@ -67,10 +65,18 @@ export const CookieBanner = ({
           flexWrap: "wrap",
         }}
       >
-        <button type="button" onClick={() => persist("accepted")}>
+        <button
+          type="button"
+          className={buttonPrimary}
+          onClick={() => persist("accepted")}
+        >
           {acceptLabel}
         </button>
-        <button type="button" onClick={() => persist("rejected")}>
+        <button
+          type="button"
+          className={buttonOutline}
+          onClick={() => persist("rejected")}
+        >
           {rejectLabel}
         </button>
       </div>

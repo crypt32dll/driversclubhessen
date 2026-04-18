@@ -1,7 +1,7 @@
 import { HeroSection } from "@/components/sections/HeroSection";
 import { Ticker } from "@/components/sections/Ticker";
 import { UpcomingEventsSection } from "@/components/sections/UpcomingEventsSection";
-import { mergeHomepageHeroWithNextEvent } from "@/lib/event-hero";
+import { mergeHomepageHero } from "@/lib/event-hero";
 import type { Event } from "@driversclub/shared";
 import type { HomepageLayoutBlockView } from "@driversclub/shared";
 
@@ -25,7 +25,7 @@ export function RenderBlocks({ blocks, events, nextEvent }: RenderBlocksProps) {
         const key = block.id ?? `${block.blockType}-${index}`;
         switch (block.blockType) {
           case "hero": {
-            const merged = mergeHomepageHeroWithNextEvent(block, nextEvent);
+            const merged = mergeHomepageHero(block, nextEvent);
             return (
               <HeroSection
                 key={key}

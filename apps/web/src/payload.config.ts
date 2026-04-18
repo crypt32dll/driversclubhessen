@@ -9,7 +9,6 @@ import sharp from "sharp";
 import { Events } from "./collections/Events.ts";
 import { Galleries } from "./collections/Galleries.ts";
 import { Media } from "./collections/Media.ts";
-import { Pages } from "./collections/Pages.ts";
 import { Users } from "./collections/Users.ts";
 import { CookieBannerGlobal } from "./globals/CookieBannerGlobal.ts";
 import { Homepage } from "./globals/Homepage.ts";
@@ -36,7 +35,7 @@ export default buildConfig({
       baseDir: path.resolve(dirname),
     },
   },
-  collections: [Users, Media, Pages, Events, Galleries],
+  collections: [Users, Media, Events, Galleries],
   db: postgresAdapter({
     pool: {
       connectionString: databaseUrl,

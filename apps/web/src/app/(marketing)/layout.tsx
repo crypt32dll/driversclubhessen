@@ -1,12 +1,37 @@
-import { CookieBannerGate } from "@/components/gdpr/CookieBannerGate";
+import { CookieBanner } from "@/components/gdpr/CookieBanner";
 import { SiteFooter } from "@/components/layout/SiteFooter";
 import { SiteNav } from "@/components/layout/SiteNav";
 import { SITE_METADATA_DEFAULTS } from "@/lib/metadata/marketing-page-metadata";
+import { gdprService } from "@/lib/services/gdpr";
 import { navigationService } from "@/lib/services/navigation";
 import type { Metadata, Viewport } from "next";
 import { Bebas_Neue, Orbitron, Rajdhani } from "next/font/google";
-import { Suspense } from "react";
+import { cache, Suspense } from "react";
 import "@/styles/global.css";
+
+const getMarketingNavigation = cache(() => navigationService.getSiteNavigation());
+
+async function MarketingSiteNav() {
+  const { items } = await getMarketingNavigation();
+  return <SiteNav items={items} />;
+}
+
+async function MarketingSiteFooterAndCookie() {
+  const [{ items }, cfg] = await Promise.all([
+    getMarketingNavigation(),
+    gdprService.getCookieBanner(),
+  ]);
+  return (
+    <>
+      <SiteFooter primaryLinks={items} />
+      <CookieBanner
+        message={cfg.message}
+        acceptLabel={cfg.acceptLabel}
+        rejectLabel={cfg.rejectLabel}
+      />
+    </>
+  );
+}
 
 const bebasNeue = Bebas_Neue({
   variable: "--font-bebas-neue",
@@ -60,24 +85,23 @@ export const viewport: Viewport = {
  * Kept separate from `(payload)` so Payload admin is not nested inside this document — avoids
  * invalid `<html>` inside `<body>` and hydration errors. See Next.js “multiple root layouts”.
  */
-export default async function MarketingRootLayout({
+export default function MarketingRootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const { items } = await navigationService.getSiteNavigation();
-
   return (
     <html
       lang="de"
       className={`${bebasNeue.variable} ${orbitron.variable} ${rajdhani.variable}`}
     >
       <body>
-        <SiteNav items={items} />
-        {children}
-        <SiteFooter primaryLinks={items} />
         <Suspense fallback={null}>
-          <CookieBannerGate />
+          <MarketingSiteNav />
+        </Suspense>
+        {children}
+        <Suspense fallback={null}>
+          <MarketingSiteFooterAndCookie />
         </Suspense>
       </body>
     </html>

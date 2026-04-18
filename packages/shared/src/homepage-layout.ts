@@ -1,21 +1,17 @@
 import { z } from "zod";
 
-import { eventInfoCardSchema, heroCtaSchema, imageSchema } from "./schemas";
+import { eventInfoCardSchema, eventSchema, imageSchema } from "./schemas";
 
 const idField = z.string().optional();
 
 export const homepageHeroBlockViewSchema = z.object({
   blockType: z.literal("hero"),
   id: idField,
-  eyebrow: z.string(),
-  titleLine1: z.string(),
-  titleLine2: z.string(),
-  dateLabel: z.string(),
-  countdownEnd: z.string().optional(),
-  badge: z.string().optional(),
-  tagline: z.string().optional(),
-  ctas: z.array(heroCtaSchema).optional(),
-  backgroundImage: imageSchema.optional(),
+  /**
+   * From Payload `heroEvent`. Hero copy, CTAs, and media come from this
+   * document’s `homepageHero` group (and title/date); no extra fields on the block.
+   */
+  heroSourceEvent: eventSchema.optional(),
 });
 
 export const homepageTickerBlockViewSchema = z.object({

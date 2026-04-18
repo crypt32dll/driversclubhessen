@@ -4,7 +4,7 @@ import { revalidateNavigation } from "../payload/hooks/revalidate.ts";
 
 const internalTargetOptions = [
   { label: "Startseite", value: "home" },
-  { label: "Startseite · Event", value: "homeEvent" },
+  { label: "Startseite · Aktuell", value: "homeEvent" },
   { label: "Startseite · Über uns", value: "homeAbout" },
   { label: "Startseite · Anfahrt", value: "homeLocation" },
   { label: "Startseite · Social", value: "homeSocial" },

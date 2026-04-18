@@ -5,6 +5,10 @@ import type {
 } from "payload";
 
 import {
+  pathsToRevalidateForTags,
+  pathsWhenEventsCollectionChanged,
+} from "../../lib/cms/paths-for-revalidate-tags.ts";
+import {
   REVALIDATE_TAG_PROFILE,
   REVALIDATE_TAGS,
 } from "../../lib/cms/isr-config.ts";
@@ -14,46 +18,68 @@ async function tag(profile: typeof REVALIDATE_TAG_PROFILE, tagName: string) {
   revalidateTag(tagName, profile);
 }
 
-export const revalidateEvents: CollectionAfterChangeHook = async () => {
+async function revalidatePathsQuiet(paths: readonly string[]) {
+  const { revalidatePath } = await import("next/cache");
+  for (const p of paths) {
+    try {
+      revalidatePath(p);
+    } catch {
+      /* Payload jobs sometimes run without App Router cache scope; tags still expire fetch cache */
+    }
+  }
+}
+
+function eventDocSlug(doc: unknown): string | undefined {
+  if (doc && typeof doc === "object" && "slug" in doc) {
+    const s = (doc as { slug?: unknown }).slug;
+    if (typeof s === "string" && s.length > 0) return s;
+  }
+  return undefined;
+}
+
+async function tagAndPaths(tagName: string) {
+  await tag(REVALIDATE_TAG_PROFILE, tagName);
+  await revalidatePathsQuiet(pathsToRevalidateForTags([tagName]));
+}
+
+export const revalidateEvents: CollectionAfterChangeHook = async ({ doc }) => {
   await tag(REVALIDATE_TAG_PROFILE, REVALIDATE_TAGS.events);
+  await revalidatePathsQuiet(pathsWhenEventsCollectionChanged(eventDocSlug(doc)));
 };
 
-export const revalidateEventsDelete: CollectionAfterDeleteHook = async () => {
+export const revalidateEventsDelete: CollectionAfterDeleteHook = async ({
+  doc,
+}) => {
   await tag(REVALIDATE_TAG_PROFILE, REVALIDATE_TAGS.events);
-};
-
-export const revalidatePages: CollectionAfterChangeHook = async () => {
-  await tag(REVALIDATE_TAG_PROFILE, REVALIDATE_TAGS.pages);
-};
-
-export const revalidatePagesDelete: CollectionAfterDeleteHook = async () => {
-  await tag(REVALIDATE_TAG_PROFILE, REVALIDATE_TAGS.pages);
+  await revalidatePathsQuiet(
+    pathsWhenEventsCollectionChanged(eventDocSlug(doc)),
+  );
 };
 
 export const revalidateGallery: CollectionAfterChangeHook = async () => {
-  await tag(REVALIDATE_TAG_PROFILE, REVALIDATE_TAGS.gallery);
+  await tagAndPaths(REVALIDATE_TAGS.gallery);
 };
 
 export const revalidateGalleryDelete: CollectionAfterDeleteHook = async () => {
-  await tag(REVALIDATE_TAG_PROFILE, REVALIDATE_TAGS.gallery);
+  await tagAndPaths(REVALIDATE_TAGS.gallery);
 };
 
 export const revalidateHomepage: GlobalAfterChangeHook = async () => {
-  await tag(REVALIDATE_TAG_PROFILE, REVALIDATE_TAGS.homepage);
+  await tagAndPaths(REVALIDATE_TAGS.homepage);
 };
 
 export const revalidateNavigation: GlobalAfterChangeHook = async () => {
-  await tag(REVALIDATE_TAG_PROFILE, REVALIDATE_TAGS.navigation);
+  await tagAndPaths(REVALIDATE_TAGS.navigation);
 };
 
 export const revalidateLegalImpressum: GlobalAfterChangeHook = async () => {
-  await tag(REVALIDATE_TAG_PROFILE, REVALIDATE_TAGS.legalImpressum);
+  await tagAndPaths(REVALIDATE_TAGS.legalImpressum);
 };
 
 export const revalidateLegalDatenschutz: GlobalAfterChangeHook = async () => {
-  await tag(REVALIDATE_TAG_PROFILE, REVALIDATE_TAGS.legalDatenschutz);
+  await tagAndPaths(REVALIDATE_TAGS.legalDatenschutz);
 };
 
 export const revalidateCookieBanner: GlobalAfterChangeHook = async () => {
-  await tag(REVALIDATE_TAG_PROFILE, REVALIDATE_TAGS.cookieBanner);
+  await tagAndPaths(REVALIDATE_TAGS.cookieBanner);
 };

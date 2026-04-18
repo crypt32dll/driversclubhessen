@@ -35,7 +35,7 @@ export function HomepageLocationBlock({ block }: Props) {
         <Reveal>
           <p className={sectionLabel}>{block.sectionLabel ?? "Anfahrt"}</p>
           <h2 className={sectionTitle}>
-            {block.titleLead ?? "Der "}
+            {`${block.titleLead ?? "Der "} `}
             <span className={sectionTitleAccent}>
               {block.titleAccent ?? "Treffpunkt"}
             </span>

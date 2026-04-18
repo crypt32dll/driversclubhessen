@@ -62,20 +62,23 @@ export function UpcomingEventsSection({
   titleAccent = "erwartet",
   eventInfoCards,
 }: Props) {
-  const cardsSource =
-    events.length === 0
-      ? eventInfoCards && eventInfoCards.length > 0
-        ? eventInfoCards
-        : STATIC_EVENT_CARDS
+  /** CMS “Info-Karten” always win when present — otherwise we used `events` and hid all info cards. */
+  const hasCmsInfoCards =
+    eventInfoCards != null && eventInfoCards.length > 0;
+
+  const cardsSource = hasCmsInfoCards
+    ? eventInfoCards
+    : events.length === 0
+      ? STATIC_EVENT_CARDS
       : null;
 
   return (
-    <section className={eventSection} id="event">
+    <section className={eventSection} id="aktuell">
       <Container>
         <Reveal>
           <p className={sectionLabel}>{sectionLabelText}</p>
           <h2 className={sectionTitle}>
-            {titleLead}
+            {`${titleLead} `}
             <span className={sectionTitleAccent}>{titleAccent}</span>
           </h2>
           {featuredEventText ? (
@@ -86,8 +89,11 @@ export function UpcomingEventsSection({
         </Reveal>
         <div className={eventGrid}>
           {cardsSource
-            ? cardsSource.map((card) => (
-                <Reveal key={card.title} className={eventCard}>
+            ? cardsSource.map((card, index) => (
+                <Reveal
+                  key={`${card.title}-${card.value}-${index}`}
+                  className={eventCard}
+                >
                   <div className={eventCardIcon}>{card.icon}</div>
                   <div className={eventCardTitle}>{card.title}</div>
                   <div className={eventCardValue}>{card.value}</div>

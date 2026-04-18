@@ -1,5 +1,5 @@
-import { PAGE_SLUG_HOME } from "@/lib/cms/page-slug";
-import { pagesService } from "@/lib/services/pages";
+import { eventService } from "@/lib/services/events";
+import { homepageService } from "@/lib/services/homepage";
 import type { Metadata } from "next";
 
 /** Matches `(marketing)/layout.tsx` defaults when no CMS row exists. */
@@ -8,24 +8,59 @@ export const SITE_METADATA_DEFAULTS = {
   description: "DriversClub Hessen - Tuning Treffen Community Plattform",
 } as const;
 
-/**
- * Maps a pathname (e.g. `/`, `/events`, `/events/foo`) to the CMS `pages.slug`
- * (`home`, `events`, `events/foo`).
- */
-export function marketingPathToCmsSlug(pathname: string): string {
-  const trimmed = pathname.trim();
-  const noSlash = trimmed.replace(/^\/+|\/+$/g, "");
-  if (noSlash.length === 0) return PAGE_SLUG_HOME;
-  return noSlash.toLowerCase();
+function normalizePath(pathname: string): string {
+  const t = pathname.trim();
+  if (!t || t === "/") return "/";
+  return t.replace(/\/+$/, "") || "/";
 }
 
+/**
+ * Resolves `<title>` and meta description from Payload:
+ * - `/` — Homepage global (collapsible „SEO — Startseite“)
+ * - `/events` — Homepage global („SEO — Events-Übersicht“)
+ * - `/gallery` — Homepage global („SEO — Galerie“)
+ * - `/events/[slug]` — Event document („SEO — Event-Detail“)
+ * - other paths — use `defaults` only (e.g. legal pages)
+ */
 export async function marketingMetadataForPath(
   pathname: string,
   defaults: { title: string; description: string },
 ): Promise<Metadata> {
-  const cmsSlug = marketingPathToCmsSlug(pathname);
-  const row = await pagesService.getPageSeoBySlug(cmsSlug);
-  const title = row?.metaTitle?.trim() || defaults.title;
-  const description = row?.metaDescription?.trim() || defaults.description;
-  return { title, description };
+  const path = normalizePath(pathname);
+
+  if (path === "/") {
+    const { marketingSeo: s } = await homepageService.getHomepageBundle();
+    return {
+      title: s.homeMetaTitle ?? defaults.title,
+      description: s.homeMetaDescription ?? defaults.description,
+    };
+  }
+
+  if (path === "/events") {
+    const { marketingSeo: s } = await homepageService.getHomepageBundle();
+    return {
+      title: s.eventsIndexMetaTitle ?? defaults.title,
+      description: s.eventsIndexMetaDescription ?? defaults.description,
+    };
+  }
+
+  if (path === "/gallery") {
+    const { marketingSeo: s } = await homepageService.getHomepageBundle();
+    return {
+      title: s.galleryMetaTitle ?? defaults.title,
+      description: s.galleryMetaDescription ?? defaults.description,
+    };
+  }
+
+  const m = /^\/events\/([^/]+)$/.exec(path);
+  if (m) {
+    const slug = m[1];
+    const ev = await eventService.getEventBySlug(slug).catch(() => null);
+    return {
+      title: ev?.metaTitle?.trim() || defaults.title,
+      description: ev?.metaDescription?.trim() || defaults.description,
+    };
+  }
+
+  return { title: defaults.title, description: defaults.description };
 }

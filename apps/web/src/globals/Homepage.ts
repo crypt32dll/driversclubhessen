@@ -20,6 +20,66 @@ export const Homepage: GlobalConfig = {
       },
       blocks: homepageLayoutBlocks,
     },
+    {
+      type: "collapsible",
+      label: "SEO — Startseite (/)",
+      admin: {
+        initCollapsed: true,
+        description: "Meta-Titel und -Beschreibung für die Startseite.",
+      },
+      fields: [
+        {
+          name: "homeMetaTitle",
+          type: "text",
+          label: "Meta-Titel",
+        },
+        {
+          name: "homeMetaDescription",
+          type: "textarea",
+          label: "Meta-Beschreibung",
+        },
+      ],
+    },
+    {
+      type: "collapsible",
+      label: "SEO — Events-Übersicht (/events)",
+      admin: {
+        initCollapsed: true,
+        description: "Meta für die Liste aller Events.",
+      },
+      fields: [
+        {
+          name: "eventsIndexMetaTitle",
+          type: "text",
+          label: "Meta-Titel",
+        },
+        {
+          name: "eventsIndexMetaDescription",
+          type: "textarea",
+          label: "Meta-Beschreibung",
+        },
+      ],
+    },
+    {
+      type: "collapsible",
+      label: "SEO — Galerie (/gallery)",
+      admin: {
+        initCollapsed: true,
+        description: "Meta für die Galerie-Übersichtsseite.",
+      },
+      fields: [
+        {
+          name: "galleryMetaTitle",
+          type: "text",
+          label: "Meta-Titel",
+        },
+        {
+          name: "galleryMetaDescription",
+          type: "textarea",
+          label: "Meta-Beschreibung",
+        },
+      ],
+    },
   ],
   hooks: {
     afterChange: [revalidateHomepage],

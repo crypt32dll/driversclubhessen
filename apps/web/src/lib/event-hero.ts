@@ -3,6 +3,16 @@ import type { HomepageHeroBlockView } from "@driversclub/shared";
 
 const DEFAULT_COUNTDOWN_FALLBACK = "2026-04-19T12:00:00";
 
+/** When no event drives the hero (matches `defaultHomepageLayoutView` hero block). */
+const HERO_FALLBACK_COPY = {
+  eyebrow: "Mi Familia & Friends praesentiert",
+  titleLine1: "Tuning",
+  titleLine2: "Treffen",
+  dateLabel: "19 · 04 · 2026",
+  badge: "EST. 2024 • HESSEN",
+  tagline: "DriversClub Hessen × Mi Familia & Friends",
+} as const;
+
 export function splitEventTitle(title: string): {
   line1: string;
   line2: string;
@@ -31,25 +41,25 @@ function countdownIsoFromEventDate(dateIso: string): string {
   return `${day}T12:00:00`;
 }
 
-function ctasForNextEvent(
-  next: Event,
-  block: HomepageHeroBlockView,
-): readonly HeroCta[] {
-  if (next.heroCtas && next.heroCtas.length > 0) {
-    return next.heroCtas;
+function ctasForFeaturedEvent(featured: Event): readonly HeroCta[] | undefined {
+  if (featured.heroCtas && featured.heroCtas.length > 0) {
+    return featured.heroCtas;
   }
-  const eventHref = `/events/${next.slug}`;
-  const fromBlock = block.ctas ?? [];
-  const filtered = fromBlock.filter((c) => c.href !== eventHref);
-  return [
-    {
-      label: "Zum Event",
-      href: eventHref,
-      variant: "primary" as const,
-      openInNewTab: false,
-    },
-    ...filtered,
-  ];
+  return undefined;
+}
+
+function staticHeroFallback(): MergedHeroProps {
+  return {
+    eyebrow: HERO_FALLBACK_COPY.eyebrow,
+    titleLine1: HERO_FALLBACK_COPY.titleLine1,
+    titleLine2: HERO_FALLBACK_COPY.titleLine2,
+    dateLabel: HERO_FALLBACK_COPY.dateLabel,
+    countdownEndIso: DEFAULT_COUNTDOWN_FALLBACK,
+    badgeText: HERO_FALLBACK_COPY.badge,
+    tagline: HERO_FALLBACK_COPY.tagline,
+    ctas: undefined,
+    backgroundImageUrl: undefined,
+  };
 }
 
 export type MergedHeroProps = {
@@ -65,64 +75,56 @@ export type MergedHeroProps = {
 };
 
 /**
- * When `next` is the next upcoming event, hero content is driven by the event (Payload `homepageHero` + fallbacks).
- * Otherwise the homepage hero block from CMS is used unchanged.
+ * Hero content priority:
+ * 1. **`block.heroSourceEvent`** — Homepage hero block → `heroEvent` (Payload)
+ * 2. **`nextUpcoming`** — first upcoming event when no relationship
+ * 3. **Site defaults** — when no event is available
+ *
+ * Per-field overrides and CTAs come from the event’s `homepageHero` group only.
  */
-export function mergeHomepageHeroWithNextEvent(
+export function mergeHomepageHero(
   block: HomepageHeroBlockView,
-  next: Event | null,
+  nextUpcoming: Event | null,
 ): MergedHeroProps {
-  if (!next) {
-    return {
-      eyebrow: block.eyebrow,
-      titleLine1: block.titleLine1,
-      titleLine2: block.titleLine2,
-      dateLabel: block.dateLabel,
-      countdownEndIso: block.countdownEnd ?? DEFAULT_COUNTDOWN_FALLBACK,
-      badgeText: block.badge,
-      tagline: block.tagline,
-      ctas: block.ctas,
-      backgroundImageUrl: block.backgroundImage?.url,
-    };
+  const source = block.heroSourceEvent ?? nextUpcoming;
+  if (!source) {
+    return staticHeroFallback();
   }
 
-  const parts = splitEventTitle(next.title);
+  const parts = splitEventTitle(source.title);
   const titleLine1 =
-    next.heroTitleLine1?.trim() ||
+    source.heroTitleLine1?.trim() ||
     parts.line1 ||
-    next.title ||
-    block.titleLine1;
+    source.title ||
+    HERO_FALLBACK_COPY.titleLine1;
   const titleLine2 =
-    next.heroTitleLine2?.trim() ||
+    source.heroTitleLine2?.trim() ||
     parts.line2 ||
-    next.location ||
-    block.titleLine2;
+    source.location ||
+    HERO_FALLBACK_COPY.titleLine2;
 
   const dateLabel =
-    next.heroDateLabel?.trim() ||
-    formatEventDateLabelDe(next.date) ||
-    block.dateLabel;
+    source.heroDateLabel?.trim() ||
+    formatEventDateLabelDe(source.date) ||
+    HERO_FALLBACK_COPY.dateLabel;
 
   const countdownEndIso =
-    next.heroCountdownEnd?.trim() ||
-    countdownIsoFromEventDate(next.date) ||
-    block.countdownEnd ||
+    source.heroCountdownEnd?.trim() ||
+    countdownIsoFromEventDate(source.date) ||
     DEFAULT_COUNTDOWN_FALLBACK;
 
   const backgroundImageUrl =
-    next.heroBackgroundImage?.url ??
-    next.images?.[0]?.url ??
-    block.backgroundImage?.url;
+    source.heroBackgroundImage?.url ?? source.images?.[0]?.url;
 
   return {
-    eyebrow: next.heroEyebrow?.trim() || block.eyebrow,
+    eyebrow: source.heroEyebrow?.trim() || HERO_FALLBACK_COPY.eyebrow,
     titleLine1,
     titleLine2,
     dateLabel,
     countdownEndIso,
-    badgeText: next.heroBadge?.trim() || block.badge,
-    tagline: next.heroTagline?.trim() || block.tagline,
-    ctas: ctasForNextEvent(next, block),
+    badgeText: source.heroBadge?.trim() || HERO_FALLBACK_COPY.badge,
+    tagline: source.heroTagline?.trim() || HERO_FALLBACK_COPY.tagline,
+    ctas: ctasForFeaturedEvent(source),
     backgroundImageUrl,
   };
 }

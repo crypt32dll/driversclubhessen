@@ -1,7 +1,9 @@
-import { Container } from "@/components/ui/Container";
+import { EventDetailMedia } from "@/components/events/EventDetailMedia";
+import { HeroSection } from "@/components/sections/HeroSection";
 import { marketingMetadataForPath } from "@/lib/metadata/marketing-page-metadata";
+import { mapEventToHeroProps } from "@/lib/map-event-detail-hero";
 import { eventService } from "@/lib/services/events";
-import Image from "next/image";
+import { marketingHome } from "@/styles/global.css";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 
@@ -37,24 +39,22 @@ export default async function EventDetailPage({ params }: Props) {
     notFound();
   }
 
+  const hero = mapEventToHeroProps(event);
+
   return (
-    <main>
-      <Container>
-        <h1>{event.title}</h1>
-        <p>{new Date(event.date).toLocaleString("de-DE")}</p>
-        <p>{event.location}</p>
-        {event.images?.[0] ? (
-          <p style={{ marginTop: "1rem" }}>
-            <Image
-              src={event.images[0].url}
-              alt={event.images[0].alternativeText ?? event.title}
-              width={event.images[0].width ?? 1200}
-              height={event.images[0].height ?? 800}
-              style={{ width: "100%", height: "auto" }}
-            />
-          </p>
-        ) : null}
-      </Container>
+    <main className={marketingHome}>
+      <HeroSection
+        eyebrow={hero.eyebrow}
+        titleLine1={hero.titleLine1}
+        titleLine2={hero.titleLine2}
+        dateLabel={hero.dateLabel}
+        countdownEndIso={hero.countdownEndIso}
+        badgeText={hero.badgeText}
+        tagline={hero.tagline}
+        ctas={hero.ctas}
+        backgroundImageUrl={hero.backgroundImageUrl}
+      />
+      <EventDetailMedia event={event} />
     </main>
   );
 }

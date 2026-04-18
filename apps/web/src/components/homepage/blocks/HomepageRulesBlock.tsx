@@ -42,7 +42,7 @@ export function HomepageRulesBlock({ block }: Props) {
         <Reveal>
           <p className={sectionLabel}>{sectionL}</p>
           <h2 className={sectionTitle}>
-            {lead}
+            {`${lead} `}
             <span className={sectionTitleAccent}>{accent}</span>
           </h2>
         </Reveal>

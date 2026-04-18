@@ -34,7 +34,7 @@ export function HomepageSocialBlock({ block }: Props) {
         <Reveal>
           <p className={sectionLabel}>{block.sectionLabel ?? "Folg uns"}</p>
           <h2 className={sectionTitle}>
-            {block.titleLead ?? "Bleib "}
+            {`${block.titleLead ?? "Bleib" } `}
             <span className={sectionTitleAccent}>
               {block.titleAccent ?? "connected"}
             </span>

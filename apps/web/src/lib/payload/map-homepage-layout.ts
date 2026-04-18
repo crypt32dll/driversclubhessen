@@ -1,5 +1,6 @@
 import type { Event as PayloadEvent, Homepage, Media } from "@/payload-types";
 import type {
+  Event,
   EventInfoCard,
   HomepageFeaturesBlockView,
   HomepageLayoutBlockView,
@@ -8,7 +9,6 @@ import type {
   HomepageSocialBlockView,
 } from "@driversclub/shared";
 
-import { mapPayloadCtaRows } from "@/lib/payload/map-hero-cta";
 import { mapPayloadEvent } from "@/lib/payload/map-event";
 import { mapPayloadMediaToImage } from "@/lib/payload/map-media";
 
@@ -38,31 +38,16 @@ function formatFeaturedEventText(ev: PayloadEvent | null | undefined): string | 
 function mapHeroBlock(
   b: Extract<NonNullable<Homepage["layout"]>[number], { blockType: "hero" }>,
 ): HomepageLayoutBlockView {
-  const ce = b.countdownEnd;
-  let countdownEnd: string | undefined;
-  if (typeof ce === "string" && ce.length > 0) countdownEnd = ce;
-
-  const bg = b.backgroundImage;
-  let backgroundImage: ReturnType<typeof mapPayloadMediaToImage> | undefined;
-  if (bg != null && typeof bg === "object" && "url" in bg) {
-    const img = mapPayloadMediaToImage(bg as Media);
-    if (img) backgroundImage = img;
+  let heroSourceEvent: Event | undefined;
+  const heroRef = b.heroEvent;
+  if (heroRef != null && typeof heroRef === "object" && "slug" in heroRef) {
+    heroSourceEvent = mapPayloadEvent(heroRef as PayloadEvent);
   }
-
-  const ctas = mapPayloadCtaRows(b.ctas);
 
   return {
     blockType: "hero",
     id: nonEmptyString(b.id) ?? undefined,
-    eyebrow: String(b.eyebrow ?? ""),
-    titleLine1: String(b.titleLine1 ?? ""),
-    titleLine2: String(b.titleLine2 ?? ""),
-    dateLabel: String(b.dateLabel ?? ""),
-    ...(countdownEnd ? { countdownEnd } : {}),
-    ...(nonEmptyString(b.badge) ? { badge: nonEmptyString(b.badge) } : {}),
-    ...(nonEmptyString(b.tagline) ? { tagline: nonEmptyString(b.tagline) } : {}),
-    ...(ctas?.length ? { ctas } : {}),
-    ...(backgroundImage ? { backgroundImage } : {}),
+    ...(heroSourceEvent ? { heroSourceEvent } : {}),
   };
 }
 
@@ -95,9 +80,15 @@ function mapEventBlock(
       const icon = nonEmptyString(row.icon);
       const title = nonEmptyString(row.title);
       const value = nonEmptyString(row.value);
-      const sub = nonEmptyString(row.sub);
-      if (!icon || !title || !value || !sub) continue;
-      infoCards.push({ icon, title, value, sub });
+      const subRaw = nonEmptyString(row.sub);
+      if (!icon || !title || !value) continue;
+      const sub = subRaw ?? "";
+      infoCards.push({
+        icon,
+        title,
+        value,
+        sub: sub.length > 0 ? sub : "\u2014",
+      });
     }
   }
 

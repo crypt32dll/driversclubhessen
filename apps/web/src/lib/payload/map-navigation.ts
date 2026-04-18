@@ -3,7 +3,7 @@ import type { SiteNavItem, SiteNavigation } from "@driversclub/shared";
 
 const INTERNAL_HREF: Record<string, string> = {
   home: "/",
-  homeEvent: "/#event",
+  homeEvent: "/#aktuell",
   homeAbout: "/#about",
   homeLocation: "/#location",
   homeSocial: "/#social",

@@ -3,6 +3,7 @@ import {
   REVALIDATE_TAGS,
   REVALIDATE_TAG_PROFILE,
 } from "@/lib/cms/isr-config";
+import { pathsToRevalidateForTags } from "@/lib/cms/paths-for-revalidate-tags";
 import { logger } from "@/lib/logger";
 import { revalidatePath, revalidateTag } from "next/cache";
 import { NextResponse } from "next/server";
@@ -62,8 +63,13 @@ export async function POST(request: Request) {
     for (const tag of tags) {
       revalidateTag(tag, REVALIDATE_TAG_PROFILE);
     }
-    logger.info("Revalidate: tags", { tags });
-    return NextResponse.json({ revalidated: true, tags });
+    /** Tag-only requests used to skip paths — ISR pages then kept stale HTML until time-based revalidate. */
+    const pathsForTags = pathsToRevalidateForTags(tags);
+    for (const path of pathsForTags) {
+      revalidatePath(path);
+    }
+    logger.info("Revalidate: tags", { tags, paths: pathsForTags });
+    return NextResponse.json({ revalidated: true, tags, paths: pathsForTags });
   }
 
   const event = body.event;
@@ -83,14 +89,13 @@ export async function POST(request: Request) {
   if (typeof event === "string" && event.startsWith("media.")) {
     tags.push(
       REVALIDATE_TAGS.homepage,
-      REVALIDATE_TAGS.pages,
       REVALIDATE_TAGS.events,
       REVALIDATE_TAGS.gallery,
     );
     paths.push("/", "/events", "/gallery");
   } else if (model === "homepage") {
     tags.push(REVALIDATE_TAGS.homepage);
-    paths.push("/");
+    paths.push("/", "/events", "/gallery");
   } else if (model === "legal-impressum") {
     tags.push(REVALIDATE_TAGS.legalImpressum);
     paths.push("/legal/impressum");
@@ -122,27 +127,10 @@ export async function POST(request: Request) {
   } else if (model === "gallery") {
     tags.push(REVALIDATE_TAGS.gallery);
     paths.push("/gallery");
-  } else if (model === "pages" || model === "page") {
-    tags.push(REVALIDATE_TAGS.pages);
-    const slug =
-      entry && typeof entry.slug === "string" ? entry.slug.trim() : "";
-    if (slug) {
-      const path =
-        slug === "home" || slug === "" ? "/" : `/${slug.replace(/^\/+/, "")}`;
-      paths.push(path);
-    } else {
-      paths.push(
-        "/",
-        "/events",
-        "/gallery",
-        "/legal/impressum",
-        "/legal/datenschutz",
-      );
-    }
   } else if (model) {
     return NextResponse.json(
       {
-        message: `Unknown model "${model}". Use manual "tags" or model: homepage | pages | navigation | event | gallery | legal-impressum | legal-datenschutz | cookie-banner.`,
+        message: `Unknown model "${model}". Use manual "tags" or model: homepage | navigation | event | gallery | legal-impressum | legal-datenschutz | cookie-banner.`,
         supportedTags: Object.values(REVALIDATE_TAGS),
       },
       { status: 400 },

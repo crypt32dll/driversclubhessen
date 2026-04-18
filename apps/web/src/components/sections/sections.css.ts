@@ -284,7 +284,7 @@ export const eventSection = style([
 
 export const eventGrid = style({
   display: "grid",
-  gridTemplateColumns: "1fr 1fr",
+  gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))",
   gap: "2rem",
   marginTop: "3rem",
   "@media": {

@@ -1,7 +1,5 @@
 import type { Block } from "payload";
 
-import { heroCtaRowFields } from "../../fields/heroCtas.ts";
-
 /** Homepage flexible layout — block order = page order. */
 export const homepageLayoutBlocks: Block[] = [
   {
@@ -9,41 +7,15 @@ export const homepageLayoutBlocks: Block[] = [
     interfaceName: "HomepageHeroBlock",
     fields: [
       {
-        name: "eyebrow",
-        type: "text",
-        required: true,
+        name: "heroEvent",
+        type: "relationship",
+        relationTo: "events",
+        label: "Hero-Event",
+        maxDepth: 2,
         admin: {
           description:
-            "Fallback-Hero, wenn kein anstehendes Event existiert. Sobald ein Event ansteht, uebernimmt das naechste Event die Hero-Inhalte (siehe Event → Startseiten-Hero).",
+            "Hero (Titel, Countdown, CTAs, Hintergrund, …) kommt aus dem Event-Dokument → Gruppe „Startseiten-Hero“. Leer = naechstes anstehendes Event aus der Liste. Wenn kein Event verfuegbar ist, nutzt das Frontend feste Fallback-Texte.",
         },
-      },
-      { name: "titleLine1", type: "text", required: true },
-      { name: "titleLine2", type: "text", required: true },
-      { name: "dateLabel", type: "text", required: true },
-      { name: "countdownEnd", type: "date" },
-      {
-        name: "badge",
-        type: "text",
-        label: "Hero-Badge",
-        defaultValue: "EST. 2024 • HESSEN",
-      },
-      {
-        name: "tagline",
-        type: "text",
-        label: "Hero-Fußzeile",
-        defaultValue: "DriversClub Hessen × Mi Familia & Friends",
-      },
-      {
-        name: "ctas",
-        type: "array",
-        labels: { singular: "Button", plural: "Buttons" },
-        fields: heroCtaRowFields,
-      },
-      {
-        name: "backgroundImage",
-        type: "upload",
-        relationTo: "media",
-        label: "Hintergrund (optional)",
       },
     ],
   },

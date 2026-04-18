@@ -33,7 +33,7 @@ export function HomepageAboutBlock({ block }: Props) {
         <Reveal>
           <p className={sectionLabel}>{block.sectionLabel ?? "Veranstalter"}</p>
           <h2 className={sectionTitle}>
-            {block.titleLead ?? "Die "}
+            {`${block.titleLead ?? "Die" } `}
             <span className={sectionTitleAccent}>
               {block.titleAccent ?? "Kollaboration"}
             </span>
