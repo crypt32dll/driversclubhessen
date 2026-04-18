@@ -57,15 +57,18 @@ export const apiClient = {
     });
 
     if (!response.ok) {
+      const hint =
+        response.status === 404
+          ? "Strapi 404: often draft-only content (publish in Content Manager) or missing content-type on this deploy; see STRAPI_VERCEL_SETUP.md."
+          : response.status === 503 || response.status === 502
+            ? "Strapi 502/503: CMS host unavailable (deploy, cold start, or Strapi Cloud outage). Retry later; check Strapi Cloud runtime logs — not a Next.js URL or Public-permissions misconfiguration."
+            : undefined;
+
       logger.error("API GET request failed", {
         path,
         status: response.status,
         strapiBase: STRAPI_URL,
-        ...(response.status === 404
-          ? {
-              hint: "Strapi 404: often draft-only content (publish in Content Manager) or missing content-type on this deploy; see STRAPI_VERCEL_SETUP.md.",
-            }
-          : {}),
+        ...(hint ? { hint } : {}),
       });
       throw new Error(`Request failed: ${response.status}`);
     }

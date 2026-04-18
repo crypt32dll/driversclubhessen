@@ -44,7 +44,7 @@ export const homepageService = {
       return await loadHomepage();
     } catch (err) {
       logger.warn(
-        "Strapi homepage unavailable; using static fallback copy (check NEXT_PUBLIC_STRAPI_URL, Public permissions, publish Homepage in Strapi, ISR cache)",
+        "Strapi homepage unavailable; using static fallback copy. If the error was 502/503, the CMS host is down or busy (see apiClient logs). Otherwise check NEXT_PUBLIC_STRAPI_URL, Public permissions, published Homepage, ISR cache.",
         err instanceof Error
           ? { name: err.name, message: err.message }
           : { err: String(err) },

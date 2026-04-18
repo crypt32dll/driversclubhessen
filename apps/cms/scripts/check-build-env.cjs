@@ -82,7 +82,7 @@ function main() {
   if (failed && !strict) {
     log(
       "WARN",
-      "Some required Strapi secrets are missing — strapi build may still work locally with .env; production needs real values.",
+      "Some required Strapi secrets are missing at prebuild (strict=false). Self-hosted: set APP_KEYS, salts, and JWT secrets in the host env. Strapi Cloud often injects these only at runtime, so this is normal during image build if `strapi build` and deploy still succeed.",
     );
   }
 
