@@ -1,7 +1,22 @@
 import { LexicalRichText } from "@/components/cms/LexicalRichText";
 import { Container } from "@/components/ui/Container";
+import {
+  marketingMetadataForPath,
+  SITE_METADATA_DEFAULTS,
+} from "@/lib/metadata/marketing-page-metadata";
 import { gdprService } from "@/lib/services/gdpr";
 import type { SerializedEditorState } from "lexical";
+import type { Metadata } from "next";
+
+export const revalidate = 3600;
+
+export async function generateMetadata(): Promise<Metadata> {
+  return marketingMetadataForPath("/legal/impressum", {
+    title: `Impressum | ${SITE_METADATA_DEFAULTS.title}`,
+    description:
+      "Impressum und rechtliche Angaben zu DriversClub Hessen (Angaben gemaess TMG).",
+  });
+}
 
 function ImpressumFallback() {
   return (

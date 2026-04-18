@@ -35,6 +35,7 @@ const DEFAULT_CTAS: readonly HeroCta[] = [
     href: "https://www.instagram.com/driversclubhessen",
     label: "@driversclubhessen",
     variant: "outline",
+    openInNewTab: true,
   },
 ];
 
@@ -131,13 +132,13 @@ export const HeroSection = ({
         <div className={heroCtas}>
           {resolvedCtas.map((c) => {
             const variant = c.variant === "outline" ? "outline" : "primary";
-            const external = isExternalHref(c.href);
+            const newTab = c.openInNewTab ?? isExternalHref(c.href);
             return (
               <ButtonLink
                 key={`${c.href}-${c.label}`}
                 href={c.href}
                 variant={variant}
-                {...(external
+                {...(newTab
                   ? { target: "_blank" as const, rel: "noopener noreferrer" }
                   : {})}
               >

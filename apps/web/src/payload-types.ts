@@ -69,6 +69,7 @@ export interface Config {
   collections: {
     users: User;
     media: Media;
+    pages: Page;
     events: Event;
     galleries: Gallery;
     'payload-kv': PayloadKv;
@@ -80,6 +81,7 @@ export interface Config {
   collectionsSelect: {
     users: UsersSelect<false> | UsersSelect<true>;
     media: MediaSelect<false> | MediaSelect<true>;
+    pages: PagesSelect<false> | PagesSelect<true>;
     events: EventsSelect<false> | EventsSelect<true>;
     galleries: GalleriesSelect<false> | GalleriesSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
@@ -178,6 +180,29 @@ export interface Media {
   focalY?: number | null;
 }
 /**
+ * Meta-Titel und -Beschreibung pro Route. Slug **home** = Startseite; sonst ohne Domain und ohne führenden Slash (z. B. events, gallery, legal/impressum, events/dein-event-slug).
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "pages".
+ */
+export interface Page {
+  id: number;
+  /**
+   * **home** für die Startseite. Beispiele: **events**, **gallery**, **legal/impressum**, **events/meet-2026**.
+   */
+  slug: string;
+  /**
+   * Optional. Leer = Standard aus dem Code für diese Route.
+   */
+  metaTitle?: string | null;
+  /**
+   * Empfohlen bis ca. 160 Zeichen.
+   */
+  metaDescription?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "events".
  */
@@ -185,7 +210,6 @@ export interface Event {
   id: number;
   title: string;
   slug: string;
-  description: string;
   date: string;
   location: string;
   images?: (number | Media)[] | null;
@@ -209,7 +233,15 @@ export interface Event {
     ctas?:
       | {
           label: string;
-          href: string;
+          /**
+           * Intern: waehle ein Event aus der Liste. Extern: vollstaendige URL (oeffnet in neuem Tab).
+           */
+          linkMode: 'reference' | 'external';
+          eventReference?: (number | null) | Event;
+          /**
+           * z. B. https://instagram.com/…
+           */
+          externalUrl?: string | null;
           variant?: ('primary' | 'outline') | null;
           id?: string | null;
         }[]
@@ -261,6 +293,10 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'media';
         value: number | Media;
+      } | null)
+    | ({
+        relationTo: 'pages';
+        value: number | Page;
       } | null)
     | ({
         relationTo: 'events';
@@ -354,12 +390,22 @@ export interface MediaSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "pages_select".
+ */
+export interface PagesSelect<T extends boolean = true> {
+  slug?: T;
+  metaTitle?: T;
+  metaDescription?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "events_select".
  */
 export interface EventsSelect<T extends boolean = true> {
   title?: T;
   slug?: T;
-  description?: T;
   date?: T;
   location?: T;
   images?: T;
@@ -377,7 +423,9 @@ export interface EventsSelect<T extends boolean = true> {
           | T
           | {
               label?: T;
-              href?: T;
+              linkMode?: T;
+              eventReference?: T;
+              externalUrl?: T;
               variant?: T;
               id?: T;
             };
@@ -465,6 +513,9 @@ export interface Homepage {
  * via the `definition` "HomepageHeroBlock".
  */
 export interface HomepageHeroBlock {
+  /**
+   * Fallback-Hero, wenn kein anstehendes Event existiert. Sobald ein Event ansteht, uebernimmt das naechste Event die Hero-Inhalte (siehe Event → Startseiten-Hero).
+   */
   eyebrow: string;
   titleLine1: string;
   titleLine2: string;
@@ -475,7 +526,15 @@ export interface HomepageHeroBlock {
   ctas?:
     | {
         label: string;
-        href: string;
+        /**
+         * Intern: waehle ein Event aus der Liste. Extern: vollstaendige URL (oeffnet in neuem Tab).
+         */
+        linkMode: 'reference' | 'external';
+        eventReference?: (number | null) | Event;
+        /**
+         * z. B. https://instagram.com/…
+         */
+        externalUrl?: string | null;
         variant?: ('primary' | 'outline') | null;
         id?: string | null;
       }[]
@@ -764,7 +823,9 @@ export interface HomepageHeroBlockSelect<T extends boolean = true> {
     | T
     | {
         label?: T;
-        href?: T;
+        linkMode?: T;
+        eventReference?: T;
+        externalUrl?: T;
         variant?: T;
         id?: T;
       };

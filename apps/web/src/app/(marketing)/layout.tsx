@@ -1,8 +1,9 @@
 import { CookieBannerGate } from "@/components/gdpr/CookieBannerGate";
 import { SiteFooter } from "@/components/layout/SiteFooter";
 import { SiteNav } from "@/components/layout/SiteNav";
+import { SITE_METADATA_DEFAULTS } from "@/lib/metadata/marketing-page-metadata";
 import { navigationService } from "@/lib/services/navigation";
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Bebas_Neue, Orbitron, Rajdhani } from "next/font/google";
 import { Suspense } from "react";
 import "@/styles/global.css";
@@ -42,13 +43,16 @@ function siteMetadataBase(): URL {
 
 export const metadata: Metadata = {
   metadataBase: siteMetadataBase(),
-  title: "DriversClub Hessen",
-  description: "DriversClub Hessen - Tuning Treffen Community Plattform",
-  /** Pinned tab / browser UI tint; matches `tokens.css` color.black */
-  themeColor: "#06060a",
+  title: SITE_METADATA_DEFAULTS.title,
+  description: SITE_METADATA_DEFAULTS.description,
   icons: {
     icon: [{ url: "/icon", type: "image/png", sizes: "32x32" }],
   },
+};
+
+/** Pinned tab / browser UI tint; matches `tokens.css` color.black */
+export const viewport: Viewport = {
+  themeColor: "#06060a",
 };
 
 /**

@@ -14,6 +14,8 @@ export const heroCtaSchema = z.object({
   label: z.string(),
   href: z.string(),
   variant: z.enum(["primary", "outline"]).optional(),
+  /** When true, render with `target="_blank"` (CMS “Externe URL” mode). */
+  openInNewTab: z.boolean().optional(),
 });
 
 export const eventSchema = z.object({
@@ -21,8 +23,6 @@ export const eventSchema = z.object({
   documentId: z.string().optional(),
   slug: z.string(),
   title: z.string(),
-  /** Strapi v5 richtext is Blocks JSON; plain string kept for fallbacks */
-  description: z.union([z.string(), blocksContentSchema]),
   date: z.string(),
   location: z.string(),
   createdAt: z.string().optional(),

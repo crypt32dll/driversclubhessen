@@ -1,7 +1,6 @@
 import type { Event as PayloadEvent, Homepage, Media } from "@/payload-types";
 import type {
   EventInfoCard,
-  HeroCta,
   HomepageFeaturesBlockView,
   HomepageLayoutBlockView,
   HomepageLayoutView,
@@ -9,6 +8,7 @@ import type {
   HomepageSocialBlockView,
 } from "@driversclub/shared";
 
+import { mapPayloadCtaRows } from "@/lib/payload/map-hero-cta";
 import { mapPayloadEvent } from "@/lib/payload/map-event";
 import { mapPayloadMediaToImage } from "@/lib/payload/map-media";
 
@@ -49,24 +49,7 @@ function mapHeroBlock(
     if (img) backgroundImage = img;
   }
 
-  const ctasRaw = b.ctas;
-  const ctas: HeroCta[] = [];
-  if (Array.isArray(ctasRaw)) {
-    for (const row of ctasRaw) {
-      if (!row) continue;
-      const label = nonEmptyString(row.label);
-      const href = nonEmptyString(row.href);
-      if (!label || !href) continue;
-      const v = row.variant;
-      const variant =
-        v === "outline"
-          ? ("outline" as const)
-          : v === "primary"
-            ? ("primary" as const)
-            : undefined;
-      ctas.push({ label, href, variant });
-    }
-  }
+  const ctas = mapPayloadCtaRows(b.ctas);
 
   return {
     blockType: "hero",
@@ -78,7 +61,7 @@ function mapHeroBlock(
     ...(countdownEnd ? { countdownEnd } : {}),
     ...(nonEmptyString(b.badge) ? { badge: nonEmptyString(b.badge) } : {}),
     ...(nonEmptyString(b.tagline) ? { tagline: nonEmptyString(b.tagline) } : {}),
-    ...(ctas.length ? { ctas } : {}),
+    ...(ctas?.length ? { ctas } : {}),
     ...(backgroundImage ? { backgroundImage } : {}),
   };
 }

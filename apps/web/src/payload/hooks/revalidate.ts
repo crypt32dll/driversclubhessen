@@ -22,6 +22,14 @@ export const revalidateEventsDelete: CollectionAfterDeleteHook = async () => {
   await tag(REVALIDATE_TAG_PROFILE, REVALIDATE_TAGS.events);
 };
 
+export const revalidatePages: CollectionAfterChangeHook = async () => {
+  await tag(REVALIDATE_TAG_PROFILE, REVALIDATE_TAGS.pages);
+};
+
+export const revalidatePagesDelete: CollectionAfterDeleteHook = async () => {
+  await tag(REVALIDATE_TAG_PROFILE, REVALIDATE_TAGS.pages);
+};
+
 export const revalidateGallery: CollectionAfterChangeHook = async () => {
   await tag(REVALIDATE_TAG_PROFILE, REVALIDATE_TAGS.gallery);
 };

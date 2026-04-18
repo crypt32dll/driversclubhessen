@@ -10,11 +10,24 @@ import {
   title,
 } from "@/components/marketing/MarketingListPage.css";
 import { Container } from "@/components/ui/Container";
+import {
+  marketingMetadataForPath,
+  SITE_METADATA_DEFAULTS,
+} from "@/lib/metadata/marketing-page-metadata";
 import { eventService } from "@/lib/services/events";
+import type { Metadata } from "next";
 import Link from "next/link";
 
 /** ISR — literal required by Next.js 16 segment config; see marketing `page.tsx` comment. */
 export const revalidate = 3600;
+
+export async function generateMetadata(): Promise<Metadata> {
+  return marketingMetadataForPath("/events", {
+    title: `Events | ${SITE_METADATA_DEFAULTS.title}`,
+    description:
+      "Anstehende Tuning-Treffen und Community-Events von DriversClub Hessen — sortiert nach Datum.",
+  });
+}
 
 export default async function EventsPage() {
   const events = await eventService.getUpcomingEvents().catch(() => []);

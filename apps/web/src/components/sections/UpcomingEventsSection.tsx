@@ -1,6 +1,5 @@
 import { Container } from "@/components/ui/Container";
 import { Reveal } from "@/components/ui/Reveal";
-import { excerptFromEventDescription } from "@/lib/cms/excerpt";
 import type { Event, EventInfoCard } from "@driversclub/shared";
 import Link from "next/link";
 import {
@@ -106,9 +105,6 @@ export function UpcomingEventsSection({
                     })}
                   </div>
                   <div className={eventCardSub}>{event.location}</div>
-                  <p className={eventCardSub}>
-                    {excerptFromEventDescription(event.description)}
-                  </p>
                   <Link href={`/events/${event.slug}`}>Details →</Link>
                 </Reveal>
               ))}

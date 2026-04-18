@@ -42,7 +42,12 @@ function ctasForNextEvent(
   const fromBlock = block.ctas ?? [];
   const filtered = fromBlock.filter((c) => c.href !== eventHref);
   return [
-    { label: "Zum Event", href: eventHref, variant: "primary" as const },
+    {
+      label: "Zum Event",
+      href: eventHref,
+      variant: "primary" as const,
+      openInNewTab: false,
+    },
     ...filtered,
   ];
 }

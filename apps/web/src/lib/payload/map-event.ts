@@ -1,6 +1,7 @@
 import type { Media, Event as PayloadEvent } from "@/payload-types";
-import type { Event, HeroCta } from "@driversclub/shared";
+import type { Event } from "@driversclub/shared";
 
+import { mapPayloadCtaRows } from "@/lib/payload/map-hero-cta";
 import { mapPayloadMediaToImage } from "@/lib/payload/map-media";
 
 function nonEmptyString(v: unknown): string | undefined {
@@ -28,31 +29,6 @@ function normalizeImages(
   return out.length ? out : undefined;
 }
 
-function mapHeroCtas(raw: unknown): HeroCta[] | undefined {
-  type Row = {
-    label?: string | null;
-    href?: string | null;
-    variant?: string | null;
-  };
-  if (!Array.isArray(raw)) return undefined;
-  const out: HeroCta[] = [];
-  for (const row of raw as Row[]) {
-    if (!row) continue;
-    const label = nonEmptyString(row.label);
-    const href = nonEmptyString(row.href);
-    if (!label || !href) continue;
-    const v = row.variant;
-    const variant =
-      v === "outline"
-        ? ("outline" as const)
-        : v === "primary"
-          ? ("primary" as const)
-          : undefined;
-    out.push({ label, href, variant });
-  }
-  return out.length ? out : undefined;
-}
-
 export function mapPayloadEvent(doc: PayloadEvent): Event {
   const dateRaw = doc.date;
   const date =
@@ -63,7 +39,7 @@ export function mapPayloadEvent(doc: PayloadEvent): Event {
   const h = doc.homepageHero;
   let heroCountdownEnd: string | undefined;
   let heroBackgroundImage: Event["heroBackgroundImage"];
-  let heroCtas: HeroCta[] | undefined;
+  let heroCtas: ReturnType<typeof mapPayloadCtaRows> | undefined;
 
   if (h && typeof h === "object") {
     heroCountdownEnd = isoFromPayloadDate(h.countdownEnd);
@@ -72,14 +48,13 @@ export function mapPayloadEvent(doc: PayloadEvent): Event {
       const img = mapPayloadMediaToImage(bg as Media);
       if (img) heroBackgroundImage = img;
     }
-    heroCtas = mapHeroCtas(h.ctas);
+    heroCtas = mapPayloadCtaRows(h.ctas);
   }
 
   return {
     id: typeof doc.id === "number" ? doc.id : undefined,
     slug: doc.slug,
     title: doc.title,
-    description: doc.description,
     date,
     location: doc.location,
     createdAt: doc.createdAt,

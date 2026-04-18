@@ -1,5 +1,6 @@
 import type { CollectionConfig } from "payload";
 
+import { heroCtaRowFields } from "../fields/heroCtas.ts";
 import {
   revalidateEvents,
   revalidateEventsDelete,
@@ -23,7 +24,6 @@ export const Events: CollectionConfig = {
       unique: true,
       index: true,
     },
-    { name: "description", type: "textarea", required: true },
     { name: "date", type: "date", required: true },
     { name: "location", type: "text", required: true },
     {
@@ -91,19 +91,7 @@ export const Events: CollectionConfig = {
           name: "ctas",
           type: "array",
           labels: { singular: "Button", plural: "Buttons" },
-          fields: [
-            { name: "label", type: "text", required: true },
-            { name: "href", type: "text", required: true },
-            {
-              name: "variant",
-              type: "select",
-              defaultValue: "primary",
-              options: [
-                { label: "Primary", value: "primary" },
-                { label: "Outline", value: "outline" },
-              ],
-            },
-          ],
+          fields: heroCtaRowFields,
         },
         {
           name: "backgroundImage",

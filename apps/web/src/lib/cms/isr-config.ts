@@ -4,6 +4,7 @@
  */
 export const REVALIDATE_TAGS = {
   homepage: "cms:homepage",
+  pages: "cms:pages",
   events: "cms:events",
   gallery: "cms:gallery",
   navigation: "cms:navigation",

@@ -1,7 +1,8 @@
-import { EventDescription } from "@/components/content/EventDescription";
 import { Container } from "@/components/ui/Container";
+import { marketingMetadataForPath } from "@/lib/metadata/marketing-page-metadata";
 import { eventService } from "@/lib/services/events";
 import Image from "next/image";
+import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 
 type Props = {
@@ -10,6 +11,23 @@ type Props = {
 
 /** ISR — literal required by Next.js 16 segment config; see marketing `page.tsx` comment. */
 export const revalidate = 3600;
+
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  const { slug } = await params;
+  const event = await eventService.getEventBySlug(slug).catch(() => null);
+  const when = event
+    ? new Date(event.date).toLocaleString("de-DE", {
+        dateStyle: "medium",
+        timeStyle: "short",
+      })
+    : null;
+  return marketingMetadataForPath(`/events/${slug}`, {
+    title: event ? `${event.title} | DriversClub Hessen` : "Event | DriversClub Hessen",
+    description: event
+      ? `${event.title}${when ? ` — ${when}` : ""}${event.location ? ` · ${event.location}` : ""}.`
+      : "Event-Details bei DriversClub Hessen.",
+  });
+}
 
 export default async function EventDetailPage({ params }: Props) {
   const { slug } = await params;
@@ -36,9 +54,6 @@ export default async function EventDetailPage({ params }: Props) {
             />
           </p>
         ) : null}
-        <article style={{ marginTop: "1.5rem" }}>
-          <EventDescription description={event.description} />
-        </article>
       </Container>
     </main>
   );

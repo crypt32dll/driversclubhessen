@@ -9,11 +9,24 @@ import {
   title,
 } from "@/components/marketing/MarketingListPage.css";
 import { Container } from "@/components/ui/Container";
+import {
+  marketingMetadataForPath,
+  SITE_METADATA_DEFAULTS,
+} from "@/lib/metadata/marketing-page-metadata";
 import { galleryService } from "@/lib/services/gallery";
 import Image from "next/image";
+import type { Metadata } from "next";
 
 /** ISR — literal required by Next.js 16 segment config; see marketing `page.tsx` comment. */
 export const revalidate = 3600;
+
+export async function generateMetadata(): Promise<Metadata> {
+  return marketingMetadataForPath("/gallery", {
+    title: `Galerie | ${SITE_METADATA_DEFAULTS.title}`,
+    description:
+      "Impressionen und Bilder aus der DriversClub Hessen Community — direkt aus dem CMS.",
+  });
+}
 
 export default async function GalleryPage() {
   const images = await galleryService.getGalleryItems().catch(() => []);

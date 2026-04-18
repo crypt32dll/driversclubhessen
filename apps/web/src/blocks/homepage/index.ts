@@ -1,16 +1,22 @@
 import type { Block } from "payload";
 
+import { heroCtaRowFields } from "../../fields/heroCtas.ts";
+
 /** Homepage flexible layout — block order = page order. */
 export const homepageLayoutBlocks: Block[] = [
   {
     slug: "hero",
     interfaceName: "HomepageHeroBlock",
-    admin: {
-      description:
-        "Fallback-Hero, wenn kein anstehendes Event existiert. Sobald ein Event ansteht, uebernimmt das naechste Event die Hero-Inhalte (siehe Event → Startseiten-Hero).",
-    },
     fields: [
-      { name: "eyebrow", type: "text", required: true },
+      {
+        name: "eyebrow",
+        type: "text",
+        required: true,
+        admin: {
+          description:
+            "Fallback-Hero, wenn kein anstehendes Event existiert. Sobald ein Event ansteht, uebernimmt das naechste Event die Hero-Inhalte (siehe Event → Startseiten-Hero).",
+        },
+      },
       { name: "titleLine1", type: "text", required: true },
       { name: "titleLine2", type: "text", required: true },
       { name: "dateLabel", type: "text", required: true },
@@ -31,19 +37,7 @@ export const homepageLayoutBlocks: Block[] = [
         name: "ctas",
         type: "array",
         labels: { singular: "Button", plural: "Buttons" },
-        fields: [
-          { name: "label", type: "text", required: true },
-          { name: "href", type: "text", required: true },
-          {
-            name: "variant",
-            type: "select",
-            defaultValue: "primary",
-            options: [
-              { label: "Primary", value: "primary" },
-              { label: "Outline", value: "outline" },
-            ],
-          },
-        ],
+        fields: heroCtaRowFields,
       },
       {
         name: "backgroundImage",
