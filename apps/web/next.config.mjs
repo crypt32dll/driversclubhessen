@@ -3,6 +3,7 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 
 import { withPayload } from "@payloadcms/next/withPayload";
+import { withBotId } from "botid/next/config";
 
 const require = createRequire(import.meta.url);
 const { createVanillaExtractPlugin } = require("@vanilla-extract/next-plugin");
@@ -107,6 +108,8 @@ const nextConfig = {
 
 const withVanillaExtract = createVanillaExtractPlugin();
 
-export default withPayload(withVanillaExtract(nextConfig), {
-  devBundleServerPackages: false,
-});
+export default withBotId(
+  withPayload(withVanillaExtract(nextConfig), {
+    devBundleServerPackages: false,
+  }),
+);
