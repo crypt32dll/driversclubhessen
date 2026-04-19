@@ -23,7 +23,6 @@ export const defaultHomepageLayoutView: HomepageLayoutView =
         sectionLabel: "Das Event",
         titleLead: "Was dich ",
         titleAccent: "erwartet",
-        featuredEventText: "Sonntag · 12:00 - 20:00 · Birstein",
       },
       {
         blockType: "features",

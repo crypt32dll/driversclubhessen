@@ -1,6 +1,7 @@
 import { Container } from "@/components/ui/Container";
 import { Reveal } from "@/components/ui/Reveal";
-import { formatEventDateTimeDe } from "@/lib/format-event-date";
+import { formatFeaturedEventTeaser } from "@/lib/format-featured-event-teaser";
+import { buildEventInfoCardsFromEvent } from "@/lib/homepage/event-info-cards-from-event";
 import type { Event, EventInfoCard } from "@driversclub/shared";
 import Link from "next/link";
 import {
@@ -44,33 +45,33 @@ const STATIC_EVENT_CARDS: readonly EventInfoCard[] = [
 ];
 
 type Props = {
-  /** Optional line from CMS (linked featured event on homepage). */
-  featuredEventText?: string;
-  /** Prefetched in the page to parallelize with homepage (avoids RSC waterfalls). */
-  events: Event[];
+  /** Next upcoming or hero-picked event; drives teaser + info cards on the homepage. */
+  leadEvent: Event | null;
   sectionLabelText?: string;
   titleLead?: string;
   titleAccent?: string;
-  /** Shown when there are no events from Payload; otherwise optional detail cards. */
+  /** Fallback when there is no `leadEvent` (e.g. no upcoming events) — marketing-only cards. */
   eventInfoCards?: readonly EventInfoCard[];
 };
 
 export function UpcomingEventsSection({
-  featuredEventText,
-  events,
+  leadEvent,
   sectionLabelText = "Das Event",
   titleLead = "Was dich ",
   titleAccent = "erwartet",
   eventInfoCards,
 }: Props) {
-  /** CMS “Info-Karten” always win when present — otherwise we used `events` and hid all info cards. */
   const hasCmsInfoCards = eventInfoCards != null && eventInfoCards.length > 0;
 
-  const cardsSource = hasCmsInfoCards
-    ? eventInfoCards
-    : events.length === 0
-      ? STATIC_EVENT_CARDS
-      : null;
+  const featuredEventText = leadEvent
+    ? formatFeaturedEventTeaser(leadEvent)
+    : undefined;
+
+  const cardsSource = leadEvent
+    ? buildEventInfoCardsFromEvent(leadEvent)
+    : hasCmsInfoCards
+      ? eventInfoCards
+      : STATIC_EVENT_CARDS;
 
   return (
     <section className={eventSection} id="aktuell">
@@ -88,30 +89,30 @@ export function UpcomingEventsSection({
           ) : null}
         </Reveal>
         <div className={eventGrid}>
-          {cardsSource
-            ? cardsSource.map((card, index) => (
-                <Reveal
-                  key={`${card.title}-${card.value}-${index}`}
-                  className={eventCard}
-                >
-                  <div className={eventCardIcon}>{card.icon}</div>
-                  <div className={eventCardTitle}>{card.title}</div>
-                  <div className={eventCardValue}>{card.value}</div>
-                  <div className={eventCardSub}>{card.sub}</div>
-                </Reveal>
-              ))
-            : events.map((event) => (
-                <Reveal key={event.slug} className={eventCard}>
-                  <div className={eventCardIcon}>📅</div>
-                  <div className={eventCardTitle}>{event.title}</div>
-                  <div className={eventCardValue}>
-                    {formatEventDateTimeDe(event.date)}
-                  </div>
-                  <div className={eventCardSub}>{event.location}</div>
-                  <Link href={`/events/${event.slug}`}>Details →</Link>
-                </Reveal>
-              ))}
+          {cardsSource.map((card, index) => (
+            <Reveal
+              key={`${card.title}-${card.value}-${index}`}
+              className={eventCard}
+            >
+              <div className={eventCardIcon}>{card.icon}</div>
+              <div className={eventCardTitle}>{card.title}</div>
+              <div className={eventCardValue}>{card.value}</div>
+              <div className={eventCardSub}>{card.sub}</div>
+            </Reveal>
+          ))}
         </div>
+        {leadEvent ? (
+          <Reveal>
+            <p
+              className={eventCardSub}
+              style={{ marginTop: "1.25rem", textAlign: "center" }}
+            >
+              <Link href={`/events/${leadEvent.slug}`}>Details →</Link>
+              {" · "}
+              <Link href="/events">Alle Termine</Link>
+            </p>
+          </Reveal>
+        ) : null}
       </Container>
     </section>
   );

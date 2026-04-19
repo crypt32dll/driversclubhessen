@@ -17,33 +17,91 @@ import {
 import { ButtonLink } from "@/components/ui/ButtonLink";
 import { Container } from "@/components/ui/Container";
 import { Reveal } from "@/components/ui/Reveal";
-import type { HomepageLocationBlockView } from "@driversclub/shared";
+import {
+  buildGoogleMapsUrlFromEvent,
+  buildLocationRowsFromEvent,
+  mapPreviewPrimarySecondary,
+} from "@/lib/homepage/location-from-event";
+import type { Event, HomepageLocationBlockView } from "@driversclub/shared";
 import Link from "next/link";
 
 const DEFAULT_MAP =
   "https://maps.google.com/?q=Industriestraße+6+63633+Birstein";
 
-type Props = { block: HomepageLocationBlockView };
+type Props = {
+  block: HomepageLocationBlockView;
+  /** Wenn gesetzt: Anfahrt-Inhalt aus Event (wie Lead-Event / Hero). */
+  leadEvent: Event | null;
+};
 
-export function HomepageLocationBlock({ block }: Props) {
-  const mapUrl = block.mapUrl ?? DEFAULT_MAP;
-  const hasRows = block.rows && block.rows.length > 0;
+export function HomepageLocationBlock({ block, leadEvent }: Props) {
+  const fromEvent = leadEvent != null;
+
+  const headingSectionLabel =
+    leadEvent?.homeLocationSectionLabel?.trim() ||
+    block.sectionLabel ||
+    "Anfahrt";
+  const headingTitleLead =
+    leadEvent?.homeLocationTitleLead?.trim() || block.titleLead || "Der ";
+  const headingTitleAccent =
+    leadEvent?.homeLocationTitleAccent?.trim() ||
+    block.titleAccent ||
+    "Treffpunkt";
+
+  const mapUrl = fromEvent
+    ? buildGoogleMapsUrlFromEvent(leadEvent)
+    : (block.mapUrl ?? DEFAULT_MAP);
+
+  const eventRows = fromEvent ? buildLocationRowsFromEvent(leadEvent) : null;
+  const hasCmsRows = Boolean(block.rows && block.rows.length > 0);
+
+  const mapPreview = fromEvent
+    ? mapPreviewPrimarySecondary(leadEvent)
+    : { primary: "Industriestraße 6", secondary: "63633 Birstein" };
 
   return (
     <section className={locationSection} id="location">
       <Container>
         <Reveal>
-          <p className={sectionLabel}>{block.sectionLabel ?? "Anfahrt"}</p>
+          <p className={sectionLabel}>{headingSectionLabel}</p>
           <h2 className={sectionTitle}>
-            {`${block.titleLead ?? "Der "} `}
-            <span className={sectionTitleAccent}>
-              {block.titleAccent ?? "Treffpunkt"}
-            </span>
+            {`${headingTitleLead} `}
+            <span className={sectionTitleAccent}>{headingTitleAccent}</span>
           </h2>
         </Reveal>
         <div className={locationContent}>
           <div className={locationInfo}>
-            {hasRows ? (
+            {fromEvent && eventRows ? (
+              <>
+                {eventRows.map((row, index) => (
+                  <Reveal
+                    key={`${row.label}-${index}`}
+                    className={locationDetail}
+                  >
+                    <div className={locIcon}>{row.icon}</div>
+                    <div>
+                      <div className={locLabel}>{row.label}</div>
+                      <div
+                        className={locValue}
+                        style={{ whiteSpace: "pre-line" }}
+                      >
+                        {row.value}
+                      </div>
+                    </div>
+                  </Reveal>
+                ))}
+                <Reveal>
+                  <ButtonLink
+                    href={mapUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className={mapCtaInline}
+                  >
+                    In Google Maps öffnen
+                  </ButtonLink>
+                </Reveal>
+              </>
+            ) : hasCmsRows ? (
               <>
                 {block.rows?.map((row, index) => (
                   <Reveal
@@ -139,9 +197,13 @@ export function HomepageLocationBlock({ block }: Props) {
             >
               <div className={mapPin}>📍</div>
               <span>
-                Industriestraße 6
-                <br />
-                63633 Birstein
+                {mapPreview.primary}
+                {mapPreview.secondary ? (
+                  <>
+                    <br />
+                    {mapPreview.secondary}
+                  </>
+                ) : null}
               </span>
               <span className={mapHint}>Klicken um Google Maps zu öffnen</span>
             </Link>

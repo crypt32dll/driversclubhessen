@@ -1,6 +1,7 @@
 import type { GlobalConfig } from "payload";
 
 import { homepageLayoutBlocks } from "../blocks/homepage/index.ts";
+import { ensureHomepageLayoutBlockNames } from "../payload/hooks/homepage-layout-block-names.ts";
 import { revalidateHomepage } from "../payload/hooks/revalidate.ts";
 
 export const Homepage: GlobalConfig = {
@@ -119,6 +120,18 @@ export const Homepage: GlobalConfig = {
     },
   ],
   hooks: {
+    afterRead: [
+      ({ doc }) => {
+        ensureHomepageLayoutBlockNames(doc as Record<string, unknown>);
+        return doc;
+      },
+    ],
+    beforeChange: [
+      ({ data }) => {
+        ensureHomepageLayoutBlockNames(data as Record<string, unknown>);
+        return data;
+      },
+    ],
     afterChange: [revalidateHomepage],
   },
 };

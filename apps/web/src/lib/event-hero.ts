@@ -1,10 +1,15 @@
-import type { Event, HeroCta } from "@driversclub/shared";
+import type {
+  Event,
+  HeroCta,
+  HomepageHeroBlockView,
+} from "@driversclub/shared";
+
+import { formatEventDateLabelDe } from "@/lib/format-event-date";
 
 function isGalleryCta(href: string): boolean {
   const path = href.trim().split("?")[0]?.split("#")[0] ?? "";
   return path === "/gallery" || path.startsWith("/gallery/");
 }
-import type { HomepageHeroBlockView } from "@driversclub/shared";
 
 const DEFAULT_COUNTDOWN_FALLBACK = "2026-04-19T12:00:00";
 
@@ -27,23 +32,6 @@ export function splitEventTitle(title: string): {
   const i = t.indexOf(" ");
   if (i === -1) return { line1: t, line2: "" };
   return { line1: t.slice(0, i), line2: t.slice(i + 1).trim() };
-}
-
-/** Display line like `19 · 04 · 2026` from an ISO date or datetime string. */
-export function formatEventDateLabelDe(dateIso: string): string {
-  const day = dateIso.slice(0, 10);
-  if (day.length !== 10) return dateIso;
-  const [y, m, d] = day.split("-").map(Number);
-  if (!y || !m || !d) return dateIso;
-  const dd = String(d).padStart(2, "0");
-  const mm = String(m).padStart(2, "0");
-  return `${dd} · ${mm} · ${y}`;
-}
-
-function countdownIsoFromEventDate(dateIso: string): string {
-  const day = dateIso.slice(0, 10);
-  if (day.length !== 10) return dateIso;
-  return `${day}T12:00:00`;
 }
 
 function ctasForFeaturedEvent(featured: Event): readonly HeroCta[] | undefined {
@@ -84,7 +72,7 @@ export type MergedHeroProps = {
  * 2. **`nextUpcoming`** — first upcoming event when no relationship
  * 3. **Site defaults** — when no event is available
  *
- * Per-field overrides and CTAs come from the event’s `homepageHero` group only.
+ * Datum- und Countdown-Anzeige kommen immer aus `event.date`; optionale Overrides nur für Texte/Bilder in `homepageHero`.
  */
 export function mergeHomepageHero(
   block: HomepageHeroBlockView,
@@ -107,15 +95,11 @@ export function mergeHomepageHero(
     source.location ||
     HERO_FALLBACK_COPY.titleLine2;
 
-  const dateLabel =
-    source.heroDateLabel?.trim() ||
-    formatEventDateLabelDe(source.date) ||
-    HERO_FALLBACK_COPY.dateLabel;
-
-  const countdownEndIso =
-    source.heroCountdownEnd?.trim() ||
-    countdownIsoFromEventDate(source.date) ||
-    DEFAULT_COUNTDOWN_FALLBACK;
+  const dateIso = source.date?.trim();
+  const dateLabel = dateIso
+    ? formatEventDateLabelDe(dateIso)
+    : HERO_FALLBACK_COPY.dateLabel;
+  const countdownEndIso = dateIso || DEFAULT_COUNTDOWN_FALLBACK;
 
   const backgroundImageUrl =
     source.heroBackgroundImage?.url ?? source.images?.[0]?.url;

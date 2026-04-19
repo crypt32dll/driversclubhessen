@@ -9,7 +9,6 @@ import type {
   HomepageSocialBlockView,
 } from "@driversclub/shared";
 
-import { formatEventDateTimeDe } from "@/lib/format-event-date";
 import { mapPayloadEvent } from "@/lib/payload/map-event";
 import { mapPayloadMediaToImage } from "@/lib/payload/map-media";
 
@@ -17,22 +16,6 @@ function nonEmptyString(v: unknown): string | undefined {
   if (v === null || v === undefined) return undefined;
   const s = String(v).trim();
   return s.length > 0 ? s : undefined;
-}
-
-function formatFeaturedEventText(
-  ev: PayloadEvent | null | undefined,
-): string | undefined {
-  if (!ev || typeof ev !== "object") return undefined;
-  try {
-    const mapped = mapPayloadEvent(ev);
-    if (!mapped.date) {
-      return [mapped.title, mapped.location].filter(Boolean).join(" · ");
-    }
-    const when = formatEventDateTimeDe(mapped.date);
-    return [when, mapped.title, mapped.location].filter(Boolean).join(" · ");
-  } catch {
-    return undefined;
-  }
 }
 
 function mapHeroBlock(
@@ -92,18 +75,6 @@ function mapEventBlock(
     }
   }
 
-  const fe = b.featuredEvent;
-  let featuredEventSlug: string | undefined;
-  let featuredEventText: string | undefined;
-  if (fe != null && typeof fe === "object") {
-    featuredEventText = formatFeaturedEventText(fe as PayloadEvent);
-    try {
-      featuredEventSlug = mapPayloadEvent(fe as PayloadEvent).slug;
-    } catch {
-      featuredEventSlug = undefined;
-    }
-  }
-
   return {
     blockType: "event",
     id: nonEmptyString(b.id) ?? undefined,
@@ -117,8 +88,6 @@ function mapEventBlock(
       ? { titleAccent: nonEmptyString(b.titleAccent) }
       : {}),
     ...(infoCards.length ? { infoCards } : {}),
-    ...(featuredEventSlug ? { featuredEventSlug } : {}),
-    ...(featuredEventText ? { featuredEventText } : {}),
   };
 }
 

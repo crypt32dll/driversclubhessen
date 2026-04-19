@@ -10,12 +10,6 @@ function nonEmptyString(v: unknown): string | undefined {
   return s.length > 0 ? s : undefined;
 }
 
-function isoFromPayloadDate(v: unknown): string | undefined {
-  if (v instanceof Date) return v.toISOString();
-  if (typeof v === "string" && v.length > 0) return v;
-  return undefined;
-}
-
 function normalizeImages(
   raw: PayloadEvent["images"],
 ): Event["images"] | undefined {
@@ -79,12 +73,10 @@ export function mapPayloadEvent(doc: PayloadEvent): Event {
       : new Date(dateRaw as string | number | Date).toISOString();
 
   const h = doc.homepageHero;
-  let heroCountdownEnd: string | undefined;
   let heroBackgroundImage: Event["heroBackgroundImage"];
   let heroCtas: ReturnType<typeof mapPayloadCtaRows> | undefined;
 
   if (h && typeof h === "object") {
-    heroCountdownEnd = isoFromPayloadDate(h.countdownEnd);
     const bg = h.backgroundImage;
     if (bg != null && typeof bg === "object" && "url" in bg) {
       const img = mapPayloadMediaToImage(bg as Media);
@@ -113,6 +105,52 @@ export function mapPayloadEvent(doc: PayloadEvent): Event {
     ...(nonEmptyString(doc.address)
       ? { address: nonEmptyString(doc.address) }
       : {}),
+    ...(nonEmptyString(doc.admissionNote)
+      ? { admissionNote: nonEmptyString(doc.admissionNote) }
+      : {}),
+    ...(nonEmptyString(doc.mapsUrl)
+      ? { mapsUrl: nonEmptyString(doc.mapsUrl) }
+      : {}),
+    ...(nonEmptyString(doc.homeEventSectionLabel)
+      ? { homeEventSectionLabel: nonEmptyString(doc.homeEventSectionLabel) }
+      : {}),
+    ...(nonEmptyString(doc.homeEventTitleLead)
+      ? { homeEventTitleLead: nonEmptyString(doc.homeEventTitleLead) }
+      : {}),
+    ...(nonEmptyString(doc.homeEventTitleAccent)
+      ? { homeEventTitleAccent: nonEmptyString(doc.homeEventTitleAccent) }
+      : {}),
+    ...(nonEmptyString(doc.homeLocationSectionLabel)
+      ? {
+          homeLocationSectionLabel: nonEmptyString(
+            doc.homeLocationSectionLabel,
+          ),
+        }
+      : {}),
+    ...(nonEmptyString(doc.homeLocationTitleLead)
+      ? { homeLocationTitleLead: nonEmptyString(doc.homeLocationTitleLead) }
+      : {}),
+    ...(nonEmptyString(doc.homeLocationTitleAccent)
+      ? { homeLocationTitleAccent: nonEmptyString(doc.homeLocationTitleAccent) }
+      : {}),
+    ...(nonEmptyString(doc.homeAboutSectionLabel)
+      ? { homeAboutSectionLabel: nonEmptyString(doc.homeAboutSectionLabel) }
+      : {}),
+    ...(nonEmptyString(doc.homeAboutTitleLead)
+      ? { homeAboutTitleLead: nonEmptyString(doc.homeAboutTitleLead) }
+      : {}),
+    ...(nonEmptyString(doc.homeAboutTitleAccent)
+      ? { homeAboutTitleAccent: nonEmptyString(doc.homeAboutTitleAccent) }
+      : {}),
+    ...(nonEmptyString(doc.collabPartnerBadge)
+      ? { collabPartnerBadge: nonEmptyString(doc.collabPartnerBadge) }
+      : {}),
+    ...(nonEmptyString(doc.collabPartnerName)
+      ? { collabPartnerName: nonEmptyString(doc.collabPartnerName) }
+      : {}),
+    ...(nonEmptyString(doc.collabAboutBody)
+      ? { collabAboutBody: nonEmptyString(doc.collabAboutBody) }
+      : {}),
     createdAt: doc.createdAt,
     images: normalizeImages(doc.images),
     ...(faq ? { faq } : {}),
@@ -128,9 +166,6 @@ export function mapPayloadEvent(doc: PayloadEvent): Event {
           ...(nonEmptyString(h.titleLine2)
             ? { heroTitleLine2: nonEmptyString(h.titleLine2) }
             : {}),
-          ...(nonEmptyString(h.dateLabel)
-            ? { heroDateLabel: nonEmptyString(h.dateLabel) }
-            : {}),
           ...(nonEmptyString(h.badge)
             ? { heroBadge: nonEmptyString(h.badge) }
             : {}),
@@ -139,7 +174,6 @@ export function mapPayloadEvent(doc: PayloadEvent): Event {
             : {}),
         }
       : {}),
-    ...(heroCountdownEnd ? { heroCountdownEnd } : {}),
     ...(heroCtas ? { heroCtas } : {}),
     ...(heroBackgroundImage ? { heroBackgroundImage } : {}),
   };

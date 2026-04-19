@@ -56,7 +56,7 @@ export const Events: CollectionConfig = {
       required: true,
       admin: {
         description:
-          "Datum und optional Uhrzeit (Kalender-Export und Event-Seite). Ohne Uhrzeit = ganztägig im Kalender.",
+          "Einzige Zeitquelle: Kalender-Export, Hero-Datumszeile und Countdown auf Start- und Event-Seite leiten sich daraus ab. Mit Uhrzeit = Startzeit; ohne konkrete Uhrzeit = ganztägig (Kalender/Hero entsprechend).",
         date: {
           pickerAppearance: "dayAndTime",
         },
@@ -77,6 +77,15 @@ export const Events: CollectionConfig = {
       admin: {
         description:
           "Optionale vollständige Adresse (Straße, PLZ Ort). Wird in Kalender-Einträgen (ICS / Google) zusätzlich zum Treffpunkt übernommen.",
+      },
+    },
+    {
+      name: "admissionNote",
+      type: "textarea",
+      label: "Eintritt / Ticketing",
+      admin: {
+        description:
+          "Optional für die Startseiten-Info-Karte «Eintritt» (z. B. «Kostenlos» oder erste Zeile Preis, zweite Zeile Hinweis). Leer = Standard «Kostenlos».",
       },
     },
     {
@@ -215,7 +224,7 @@ export const Events: CollectionConfig = {
       label: "Startseiten-Hero",
       admin: {
         description:
-          "Wenn dieses Event das naechste anstehende ist, ersetzt es die Hero-Inhalte der Startseite (Titel, Countdown, optional Hintergrund). Leere Felder nutzen sinnvolle Standardwerte aus Titel und Datum.",
+          "Wenn dieses Event das naechste anstehende ist, steuert es die Startseiten-Hero-Inhalte (Titel, optional Hintergrund). Datum und Countdown kommen immer aus dem Feld «Datum» oben.",
       },
       fields: [
         {
@@ -242,27 +251,6 @@ export const Events: CollectionConfig = {
           admin: {
             description:
               "Zweite grosse Titelzeile im Startseiten-Hero (oft Akzent-Wort).",
-          },
-        },
-        {
-          name: "dateLabel",
-          type: "text",
-          label: "Datumszeile (optional)",
-          admin: {
-            description:
-              "Steht unter dem Titel, z. B. formatiertes Datum. Leer = automatisch aus Event-Datum.",
-          },
-        },
-        {
-          name: "countdownEnd",
-          type: "date",
-          label: "Countdown-Ziel",
-          admin: {
-            description:
-              "Datum und Uhrzeit fuer den Countdown. Leer = Event-Datum um 12:00 Uhr.",
-            date: {
-              pickerAppearance: "dayAndTime",
-            },
           },
         },
         {
@@ -300,6 +288,142 @@ export const Events: CollectionConfig = {
           admin: {
             description:
               "Grossflaechiges Hero-Hintergrundbild auf der Startseite (LCP-relevant).",
+          },
+        },
+      ],
+    },
+    {
+      type: "collapsible",
+      label: "Startseite — Anfahrt & Event-Abschnitt",
+      admin: {
+        initCollapsed: true,
+        description:
+          "Gilt, wenn dieses Event auf der Startseite als aktuelles Lead-Event erscheint (gleiche automatische Auswahl wie beim Hero — keine extra Referenz im Homepage-Layout). Leer = Vorgaben aus den jeweiligen Homepage-Bloecken.",
+      },
+      fields: [
+        {
+          name: "mapsUrl",
+          type: "text",
+          label: "Google Maps-Link",
+          admin: {
+            description:
+              "Optional: vollstaendige https://-URL fuer «In Google Maps oeffnen». Leer = automatische Suche aus Adresse bzw. Treffpunkt.",
+          },
+        },
+        {
+          name: "homeEventSectionLabel",
+          type: "text",
+          label: "Kicker «Das Event»",
+          admin: {
+            description:
+              "Kleine Zeile ueber dem Event-Abschnitt auf der Startseite. Leer = Wert aus Homepage-Layout.",
+          },
+        },
+        {
+          name: "homeEventTitleLead",
+          type: "text",
+          label: "Titel-Anfang «Das Event»",
+          admin: {
+            description:
+              "Erster Teil der grossen Ueberschrift. Leer = Homepage-Layout.",
+          },
+        },
+        {
+          name: "homeEventTitleAccent",
+          type: "text",
+          label: "Titel-Akzent «Das Event»",
+          admin: {
+            description:
+              "Hervorgehobener Teil der Ueberschrift. Leer = Homepage-Layout.",
+          },
+        },
+        {
+          name: "homeLocationSectionLabel",
+          type: "text",
+          label: "Kicker «Anfahrt»",
+          admin: {
+            description:
+              "Kleine Zeile ueber dem Anfahrt-Block. Leer = Homepage-Layout.",
+          },
+        },
+        {
+          name: "homeLocationTitleLead",
+          type: "text",
+          label: "Titel-Anfang «Anfahrt»",
+          admin: {
+            description:
+              "Erster Teil der grossen Ueberschrift. Leer = Homepage-Layout.",
+          },
+        },
+        {
+          name: "homeLocationTitleAccent",
+          type: "text",
+          label: "Titel-Akzent «Anfahrt»",
+          admin: {
+            description: "Hervorgehobener Teil. Leer = Homepage-Layout.",
+          },
+        },
+      ],
+    },
+    {
+      type: "collapsible",
+      label: "Startseite — Kollaboration (Über uns)",
+      admin: {
+        initCollapsed: true,
+        description:
+          "Linkes Logo/Label, Partner-Name und Beschreibung fuer den Abschnitt «Die Kollaboration», wenn dieses Event das aktuelle Lead-Event ist. Rechts bleibt DriversClub Hessen (Anzeige aus Homepage-Layout oder Standard).",
+      },
+      fields: [
+        {
+          name: "homeAboutSectionLabel",
+          type: "text",
+          label: "Kicker «Über uns»",
+          admin: {
+            description:
+              "Kleine Zeile ueber dem Kollaborations-Block. Leer = Homepage-Layout.",
+          },
+        },
+        {
+          name: "homeAboutTitleLead",
+          type: "text",
+          label: "Titel-Anfang «Kollaboration»",
+          admin: {
+            description:
+              "Erster Teil der grossen Ueberschrift. Leer = Homepage-Layout.",
+          },
+        },
+        {
+          name: "homeAboutTitleAccent",
+          type: "text",
+          label: "Titel-Akzent «Kollaboration»",
+          admin: {
+            description: "Hervorgehobener Teil. Leer = Homepage-Layout.",
+          },
+        },
+        {
+          name: "collabPartnerBadge",
+          type: "text",
+          label: "Partner — Badge (Kreis)",
+          admin: {
+            description:
+              "Kurzes Label im linken Kreis (z. B. «MI FAMILIA & FRIENDS»). Leer = Werte aus dem Homepage-Block «Ueber uns».",
+          },
+        },
+        {
+          name: "collabPartnerName",
+          type: "text",
+          label: "Partner — Name",
+          admin: {
+            description: "Name unter dem linken Kreis. Leer = Homepage-Block.",
+          },
+        },
+        {
+          name: "collabAboutBody",
+          type: "textarea",
+          label: "Beschreibungstext",
+          admin: {
+            description:
+              "Fliesstext unter den Logos. Leer = Text aus dem Homepage-Block.",
           },
         },
       ],

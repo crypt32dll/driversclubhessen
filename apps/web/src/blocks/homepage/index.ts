@@ -58,19 +58,26 @@ export const homepageLayoutBlocks: Block[] = [
         name: "sectionLabel",
         type: "text",
         defaultValue: "Das Event",
-        admin: { description: "Kleine Ueberschrift ueber dem Abschnitt." },
+        admin: {
+          description:
+            "Kleine Ueberschrift. Mit Lead-Event: optional auch im Event («Startseite — Anfahrt & Event-Abschnitt»); dieses Feld ist Fallback ohne Event oder wenn das Event-Feld leer ist.",
+        },
       },
       {
         name: "titleLead",
         type: "text",
         defaultValue: "Was dich ",
-        admin: { description: "Titel-Anfang (normale Schrift)." },
+        admin: {
+          description: "Titel-Anfang (normale Schrift). Fallback wie oben.",
+        },
       },
       {
         name: "titleAccent",
         type: "text",
         defaultValue: "erwartet",
-        admin: { description: "Titel-Akzentteil (hervorgehoben)." },
+        admin: {
+          description: "Titel-Akzentteil (hervorgehoben). Fallback wie oben.",
+        },
       },
       {
         name: "infoCards",
@@ -78,7 +85,7 @@ export const homepageLayoutBlocks: Block[] = [
         labels: { singular: "Info-Karte", plural: "Info-Karten" },
         admin: {
           description:
-            "Anzeige wenn keine Events aus der Datenbank geladen werden.",
+            "Nur Fallback ohne Lead-Event (kein anstehendes Event). Sonst: Karten automatisch aus dem Event.",
         },
         fields: [
           { name: "icon", type: "text", required: true },
@@ -95,7 +102,7 @@ export const homepageLayoutBlocks: Block[] = [
         label: "Hervorgehobenes Event",
         admin: {
           description:
-            "Daten fuer den Event-Teaser (wenn die Seite Events aus der API laedt). Info-Karten darueber gelten als Fallback ohne API-Daten.",
+            "Optional; wird im Frontend nicht mehr fuer die Startseite ausgewertet — Lead-Event wie beim Hero (naechstes Event bzw. Hero-Event).",
         },
       },
     ],
@@ -219,43 +226,61 @@ export const homepageLayoutBlocks: Block[] = [
         name: "sectionLabel",
         type: "text",
         defaultValue: "Veranstalter",
-        admin: { description: "Kleine Ueberschrift." },
+        admin: {
+          description:
+            "Kleine Ueberschrift. Mit Lead-Event: optional auch im Event («Startseite — Kollaboration»); dieses Feld ist Fallback ohne Event oder wenn das Event-Feld leer ist.",
+        },
       },
       {
         name: "titleLead",
         type: "text",
         defaultValue: "Die ",
-        admin: { description: "Titel-Anfang." },
+        admin: {
+          description: "Titel-Anfang. Fallback wie oben.",
+        },
       },
       {
         name: "titleAccent",
         type: "text",
         defaultValue: "Kollaboration",
-        admin: { description: "Titel-Akzent." },
+        admin: {
+          description: "Titel-Akzent. Fallback wie oben.",
+        },
       },
       {
         name: "leftBadge",
         type: "text",
         defaultValue: "MI FAMILIA & FRIENDS",
-        admin: { description: "Kleines Label in der linken Spalte." },
+        admin: {
+          description:
+            "Linkes Kreis-Label. Mit aktuellem Lead-Event: kann im Event unter «Kollaboration» überschrieben werden.",
+        },
       },
       {
         name: "leftName",
         type: "text",
         defaultValue: "Mi Familia",
-        admin: { description: "Name / Titel in der linken Spalte." },
+        admin: {
+          description:
+            "Name links unter dem Kreis. Mit Lead-Event: optional aus dem Event.",
+        },
       },
       {
         name: "rightBadge",
         type: "text",
         defaultValue: "DRIVERS CLUB HESSEN",
-        admin: { description: "Kleines Label in der rechten Spalte." },
+        admin: {
+          description:
+            "Rechtes Kreis-Label (DriversClub Hessen) — typischerweise unverändert.",
+        },
       },
       {
         name: "rightName",
         type: "text",
         defaultValue: "DCH Est. 2024",
-        admin: { description: "Name / Titel in der rechten Spalte." },
+        admin: {
+          description: "Name rechts unter dem Kreis (DCH).",
+        },
       },
       {
         name: "body",
@@ -263,7 +288,7 @@ export const homepageLayoutBlocks: Block[] = [
         label: "Beschreibung",
         admin: {
           description:
-            "Fliesstext im «Ueber uns»-Bereich zwischen den beiden Spalten.",
+            "Fliesstext unter den Logos. Mit Lead-Event: optional aus dem Event («Beschreibungstext»).",
         },
       },
     ],
@@ -277,19 +302,26 @@ export const homepageLayoutBlocks: Block[] = [
         name: "sectionLabel",
         type: "text",
         defaultValue: "Anfahrt",
-        admin: { description: "Kleine Ueberschrift." },
+        admin: {
+          description:
+            "Kleine Ueberschrift. Mit Lead-Event: optional auch im Event («Startseite — Anfahrt & Event-Abschnitt»); dieses Feld ist Fallback ohne Event oder wenn das Event-Feld leer ist.",
+        },
       },
       {
         name: "titleLead",
         type: "text",
         defaultValue: "Der ",
-        admin: { description: "Titel-Anfang." },
+        admin: {
+          description: "Titel-Anfang. Fallback wie oben.",
+        },
       },
       {
         name: "titleAccent",
         type: "text",
         defaultValue: "Treffpunkt",
-        admin: { description: "Titel-Akzent." },
+        admin: {
+          description: "Titel-Akzent. Fallback wie oben.",
+        },
       },
       {
         name: "mapUrl",
@@ -299,7 +331,7 @@ export const homepageLayoutBlocks: Block[] = [
           "https://maps.google.com/?q=Industriestraße+6+63633+Birstein",
         admin: {
           description:
-            "Link, der beim Klick auf die Karte geoeffnet wird (vollstaendige https://… URL).",
+            "Nur wenn kein Lead-Event: Link beim Klick. Mit aktuellem Event: Feld «Google Maps-Link» am Event (oder automatische Suche).",
         },
       },
       {
@@ -317,7 +349,7 @@ export const homepageLayoutBlocks: Block[] = [
         labels: { singular: "Zeile", plural: "Zeilen" },
         admin: {
           description:
-            "Optional: strukturierte Infos (Adresse, Zeiten, …). Leer = Standard-Fallback im Frontend.",
+            "Nur ohne Lead-Event: manuelle Zeilen. Mit aktuellem Event: Adresse, Termin und Eintritt aus dem Event.",
         },
         fields: [
           { name: "icon", type: "text", defaultValue: "📍" },

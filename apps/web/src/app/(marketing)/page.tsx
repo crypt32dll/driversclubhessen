@@ -27,11 +27,7 @@ export default async function MarketingPage() {
 
   return (
     <main className={marketingHome}>
-      <RenderBlocks
-        blocks={bundle.layout.blocks}
-        events={events}
-        nextEvent={nextEvent}
-      />
+      <RenderBlocks blocks={bundle.layout.blocks} nextEvent={nextEvent} />
     </main>
   );
 }

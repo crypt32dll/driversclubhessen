@@ -44,6 +44,27 @@ export const eventSchema = z.object({
   location: z.string(),
   /** Straße, PLZ Ort — für Kalender-LOCATION und Beschreibung. */
   address: z.string().optional(),
+  /** Optional: Eintritt / Ticketing-Zeile für Homepage-Info-Karten (erste Zeile = Hauptzeile). */
+  admissionNote: z.string().optional(),
+  /** Optional: vollständiger Google-Maps-Link; leer = Suche aus Adresse/Treffpunkt. */
+  mapsUrl: z.string().optional(),
+  /** Optional: Kicker im Homepage-Block «Das Event» wenn dieses Event Lead-Event ist. */
+  homeEventSectionLabel: z.string().optional(),
+  homeEventTitleLead: z.string().optional(),
+  homeEventTitleAccent: z.string().optional(),
+  /** Homepage «Anfahrt»-Überschriften bei Lead-Event. */
+  homeLocationSectionLabel: z.string().optional(),
+  homeLocationTitleLead: z.string().optional(),
+  homeLocationTitleAccent: z.string().optional(),
+  /** Homepage «Über uns»-Überschriften bei Lead-Event. */
+  homeAboutSectionLabel: z.string().optional(),
+  homeAboutTitleLead: z.string().optional(),
+  homeAboutTitleAccent: z.string().optional(),
+  /** Partner-Spalte links im Homepage-Block «Kollaboration», wenn dieses Event Lead-Event ist. */
+  collabPartnerBadge: z.string().optional(),
+  collabPartnerName: z.string().optional(),
+  /** Fliesstext «Über uns» auf der Startseite für dieses Event. */
+  collabAboutBody: z.string().optional(),
   /** Defaults to `planned` in the mapper when missing (legacy rows). */
   status: eventStatusSchema.optional(),
   createdAt: z.string().optional(),
@@ -52,9 +73,6 @@ export const eventSchema = z.object({
   heroEyebrow: z.string().optional(),
   heroTitleLine1: z.string().optional(),
   heroTitleLine2: z.string().optional(),
-  heroDateLabel: z.string().optional(),
-  /** ISO datetime for countdown target */
-  heroCountdownEnd: z.string().optional(),
   heroBadge: z.string().optional(),
   heroTagline: z.string().optional(),
   heroCtas: z.array(heroCtaSchema).optional(),

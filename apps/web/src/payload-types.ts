@@ -201,7 +201,7 @@ export interface Event {
    */
   slug: string;
   /**
-   * Datum und optional Uhrzeit (Kalender-Export und Event-Seite). Ohne Uhrzeit = ganztägig im Kalender.
+   * Einzige Zeitquelle: Kalender-Export, Hero-Datumszeile und Countdown auf Start- und Event-Seite leiten sich daraus ab. Mit Uhrzeit = Startzeit; ohne konkrete Uhrzeit = ganztägig (Kalender/Hero entsprechend).
    */
   date: string;
   /**
@@ -212,6 +212,10 @@ export interface Event {
    * Optionale vollständige Adresse (Straße, PLZ Ort). Wird in Kalender-Einträgen (ICS / Google) zusätzlich zum Treffpunkt übernommen.
    */
   address?: string | null;
+  /**
+   * Optional für die Startseiten-Info-Karte «Eintritt» (z. B. «Kostenlos» oder erste Zeile Preis, zweite Zeile Hinweis). Leer = Standard «Kostenlos».
+   */
+  admissionNote?: string | null;
   /**
    * «Abgesagt» blendet das Event auf der öffentlichen Übersicht und im Kalender-Feed aus; die Detail-URL bleibt erreichbar. «Ausverkauft» zeigt ein Badge, bleibt aber sichtbar.
    */
@@ -254,7 +258,7 @@ export interface Event {
    */
   metaDescription?: string | null;
   /**
-   * Wenn dieses Event das naechste anstehende ist, ersetzt es die Hero-Inhalte der Startseite (Titel, Countdown, optional Hintergrund). Leere Felder nutzen sinnvolle Standardwerte aus Titel und Datum.
+   * Wenn dieses Event das naechste anstehende ist, steuert es die Startseiten-Hero-Inhalte (Titel, optional Hintergrund). Datum und Countdown kommen immer aus dem Feld «Datum» oben.
    */
   homepageHero?: {
     /**
@@ -269,14 +273,6 @@ export interface Event {
      * Zweite grosse Titelzeile im Startseiten-Hero (oft Akzent-Wort).
      */
     titleLine2?: string | null;
-    /**
-     * Steht unter dem Titel, z. B. formatiertes Datum. Leer = automatisch aus Event-Datum.
-     */
-    dateLabel?: string | null;
-    /**
-     * Datum und Uhrzeit fuer den Countdown. Leer = Event-Datum um 12:00 Uhr.
-     */
-    countdownEnd?: string | null;
     /**
      * Kompaktes Label im Hero (z. B. Event-Name oder Sponsoring).
      */
@@ -315,6 +311,58 @@ export interface Event {
      */
     backgroundImage?: (number | null) | Media;
   };
+  /**
+   * Optional: vollstaendige https://-URL fuer «In Google Maps oeffnen». Leer = automatische Suche aus Adresse bzw. Treffpunkt.
+   */
+  mapsUrl?: string | null;
+  /**
+   * Kleine Zeile ueber dem Event-Abschnitt auf der Startseite. Leer = Wert aus Homepage-Layout.
+   */
+  homeEventSectionLabel?: string | null;
+  /**
+   * Erster Teil der grossen Ueberschrift. Leer = Homepage-Layout.
+   */
+  homeEventTitleLead?: string | null;
+  /**
+   * Hervorgehobener Teil der Ueberschrift. Leer = Homepage-Layout.
+   */
+  homeEventTitleAccent?: string | null;
+  /**
+   * Kleine Zeile ueber dem Anfahrt-Block. Leer = Homepage-Layout.
+   */
+  homeLocationSectionLabel?: string | null;
+  /**
+   * Erster Teil der grossen Ueberschrift. Leer = Homepage-Layout.
+   */
+  homeLocationTitleLead?: string | null;
+  /**
+   * Hervorgehobener Teil. Leer = Homepage-Layout.
+   */
+  homeLocationTitleAccent?: string | null;
+  /**
+   * Kleine Zeile ueber dem Kollaborations-Block. Leer = Homepage-Layout.
+   */
+  homeAboutSectionLabel?: string | null;
+  /**
+   * Erster Teil der grossen Ueberschrift. Leer = Homepage-Layout.
+   */
+  homeAboutTitleLead?: string | null;
+  /**
+   * Hervorgehobener Teil. Leer = Homepage-Layout.
+   */
+  homeAboutTitleAccent?: string | null;
+  /**
+   * Kurzes Label im linken Kreis (z. B. «MI FAMILIA & FRIENDS»). Leer = Werte aus dem Homepage-Block «Ueber uns».
+   */
+  collabPartnerBadge?: string | null;
+  /**
+   * Name unter dem linken Kreis. Leer = Homepage-Block.
+   */
+  collabPartnerName?: string | null;
+  /**
+   * Fliesstext unter den Logos. Leer = Text aus dem Homepage-Block.
+   */
+  collabAboutBody?: string | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -470,6 +518,7 @@ export interface EventsSelect<T extends boolean = true> {
   date?: T;
   location?: T;
   address?: T;
+  admissionNote?: T;
   status?: T;
   faq?:
     | T
@@ -493,8 +542,6 @@ export interface EventsSelect<T extends boolean = true> {
         eyebrow?: T;
         titleLine1?: T;
         titleLine2?: T;
-        dateLabel?: T;
-        countdownEnd?: T;
         badge?: T;
         tagline?: T;
         ctas?:
@@ -509,6 +556,19 @@ export interface EventsSelect<T extends boolean = true> {
             };
         backgroundImage?: T;
       };
+  mapsUrl?: T;
+  homeEventSectionLabel?: T;
+  homeEventTitleLead?: T;
+  homeEventTitleAccent?: T;
+  homeLocationSectionLabel?: T;
+  homeLocationTitleLead?: T;
+  homeLocationTitleAccent?: T;
+  homeAboutSectionLabel?: T;
+  homeAboutTitleLead?: T;
+  homeAboutTitleAccent?: T;
+  collabPartnerBadge?: T;
+  collabPartnerName?: T;
+  collabAboutBody?: T;
   updatedAt?: T;
   createdAt?: T;
 }
@@ -654,19 +714,19 @@ export interface HomepageTickerBlock {
  */
 export interface HomepageEventBlock {
   /**
-   * Kleine Ueberschrift ueber dem Abschnitt.
+   * Kleine Ueberschrift. Mit Lead-Event: optional auch im Event («Startseite — Anfahrt & Event-Abschnitt»); dieses Feld ist Fallback ohne Event oder wenn das Event-Feld leer ist.
    */
   sectionLabel?: string | null;
   /**
-   * Titel-Anfang (normale Schrift).
+   * Titel-Anfang (normale Schrift). Fallback wie oben.
    */
   titleLead?: string | null;
   /**
-   * Titel-Akzentteil (hervorgehoben).
+   * Titel-Akzentteil (hervorgehoben). Fallback wie oben.
    */
   titleAccent?: string | null;
   /**
-   * Anzeige wenn keine Events aus der Datenbank geladen werden.
+   * Nur Fallback ohne Lead-Event (kein anstehendes Event). Sonst: Karten automatisch aus dem Event.
    */
   infoCards?:
     | {
@@ -678,7 +738,7 @@ export interface HomepageEventBlock {
       }[]
     | null;
   /**
-   * Daten fuer den Event-Teaser (wenn die Seite Events aus der API laedt). Info-Karten darueber gelten als Fallback ohne API-Daten.
+   * Optional; wird im Frontend nicht mehr fuer die Startseite ausgewertet — Lead-Event wie beim Hero (naechstes Event bzw. Hero-Event).
    */
   featuredEvent?: (number | null) | Event;
   id?: string | null;
@@ -773,35 +833,35 @@ export interface HomepageRulesBlock {
  */
 export interface HomepageAboutBlock {
   /**
-   * Kleine Ueberschrift.
+   * Kleine Ueberschrift. Mit Lead-Event: optional auch im Event («Startseite — Kollaboration»); dieses Feld ist Fallback ohne Event oder wenn das Event-Feld leer ist.
    */
   sectionLabel?: string | null;
   /**
-   * Titel-Anfang.
+   * Titel-Anfang. Fallback wie oben.
    */
   titleLead?: string | null;
   /**
-   * Titel-Akzent.
+   * Titel-Akzent. Fallback wie oben.
    */
   titleAccent?: string | null;
   /**
-   * Kleines Label in der linken Spalte.
+   * Linkes Kreis-Label. Mit aktuellem Lead-Event: kann im Event unter «Kollaboration» überschrieben werden.
    */
   leftBadge?: string | null;
   /**
-   * Name / Titel in der linken Spalte.
+   * Name links unter dem Kreis. Mit Lead-Event: optional aus dem Event.
    */
   leftName?: string | null;
   /**
-   * Kleines Label in der rechten Spalte.
+   * Rechtes Kreis-Label (DriversClub Hessen) — typischerweise unverändert.
    */
   rightBadge?: string | null;
   /**
-   * Name / Titel in der rechten Spalte.
+   * Name rechts unter dem Kreis (DCH).
    */
   rightName?: string | null;
   /**
-   * Fliesstext im «Ueber uns»-Bereich zwischen den beiden Spalten.
+   * Fliesstext unter den Logos. Mit Lead-Event: optional aus dem Event («Beschreibungstext»).
    */
   body?: string | null;
   id?: string | null;
@@ -814,19 +874,19 @@ export interface HomepageAboutBlock {
  */
 export interface HomepageLocationBlock {
   /**
-   * Kleine Ueberschrift.
+   * Kleine Ueberschrift. Mit Lead-Event: optional auch im Event («Startseite — Anfahrt & Event-Abschnitt»); dieses Feld ist Fallback ohne Event oder wenn das Event-Feld leer ist.
    */
   sectionLabel?: string | null;
   /**
-   * Titel-Anfang.
+   * Titel-Anfang. Fallback wie oben.
    */
   titleLead?: string | null;
   /**
-   * Titel-Akzent.
+   * Titel-Akzent. Fallback wie oben.
    */
   titleAccent?: string | null;
   /**
-   * Link, der beim Klick auf die Karte geoeffnet wird (vollstaendige https://… URL).
+   * Nur wenn kein Lead-Event: Link beim Klick. Mit aktuellem Event: Feld «Google Maps-Link» am Event (oder automatische Suche).
    */
   mapUrl?: string | null;
   /**
@@ -834,7 +894,7 @@ export interface HomepageLocationBlock {
    */
   mapImage?: (number | null) | Media;
   /**
-   * Optional: strukturierte Infos (Adresse, Zeiten, …). Leer = Standard-Fallback im Frontend.
+   * Nur ohne Lead-Event: manuelle Zeilen. Mit aktuellem Event: Adresse, Termin und Eintritt aus dem Event.
    */
   rows?:
     | {
