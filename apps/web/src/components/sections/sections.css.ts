@@ -232,9 +232,9 @@ export const estTag = style({
   fontFamily: vars.font.accent,
   fontSize: "0.55rem",
   letterSpacing: "0.25em",
-  color: "rgba(255,255,255,0.25)",
+  color: "rgba(255,255,255,0.55)",
   textTransform: "uppercase",
-  marginTop: "0.5rem",
+  marginTop: "1.25rem",
 });
 
 /* Section titles (original `.section-label`, `.section-title`) */

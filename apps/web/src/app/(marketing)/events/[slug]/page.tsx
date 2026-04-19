@@ -1,11 +1,17 @@
 import { EventDetailExtras } from "@/components/events/EventDetailExtras";
 import { EventDetailMedia } from "@/components/events/EventDetailMedia";
+import {
+  EventShareButton,
+  eventDetailMainWithFab,
+} from "@/components/events/EventShareButton";
 import { HeroSection } from "@/components/sections/HeroSection";
 import { formatEventDateTimeDe } from "@/lib/format-event-date";
 import { mapEventToHeroProps } from "@/lib/map-event-detail-hero";
 import { marketingMetadataForPath } from "@/lib/metadata/marketing-page-metadata";
+import { buildEventJsonLd } from "@/lib/seo/event-json-ld";
 import { getCachedEventBySlug } from "@/lib/services/event-detail";
 import { eventService } from "@/lib/services/events";
+import { getMarketingSiteOrigin } from "@/lib/site-origin";
 import { marketingHome } from "@/styles/global.css";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
@@ -45,9 +51,17 @@ export default async function EventDetailPage({ params }: Props) {
   }
 
   const hero = mapEventToHeroProps(event);
+  const siteOrigin = getMarketingSiteOrigin();
+  const canonicalUrl = `${siteOrigin}/events/${slug}`;
+  const jsonLd = buildEventJsonLd(event, canonicalUrl);
 
   return (
     <main className={marketingHome}>
+      <script
+        type="application/ld+json"
+        // biome-ignore lint/security/noDangerouslySetInnerHtml: JSON-LD from server-built schema object (no user HTML).
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
       <HeroSection
         eyebrow={hero.eyebrow}
         titleLine1={hero.titleLine1}
@@ -60,6 +74,7 @@ export default async function EventDetailPage({ params }: Props) {
         backgroundImageUrl={hero.backgroundImageUrl}
         priorityBackground
       />
+      <EventShareButton title={event.title} url={canonicalUrl} />
       <EventDetailExtras event={event} />
       <EventDetailMedia event={event} />
     </main>

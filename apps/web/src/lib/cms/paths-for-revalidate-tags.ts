@@ -1,4 +1,9 @@
 import { REVALIDATE_TAGS } from "./isr-config.ts";
+import {
+  EVENTS_RSS_XML_PATH,
+  MARKETING_STATIC_PATHS,
+  SITEMAP_XML_PATH,
+} from "./marketing-static-paths.ts";
 
 /** Routes to refresh when the given cache tags are invalidated (ISR + RSC). */
 export function pathsToRevalidateForTags(tags: string[]): string[] {
@@ -6,6 +11,8 @@ export function pathsToRevalidateForTags(tags: string[]): string[] {
   if (tags.includes(REVALIDATE_TAGS.events)) {
     out.add("/");
     out.add("/events");
+    out.add(SITEMAP_XML_PATH);
+    out.add(EVENTS_RSS_XML_PATH);
   }
   if (tags.includes(REVALIDATE_TAGS.homepage)) {
     out.add("/");
@@ -16,14 +23,7 @@ export function pathsToRevalidateForTags(tags: string[]): string[] {
     out.add("/gallery");
   }
   if (tags.includes(REVALIDATE_TAGS.navigation)) {
-    for (const p of [
-      "/",
-      "/events",
-      "/gallery",
-      "/faq",
-      "/legal/impressum",
-      "/legal/datenschutz",
-    ]) {
+    for (const p of MARKETING_STATIC_PATHS) {
       out.add(p);
     }
   }

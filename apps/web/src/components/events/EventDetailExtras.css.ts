@@ -48,6 +48,7 @@ export const calBar = style({
   display: "flex",
   flexWrap: "wrap",
   alignItems: "center",
+  justifyContent: "center",
   gap: "0.75rem 1rem",
   marginBottom: "2rem",
   padding: "1rem 1.25rem",
@@ -63,6 +64,7 @@ export const calBarTitle = style({
   textTransform: "uppercase",
   color: vars.color.purpleLight,
   margin: 0,
+  textAlign: "center",
   width: "100%",
   "@media": {
     "(min-width: 520px)": {

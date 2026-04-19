@@ -7,12 +7,14 @@ import {
   eventCardTitleRow,
   eventGrid,
   intro,
+  introFeedLinks,
   kicker,
   lede,
   main,
   title,
 } from "@/components/marketing/MarketingListPage.css";
 import { Container } from "@/components/ui/Container";
+import { EVENTS_RSS_XML_PATH } from "@/lib/cms/marketing-static-paths";
 import { formatEventDateTimeDe } from "@/lib/format-event-date";
 import {
   SITE_METADATA_DEFAULTS,
@@ -54,8 +56,10 @@ export default async function EventsPage() {
             Alle kommenden Events — sortiert nach Datum. Details und Anmeldung
             auf der jeweiligen Event-Seite.
           </p>
-          <p className={lede}>
+          <p className={`${lede} ${introFeedLinks}`}>
             <Link href="/events/ics">Kalender-Feed (.ics)</Link>
+            {" · "}
+            <Link href={EVENTS_RSS_XML_PATH}>RSS-Feed</Link>
           </p>
         </header>
         {events.length === 0 ? (

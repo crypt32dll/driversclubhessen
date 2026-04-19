@@ -37,6 +37,11 @@ export const lede = style({
   lineHeight: 1.5,
 });
 
+/** Centered feed links row (e.g. Kalender / RSS) under intro lede — keep first lede left-aligned. */
+export const introFeedLinks = style({
+  textAlign: "center",
+});
+
 export const eventGrid = style({
   display: "grid",
   gap: "1.25rem",

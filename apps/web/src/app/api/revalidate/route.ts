@@ -3,6 +3,10 @@ import {
   REVALIDATE_TAGS,
   REVALIDATE_TAG_PROFILE,
 } from "@/lib/cms/isr-config";
+import {
+  EVENTS_RSS_XML_PATH,
+  SITEMAP_XML_PATH,
+} from "@/lib/cms/marketing-static-paths";
 import { pathsToRevalidateForTags } from "@/lib/cms/paths-for-revalidate-tags";
 import { logger } from "@/lib/logger";
 import { revalidatePath, revalidateTag } from "next/cache";
@@ -120,7 +124,7 @@ export async function POST(request: Request) {
     );
   } else if (model === "event") {
     tags.push(REVALIDATE_TAGS.events);
-    paths.push("/", "/events");
+    paths.push("/", "/events", SITEMAP_XML_PATH, EVENTS_RSS_XML_PATH);
     if (entry?.slug) {
       paths.push(`/events/${entry.slug}`);
     }
