@@ -11,7 +11,6 @@ export const section = style({
 /* ── HERO ── */
 export const hero = style({
   position: "relative",
-  minHeight: "100vh",
   display: "flex",
   flexDirection: "column",
   alignItems: "center",

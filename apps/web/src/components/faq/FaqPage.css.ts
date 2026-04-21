@@ -2,8 +2,6 @@ import { vars } from "@/styles/tokens.css";
 import { style } from "@vanilla-extract/css";
 
 export const main = style({
-  paddingTop: "4rem",
-  paddingBottom: "5rem",
   minHeight: "60vh",
   fontFamily: vars.font.body,
 });
