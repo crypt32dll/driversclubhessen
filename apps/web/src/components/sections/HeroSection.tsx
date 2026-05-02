@@ -1,6 +1,5 @@
 import Image from "next/image";
 
-import { ButtonLink } from "@/components/ui/ButtonLink";
 import type { HeroCta } from "@driversclub/shared";
 import {
   estTag,
@@ -13,6 +12,7 @@ import {
   heroCtas,
   heroEyebrow,
   heroGrid,
+  heroPastBadgePill,
   heroSub,
   heroTitle,
   heroTitleLine1,
@@ -37,14 +37,6 @@ const DEFAULT_CTAS: readonly HeroCta[] = [
   },
 ];
 
-function isExternalHref(href: string) {
-  return (
-    href.startsWith("http://") ||
-    href.startsWith("https://") ||
-    href.startsWith("mailto:")
-  );
-}
-
 export type HeroSectionProps = {
   eyebrow?: string;
   titleLine1?: string;
@@ -53,6 +45,9 @@ export type HeroSectionProps = {
   /** ISO datetime string for the countdown target */
   countdownEndIso?: string;
   badgeText?: string;
+  heroPastFeatured?: boolean;
+  /** Gleiche Bedingung wie anstehende Events / Kalender (.ics): Kalendertag ≥ heute, nicht abgesagt. */
+  heroShowActions?: boolean;
   tagline?: string;
   ctas?: readonly HeroCta[];
   /** Optional full-bleed background (CMS media URL). */
@@ -68,6 +63,8 @@ export function HeroSection({
   dateLabel = "19 · 04 · 2026",
   countdownEndIso = DEFAULT_COUNTDOWN_END,
   badgeText = DEFAULT_BADGE,
+  heroPastFeatured = false,
+  heroShowActions = true,
   tagline = DEFAULT_TAGLINE,
   ctas,
   backgroundImageUrl,
@@ -93,7 +90,9 @@ export function HeroSection({
       <div className={heroBg} aria-hidden />
       <div className={heroGrid} aria-hidden />
       <div className={heroContent}>
-        <div className={heroBadgePill}>{badgeText}</div>
+        <div className={heroPastFeatured ? heroPastBadgePill : heroBadgePill}>
+          {badgeText}
+        </div>
         <p className={heroEyebrow}>{eyebrow}</p>
         <h1 className={heroTitle}>
           <span className={heroTitleLine1}>{titleLine1}</span>
@@ -101,26 +100,11 @@ export function HeroSection({
         </h1>
         <p className={heroSub}>{dateLabel}</p>
 
-        <HeroCountdown countdownEndIso={countdownEndIso} />
-
-        <div className={heroCtas}>
-          {resolvedCtas.map((c) => {
-            const variant = c.variant === "outline" ? "outline" : "primary";
-            const newTab = c.openInNewTab ?? isExternalHref(c.href);
-            return (
-              <ButtonLink
-                key={`${c.href}-${c.label}`}
-                href={c.href}
-                variant={variant}
-                {...(newTab
-                  ? { target: "_blank" as const, rel: "noopener noreferrer" }
-                  : {})}
-              >
-                {c.label}
-              </ButtonLink>
-            );
-          })}
-        </div>
+        <HeroCountdown
+          countdownEndIso={countdownEndIso}
+          ctas={resolvedCtas}
+          showHeroActions={heroShowActions}
+        />
         <p className={estTag}>{tagline}</p>
       </div>
     </section>

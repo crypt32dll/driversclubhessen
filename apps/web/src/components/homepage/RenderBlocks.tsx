@@ -37,6 +37,8 @@ export function RenderBlocks({ blocks, nextEvent }: RenderBlocksProps) {
                 dateLabel={merged.dateLabel}
                 countdownEndIso={merged.countdownEndIso}
                 badgeText={merged.badgeText}
+                heroPastFeatured={merged.heroPastFeatured}
+                heroShowActions={merged.heroShowActions ?? true}
                 tagline={merged.tagline}
                 ctas={merged.ctas}
                 backgroundImageUrl={merged.backgroundImageUrl}

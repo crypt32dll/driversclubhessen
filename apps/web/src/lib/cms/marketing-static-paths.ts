@@ -23,4 +23,5 @@ export function marketingPathSitemapPriority(path: string): number {
 }
 
 export const SITEMAP_XML_PATH = "/sitemap.xml";
-export const EVENTS_RSS_XML_PATH = "/events/rss.xml";
+/** Aggregierte ICS-Datei nur mit anstehenden Events (`/events/ics`). */
+export const EVENTS_ICS_FEED_PATH = "/events/ics";

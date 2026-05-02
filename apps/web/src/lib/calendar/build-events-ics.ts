@@ -1,3 +1,7 @@
+import {
+  EVENT_TIMED_DEFAULT_DURATION_MS,
+  addDaysYmd,
+} from "@/lib/calendar/event-schedule-bounds";
 import { isPayloadDateOnlyEventInstant } from "@/lib/format-event-date";
 import { getMarketingSiteOrigin } from "@/lib/site-origin";
 import type { Event } from "@driversclub/shared";
@@ -10,16 +14,6 @@ import { escapeIcsText, foldIcsContentLine } from "./ics-text.ts";
 
 const PRODID = "-//DriversClub Hessen//DE";
 const CALNAME = "DriversClub Hessen — Events";
-
-function addDaysYmd(dateYmd: string): string {
-  const [y, m, d] = dateYmd.split("-").map(Number);
-  const dt = new Date(Date.UTC(y, m - 1, d));
-  dt.setUTCDate(dt.getUTCDate() + 1);
-  const yy = dt.getUTCFullYear();
-  const mm = String(dt.getUTCMonth() + 1).padStart(2, "0");
-  const dd = String(dt.getUTCDate()).padStart(2, "0");
-  return `${yy}-${mm}-${dd}`;
-}
 
 function eventUid(slug: string, host: string): string {
   const safeHost = host.replace(/^https?:\/\//i, "").split("/")[0];
@@ -52,7 +46,7 @@ function buildVevent(event: Event, siteOrigin: string): string {
     lines.push(`DTEND;VALUE=DATE:${endExclusive.replace(/-/g, "")}`);
   } else {
     const start = new Date(iso);
-    const end = new Date(start.getTime() + 2 * 60 * 60 * 1000);
+    const end = new Date(start.getTime() + EVENT_TIMED_DEFAULT_DURATION_MS);
     const fmt = (d: Date) =>
       `${d.toISOString().replace(/[-:]/g, "").split(".")[0]}Z`;
     lines.push(`DTSTART:${fmt(start)}`);

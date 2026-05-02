@@ -1,5 +1,6 @@
 import { Container } from "@/components/ui/Container";
 import { buildGoogleCalendarTemplateUrl } from "@/lib/calendar/google-calendar-url";
+import { isMarketingEventEligibleForIcs } from "@/lib/services/events";
 import { getMarketingSiteOrigin } from "@/lib/site-origin";
 import type { Event } from "@driversclub/shared";
 import Link from "next/link";
@@ -34,7 +35,7 @@ export function EventDetailExtras({ event }: Props) {
 
   const hasFaq = (event.faq?.length ?? 0) > 0;
   const hasBring = (event.bringList?.length ?? 0) > 0;
-  const hasCal = event.status !== "cancelled";
+  const hasCal = isMarketingEventEligibleForIcs(event);
 
   if (!hasFaq && !hasBring && !hasCal) {
     return null;

@@ -87,7 +87,7 @@ const nextConfig = {
   turbopack: {
     root: path.join(process.cwd(), "../.."),
   },
-  webpack: (webpackConfig) => {
+  webpack: (webpackConfig, { dev }) => {
     webpackConfig.resolve = webpackConfig.resolve ?? {};
     /**
      * Do not map `.js` → `.ts` globally: it breaks precompiled packages (e.g. `@payloadcms/ui`
@@ -97,6 +97,13 @@ const nextConfig = {
     webpackConfig.resolve.extensionAlias = {
       ".cjs": [".cts", ".cjs"],
     };
+    /**
+     * Disable persistent pack cache in dev — avoids `ENOENT … *.pack.gz` / 500s when
+     * `.next` was removed or incomplete while `next dev` was still running.
+     */
+    if (dev) {
+      webpackConfig.cache = false;
+    }
     return webpackConfig;
   },
   images: {

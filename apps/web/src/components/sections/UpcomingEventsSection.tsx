@@ -2,6 +2,7 @@ import { Container } from "@/components/ui/Container";
 import { Reveal } from "@/components/ui/Reveal";
 import { formatFeaturedEventTeaser } from "@/lib/format-featured-event-teaser";
 import { buildEventInfoCardsFromEvent } from "@/lib/homepage/event-info-cards-from-event";
+import { isMarketingEventPast } from "@/lib/services/events";
 import type { Event, EventInfoCard } from "@driversclub/shared";
 import Link from "next/link";
 import {
@@ -12,7 +13,9 @@ import {
   eventCardValue,
   eventGrid,
   eventSection,
-  sectionLabel,
+  sectionLabelInline,
+  sectionLabelRow,
+  sectionPastBadge,
   sectionTitle,
   sectionTitleAccent,
 } from "./sections.css";
@@ -73,11 +76,18 @@ export function UpcomingEventsSection({
       ? eventInfoCards
       : STATIC_EVENT_CARDS;
 
+  const pastLead = leadEvent != null ? isMarketingEventPast(leadEvent) : false;
+
   return (
     <section className={eventSection} id="aktuell">
       <Container>
         <Reveal>
-          <p className={sectionLabel}>{sectionLabelText}</p>
+          <div className={sectionLabelRow}>
+            <p className={sectionLabelInline}>{sectionLabelText}</p>
+            {pastLead ? (
+              <span className={sectionPastBadge}>Vergangenes Event</span>
+            ) : null}
+          </div>
           <h2 className={sectionTitle}>
             {`${titleLead} `}
             <span className={sectionTitleAccent}>{titleAccent}</span>

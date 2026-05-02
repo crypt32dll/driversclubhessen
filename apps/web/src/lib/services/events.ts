@@ -22,6 +22,13 @@ function isEventOnOrAfterToday(dateIso: string): boolean {
   return day >= todayIsoDate();
 }
 
+/** Strictly before today’s calendar day (`YYYY-MM-DD` from `event.date`). */
+function isEventBeforeToday(dateIso: string): boolean {
+  const day = dateIso.slice(0, 10);
+  if (day.length !== 10) return false;
+  return day < todayIsoDate();
+}
+
 function sortEventsByDateAsc(events: Event[]): Event[] {
   return [...events].sort((a, b) => {
     const da = a.date.slice(0, 10);
@@ -31,11 +38,46 @@ function sortEventsByDateAsc(events: Event[]): Event[] {
   });
 }
 
+function sortEventsByDateDesc(events: Event[]): Event[] {
+  return [...events].sort((a, b) => {
+    const da = a.date.slice(0, 10);
+    const db = b.date.slice(0, 10);
+    if (da !== db) return db.localeCompare(da);
+    return a.slug.localeCompare(b.slug);
+  });
+}
+
+/** Kalenderexport / .ics-Link: gleiche Regel wie «aktive» Liste — nur nicht abgesagt und Datum ≥ heute. */
+export function isMarketingEventEligibleForIcs(
+  event: Pick<Event, "date" | "status">,
+): boolean {
+  if (event.status === "cancelled") return false;
+  return isEventOnOrAfterToday(event.date);
+}
+
+/** Kalendertag vor heute — für Homepage-Vergangenheits-Badges (Abgesagte ausblenden). */
+export function isMarketingEventPast(
+  event: Pick<Event, "date" | "status">,
+): boolean {
+  if (event.status === "cancelled") return false;
+  return isEventBeforeToday(event.date);
+}
+
 function filterUpcomingSorted(events: Event[]): Event[] {
   return sortEventsByDateAsc(
     events.filter((e) => {
       if (e.status === "cancelled") return false;
       return isEventOnOrAfterToday(e.date);
+    }),
+  );
+}
+
+/** Past events — newest date first — cancelled rows omitted (consistent with listing). */
+function filterPastSortedDesc(events: Event[]): Event[] {
+  return sortEventsByDateDesc(
+    events.filter((e) => {
+      if (e.status === "cancelled") return false;
+      return isEventBeforeToday(e.date);
     }),
   );
 }
@@ -89,13 +131,27 @@ function fetchEventBySlugCached(slug: string) {
   );
 }
 
-async function loadUpcomingEvents(): Promise<Event[]> {
+async function loadAllMarketingEvents(): Promise<Event[]> {
   if (await isCmsPreviewRequest()) {
-    const all = await fetchEventsListFromPayload();
-    return filterUpcomingSorted(all);
+    return fetchEventsListFromPayload();
   }
-  const all = await fetchEventsFromCms();
+  return fetchEventsFromCms();
+}
+
+async function loadUpcomingEvents(): Promise<Event[]> {
+  const all = await loadAllMarketingEvents();
   return filterUpcomingSorted(all);
+}
+
+async function loadEventListingPartitions(): Promise<{
+  active: Event[];
+  past: Event[];
+}> {
+  const all = await loadAllMarketingEvents();
+  return {
+    active: filterUpcomingSorted(all),
+    past: filterPastSortedDesc(all),
+  };
 }
 
 export const eventService = {
@@ -113,6 +169,27 @@ export const eventService = {
           : { err: String(err) },
       );
       return [];
+    }
+  },
+
+  /**
+   * Events page: aktive/anstehende (Kalendertag heute oder später) vs. Vergangenes (Kalendertag vor heute).
+   * Abgesagte Einträge erscheinen in keiner Liste.
+   */
+  async getEventListingPartitions(): Promise<{
+    active: Event[];
+    past: Event[];
+  }> {
+    try {
+      return await loadEventListingPartitions();
+    } catch (err) {
+      logger.warn(
+        "Payload events unavailable for listing partitions.",
+        err instanceof Error
+          ? { name: err.name, message: err.message }
+          : { err: String(err) },
+      );
+      return { active: [], past: [] };
     }
   },
 

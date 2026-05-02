@@ -69,6 +69,7 @@ export default async function EventDetailPage({ params }: Props) {
         dateLabel={hero.dateLabel}
         countdownEndIso={hero.countdownEndIso}
         badgeText={hero.badgeText}
+        heroShowActions={hero.heroShowActions}
         tagline={hero.tagline}
         ctas={hero.ctas}
         backgroundImageUrl={hero.backgroundImageUrl}

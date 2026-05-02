@@ -37,9 +37,17 @@ export const lede = style({
   lineHeight: 1.5,
 });
 
-/** Centered feed links row (e.g. Kalender / RSS) under intro lede — keep first lede left-aligned. */
-export const introFeedLinks = style({
-  textAlign: "center",
+/** Separate block (“Vergangene Events”) unter anstehenden Treffen — einheitlicher Abstand. */
+export const listingBlock = style({
+  marginTop: "2.75rem",
+});
+
+export const subsectionTitle = style({
+  fontFamily: vars.font.heading,
+  fontSize: "clamp(1.35rem, 3vw, 2rem)",
+  letterSpacing: "0.04em",
+  color: vars.color.white,
+  margin: "0 0 1.25rem",
 });
 
 export const eventGrid = style({
@@ -56,15 +64,60 @@ export const eventGrid = style({
   },
 });
 
-export const eventCard = style({
-  display: "block",
-  padding: "1.25rem 1.5rem",
+const cardShellBase = {
   borderRadius: "8px",
   border: "1px solid rgba(0, 229, 255, 0.2)",
   background: `linear-gradient(145deg, ${vars.color.card} 0%, rgba(12,12,20,0.95) 100%)`,
+  transition: "border-color 0.2s, box-shadow 0.2s",
+} as const;
+
+/** List card umrahmt Body-Link + optional .ics-Zeile. */
+export const eventCardShell = style({
+  display: "flex",
+  flexDirection: "column",
+  ...cardShellBase,
+  selectors: {
+    "&:hover, &:focus-within": {
+      borderColor: vars.color.cyanDark,
+      boxShadow: vars.shadow.glowCyan,
+    },
+  },
+});
+
+export const eventCardBody = style({
+  display: "block",
+  padding: "1.25rem 1.5rem 1rem",
   textDecoration: "none",
   color: "inherit",
-  transition: "border-color 0.2s, box-shadow 0.2s",
+});
+
+export const eventCardIcs = style({
+  display: "block",
+  marginTop: "auto",
+  padding: "0.65rem 1.5rem 1rem",
+  borderTop: "1px solid rgba(0, 229, 255, 0.15)",
+  fontFamily: vars.font.accent,
+  fontSize: "0.68rem",
+  letterSpacing: "0.14em",
+  textTransform: "uppercase",
+  color: vars.color.cyan,
+  textDecoration: "none",
+  transition: "color 0.15s ease, background 0.15s ease",
+  selectors: {
+    "&:hover": {
+      color: vars.color.white,
+      background: "rgba(0,229,255,0.06)",
+    },
+  },
+});
+
+/**Einzelkarte ohne .ics (Vergangenheit) — ganze Fläche wie früher `eventCard`. */
+export const eventCard = style({
+  display: "block",
+  padding: "1.25rem 1.5rem",
+  ...cardShellBase,
+  textDecoration: "none",
+  color: "inherit",
   selectors: {
     "&:hover": {
       borderColor: vars.color.cyanDark,

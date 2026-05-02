@@ -1,4 +1,5 @@
 import { formatEventDateLabelDe } from "@/lib/format-event-date";
+import { isMarketingEventEligibleForIcs } from "@/lib/services/events";
 import type { Event, HeroCta } from "@driversclub/shared";
 
 const DEFAULT_CTAS: readonly HeroCta[] = [
@@ -79,6 +80,7 @@ export function mapEventToHeroProps(event: Event) {
     dateLabel: formatEventDateLabelDe(event.date),
     countdownEndIso: event.date,
     badgeText: event.heroBadge ?? statusBadge ?? "Event",
+    heroShowActions: isMarketingEventEligibleForIcs(event),
     tagline: event.heroTagline ?? event.location,
     ctas: ctasForEventDetail(event),
     backgroundImageUrl,

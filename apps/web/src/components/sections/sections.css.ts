@@ -92,6 +92,17 @@ export const badge = style({
   },
 });
 
+/** Vergangen-heits-Stemma auf der Homepage wenn Lead-Event-Datum zurückliegt */
+export const heroPastBadgePill = style([
+  badge,
+  {
+    color: "rgba(235, 200, 180, 0.95)",
+    borderColor: "rgba(200, 120, 90, 0.45)",
+    textShadow: "none",
+    background: "rgba(45, 24, 18, 0.45)",
+  },
+]);
+
 export const heroEyebrow = style({
   fontFamily: vars.font.body,
   fontSize: "clamp(1rem, 2vw, 1.3rem)",
@@ -227,6 +238,11 @@ export const heroCtas = style({
   },
 });
 
+/** Gleicher vertikaler Abstand wie unter der Countdown-Zeile, wenn nur noch CTAs gerendert werden. */
+export const heroCtasAfterDateGap = style({
+  marginTop: "2.5rem",
+});
+
 export const estTag = style({
   fontFamily: vars.font.accent,
   fontSize: "0.55rem",
@@ -244,6 +260,30 @@ export const sectionLabel = style({
   color: vars.color.purpleLight,
   textTransform: "uppercase",
   marginBottom: "0.5rem",
+});
+
+/** Zeile ohne Abstand wenn ein Past-Badge seitlich sitzt (`marginBottom` folgt erst am Row-Wrapper). */
+export const sectionLabelInline = style([sectionLabel, { marginBottom: 0 }]);
+
+export const sectionLabelRow = style({
+  display: "flex",
+  flexWrap: "wrap",
+  alignItems: "center",
+  gap: "0.75rem",
+  marginBottom: "0.5rem",
+});
+
+export const sectionPastBadge = style({
+  flexShrink: 0,
+  fontFamily: vars.font.accent,
+  fontSize: "0.58rem",
+  letterSpacing: "0.2em",
+  textTransform: "uppercase",
+  padding: "0.25rem 0.65rem",
+  borderRadius: "3px",
+  border: "1px solid rgba(200, 120, 90, 0.4)",
+  color: "rgba(235, 200, 180, 0.95)",
+  background: "rgba(45, 24, 18, 0.35)",
 });
 
 export const sectionTitle = style({

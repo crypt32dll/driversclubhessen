@@ -1,6 +1,6 @@
 import { REVALIDATE_TAGS } from "./isr-config.ts";
 import {
-  EVENTS_RSS_XML_PATH,
+  EVENTS_ICS_FEED_PATH,
   MARKETING_STATIC_PATHS,
   SITEMAP_XML_PATH,
 } from "./marketing-static-paths.ts";
@@ -12,7 +12,7 @@ export function pathsToRevalidateForTags(tags: string[]): string[] {
     out.add("/");
     out.add("/events");
     out.add(SITEMAP_XML_PATH);
-    out.add(EVENTS_RSS_XML_PATH);
+    out.add(EVENTS_ICS_FEED_PATH);
   }
   if (tags.includes(REVALIDATE_TAGS.homepage)) {
     out.add("/");

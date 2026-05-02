@@ -1,5 +1,6 @@
 import { buildEventsIcsDocument } from "@/lib/calendar/build-events-ics";
 import { getCachedEventBySlug } from "@/lib/services/event-detail";
+import { isMarketingEventEligibleForIcs } from "@/lib/services/events";
 import { NextResponse } from "next/server";
 
 /** ISR — literal required by Next.js 16 segment config; see marketing `page.tsx` comment. */
@@ -12,7 +13,7 @@ type Props = {
 export async function GET(_request: Request, { params }: Props) {
   const { slug } = await params;
   const event = await getCachedEventBySlug(slug).catch(() => null);
-  if (!event || event.status === "cancelled") {
+  if (!event || !isMarketingEventEligibleForIcs(event)) {
     return new NextResponse("Not found", { status: 404 });
   }
   const body = buildEventsIcsDocument([event]);

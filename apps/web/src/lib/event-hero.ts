@@ -5,6 +5,10 @@ import type {
 } from "@driversclub/shared";
 
 import { formatEventDateLabelDe } from "@/lib/format-event-date";
+import {
+  isMarketingEventEligibleForIcs,
+  isMarketingEventPast,
+} from "@/lib/services/events";
 
 function isGalleryCta(href: string): boolean {
   const path = href.trim().split("?")[0]?.split("#")[0] ?? "";
@@ -48,6 +52,7 @@ function staticHeroFallback(): MergedHeroProps {
     dateLabel: HERO_FALLBACK_COPY.dateLabel,
     countdownEndIso: DEFAULT_COUNTDOWN_FALLBACK,
     badgeText: HERO_FALLBACK_COPY.badge,
+    heroShowActions: true,
     tagline: HERO_FALLBACK_COPY.tagline,
     ctas: undefined,
     backgroundImageUrl: undefined,
@@ -61,6 +66,10 @@ export type MergedHeroProps = {
   dateLabel: string;
   countdownEndIso: string;
   badgeText?: string;
+  /** Visuelles Vergangen-Pill wenn das ausgewählte Event vor heute liegt */
+  heroPastFeatured?: boolean;
+  /** Primäre Hero-Buttons — konsistent mit /events («aktive» Kalendertage) und ICS. */
+  heroShowActions?: boolean;
   tagline?: string;
   ctas?: readonly HeroCta[];
   backgroundImageUrl?: string;
@@ -104,13 +113,19 @@ export function mergeHomepageHero(
   const backgroundImageUrl =
     source.heroBackgroundImage?.url ?? source.images?.[0]?.url;
 
+  const pastFeatured = isMarketingEventPast(source);
+
   return {
     eyebrow: source.heroEyebrow?.trim() || HERO_FALLBACK_COPY.eyebrow,
     titleLine1,
     titleLine2,
     dateLabel,
     countdownEndIso,
-    badgeText: source.heroBadge?.trim() || HERO_FALLBACK_COPY.badge,
+    badgeText: pastFeatured
+      ? "VERGANGENES EVENT"
+      : source.heroBadge?.trim() || HERO_FALLBACK_COPY.badge,
+    heroPastFeatured: pastFeatured,
+    heroShowActions: isMarketingEventEligibleForIcs(source),
     tagline: source.heroTagline?.trim() || HERO_FALLBACK_COPY.tagline,
     ctas: ctasForFeaturedEvent(source),
     backgroundImageUrl,
