@@ -6,16 +6,17 @@ import type {
 
 import {
   REVALIDATE_TAGS,
-  REVALIDATE_TAG_PROFILE,
+  REVALIDATE_TAG_IMMEDIATE_EXPIRE,
 } from "../../lib/cms/isr-config.ts";
 import {
   pathsToRevalidateForTags,
   pathsWhenEventsCollectionChanged,
 } from "../../lib/cms/paths-for-revalidate-tags.ts";
 
-async function tag(profile: typeof REVALIDATE_TAG_PROFILE, tagName: string) {
+/** Payload afterChange/delete — flush tagged `unstable_cache` so publishes are visible immediately. */
+async function purgeTagAfterCmsMutation(tagName: string) {
   const { revalidateTag } = await import("next/cache");
-  revalidateTag(tagName, profile);
+  revalidateTag(tagName, REVALIDATE_TAG_IMMEDIATE_EXPIRE);
 }
 
 async function revalidatePathsQuiet(paths: readonly string[]) {
@@ -38,12 +39,12 @@ function eventDocSlug(doc: unknown): string | undefined {
 }
 
 async function tagAndPaths(tagName: string) {
-  await tag(REVALIDATE_TAG_PROFILE, tagName);
+  await purgeTagAfterCmsMutation(tagName);
   await revalidatePathsQuiet(pathsToRevalidateForTags([tagName]));
 }
 
 export const revalidateEvents: CollectionAfterChangeHook = async ({ doc }) => {
-  await tag(REVALIDATE_TAG_PROFILE, REVALIDATE_TAGS.events);
+  await purgeTagAfterCmsMutation(REVALIDATE_TAGS.events);
   await revalidatePathsQuiet(
     pathsWhenEventsCollectionChanged(eventDocSlug(doc)),
   );
@@ -52,7 +53,7 @@ export const revalidateEvents: CollectionAfterChangeHook = async ({ doc }) => {
 export const revalidateEventsDelete: CollectionAfterDeleteHook = async ({
   doc,
 }) => {
-  await tag(REVALIDATE_TAG_PROFILE, REVALIDATE_TAGS.events);
+  await purgeTagAfterCmsMutation(REVALIDATE_TAGS.events);
   await revalidatePathsQuiet(
     pathsWhenEventsCollectionChanged(eventDocSlug(doc)),
   );

@@ -1,6 +1,8 @@
 /**
- * Next.js Data Cache tags for Payload-backed reads. Use with `revalidateTag()` from
- * `/api/revalidate` (webhooks / Payload hooks) for on-demand ISR; time-based `revalidate` remains a fallback.
+ * Next.js Data Cache tags for Payload-backed reads. On-demand: `POST /api/revalidate`
+ * uses `revalidateTag(tag, 'max')`; Payload `afterChange` hooks use `{ expire: 0 }`
+ * so author saves are never stuck behind stale-while-revalidate. Time-based
+ * `unstable_cache` `revalidate` remains the fallback TTL.
  */
 export const REVALIDATE_TAGS = {
   homepage: "cms:homepage",
@@ -30,8 +32,12 @@ export const CMS_ISR_SECONDS = parseCmsIsrRevalidateSeconds();
 /** @deprecated Use CMS_ISR_SECONDS */
 export const STRAPI_ISR_SECONDS = CMS_ISR_SECONDS;
 
+/** Next.js 16 recommended profile for Route Handler / webhook revalidation (SWR background refresh). */
+export const REVALIDATE_TAG_PROFILE_MAX = "max" as const;
+
 /**
- * Next.js 16+ `revalidateTag(tag, profile)` requires a cache profile.
- * Matches `cacheLife.cms` in `next.config.ts`.
+ * Immediate tag expiry — use when an author mutation just wrote to the DB (Payload
+ * hooks). `max` keeps serving stale briefly; editors expect the next paint to reflect
+ * the save.
  */
-export const REVALIDATE_TAG_PROFILE = "cms" as const;
+export const REVALIDATE_TAG_IMMEDIATE_EXPIRE = { expire: 0 } as const;

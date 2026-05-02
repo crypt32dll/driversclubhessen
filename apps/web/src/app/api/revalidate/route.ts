@@ -1,7 +1,7 @@
 import {
   CMS_ISR_SECONDS,
   REVALIDATE_TAGS,
-  REVALIDATE_TAG_PROFILE,
+  REVALIDATE_TAG_PROFILE_MAX,
 } from "@/lib/cms/isr-config";
 import {
   EVENTS_ICS_FEED_PATH,
@@ -26,6 +26,7 @@ function getBearer(request: Request): string | undefined {
 
 /**
  * On-demand revalidation for Payload → Vercel.
+ * Uses `revalidateTag(_, 'max')` here — author saves go through Payload hooks with immediate expire.
  *
  * **Auth:** `Authorization: Bearer <REVALIDATE_SECRET>` (recommended), or `{ "secret": "..." }` in JSON.
  *
@@ -65,7 +66,7 @@ export async function POST(request: Request) {
   if (Array.isArray(tagsInput) && tagsInput.length > 0) {
     const tags = tagsInput.filter((t): t is string => typeof t === "string");
     for (const tag of tags) {
-      revalidateTag(tag, REVALIDATE_TAG_PROFILE);
+      revalidateTag(tag, REVALIDATE_TAG_PROFILE_MAX);
     }
     /** Tag-only requests used to skip paths — ISR pages then kept stale HTML until time-based revalidate. */
     const pathsForTags = pathsToRevalidateForTags(tags);
@@ -152,7 +153,7 @@ export async function POST(request: Request) {
 
   const uniquePaths = [...new Set(paths)];
   for (const tag of tags) {
-    revalidateTag(tag, REVALIDATE_TAG_PROFILE);
+    revalidateTag(tag, REVALIDATE_TAG_PROFILE_MAX);
   }
   for (const path of uniquePaths) {
     revalidatePath(path);
